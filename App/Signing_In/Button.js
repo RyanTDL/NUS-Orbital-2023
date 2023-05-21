@@ -1,5 +1,5 @@
-import React, {Component} from "react";
-import { View, Button, StyleSheet, TouchableOpacity, Text } from "react-native";
+import React from "react";
+import {TouchableOpacity, Text } from "react-native";
 
 
 export default function AppButton({ onPress, title, buttonStyle, textStyle }){
