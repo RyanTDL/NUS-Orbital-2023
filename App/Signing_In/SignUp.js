@@ -12,6 +12,7 @@ export default function SignUp({navigation}) {
     const [confirmPassWord, setConfirmPassWord]= useState('')
 
 
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={[styles.child_container, {flex:1}]}>
@@ -51,7 +52,7 @@ export default function SignUp({navigation}) {
                     onPress={()=> {
                         return (
                             console.log('Button pressed'),
-                            navigation.navigate('Home Screen')
+                            navigation.replace('Home Screen')
                         );
                     }}
                     buttonStyle={styles.appButtonContainer}
@@ -62,7 +63,7 @@ export default function SignUp({navigation}) {
                     onPress={()=> {
                         return (
                             console.log('Button pressed'),
-                            navigation.navigate('Welcome Page')
+                            navigation.replace('Welcome Page')
                         );
                     }}
                     buttonStyle={styles.appButtonContainer}

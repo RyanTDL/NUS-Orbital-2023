@@ -20,7 +20,7 @@ export default function Welcome({navigation}) {
                         onPress={()=> {
                             return (
                                 console.log('Button pressed'),
-                                navigation.navigate('Log In Page')
+                                navigation.replace('Log In Page')
                             );
                         }}
                         buttonStyle={styles.appButtonContainer}
@@ -31,7 +31,7 @@ export default function Welcome({navigation}) {
                         onPress={()=> {
                             return (
                                 console.log('Button pressed'),
-                                navigation.navigate('Sign Up Page')
+                                navigation.replace('Sign Up Page')
                             );
                         }}
                         buttonStyle={styles.appButtonContainer}

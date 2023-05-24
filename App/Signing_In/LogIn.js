@@ -45,7 +45,7 @@ export default function LogIn({navigation}) {
                         onPress={()=> {
                             return (
                                 console.log('Button pressed'),
-                                navigation.navigate('Home Screen')
+                                navigation.replace('Home Screen')
                             );
                         }}
                         buttonStyle={styles.appButtonContainer}
