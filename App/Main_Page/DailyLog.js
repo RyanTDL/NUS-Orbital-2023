@@ -1,30 +1,36 @@
-import React, {useState, useEffect, useCallback} from "react";
+import React, {useState, useEffect, useCallback, StrictMode} from "react";
 import {Dimensions, StyleSheet, Text, TextInput, View, SafeAreaView} from 'react-native';
-import {useForm} from "react-hook-form";
 import NavTab from "./NavTab";
 import AppButton from "../Signing_In/Button";
+import {db} from "../../firebase";
+import {collection, addDoc} from "firebase/firestore";
+
+
 
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
 
+const addToDatabase = async(exercise, steps, sleep, study) => {
+    try {
+        const docRef = await addDoc(collection(db, "Player"), {
+            Strength: parseInt(exercise,10), //parseInt converts string to int, also deals with values like "12s2"(converted to 122) and "nasw" (converted to NaN)
+            Agility: parseInt(steps,10),
+            Stamina: parseInt(sleep,10),
+            Intellect: parseInt(study,10),
+        });
+    } 
+    catch (e) {
+        console.error("Error adding document: ", e);
+    }
+}
+
+
 export default function DailyLog({navigation}) {
 
-    // const [exerciseHours, setExerciseHours]= useState({hours:0, data_logged: false})
-    // const [stepsTaken, setStepsTaken]= useState({steps:0, data_logged: false})
-    // const [sleepHours, setSleepHours]= useState({hours:0, data_logged: false})
-    // const [studyHours, setStudyHours]= useState({hours:0, data_logged: false})
-
-    const {register, handleSubmit, setValue}= useForm();
-    const onSubmit= useCallback(formData => {console.log(formData)}, []);
-    const onChangeField= useCallback(name => text =>{setValue(name,text)}, []);
-
-    useEffect(()=>{
-        register('exerciseHours');
-        register('stepsTaken');
-        register('sleepHours');
-        register('studyHours');
-    }, [register]);
-
-
+    const [exerciseHours, setExerciseHours]= useState("")
+    const [stepsTaken, setStepsTaken]= useState("")
+    const [sleepHours, setSleepHours]= useState("")
+    const [studyHours, setStudyHours]= useState("")
+    
     return (
         <SafeAreaView style={styles.container}>
             <View style={[styles.child_container, {flex:1}]}>
@@ -38,7 +44,8 @@ export default function DailyLog({navigation}) {
                         <TextInput 
                             style={styles.entries}
                             placeholder='Total Hours'
-                            onChangeText={onChangeField('exerciseHours')}
+                            value={exerciseHours}
+                            onChangeText={hours => setExerciseHours(hours)}
                         />
                     </View>
                     
@@ -47,7 +54,8 @@ export default function DailyLog({navigation}) {
                         <TextInput 
                             style={styles.entries}
                             placeholder='Total Steps'
-                            onChangeText={onChangeField('stepsTaken')}
+                            value={stepsTaken}
+                            onChangeText={steps => setStepsTaken(steps)}
                         />
                     </View>
                     
@@ -56,7 +64,8 @@ export default function DailyLog({navigation}) {
                         <TextInput 
                             style={styles.entries}
                             placeholder='Total Hours'
-                            onChangeText={onChangeField('sleepHours')}
+                            value={sleepHours}
+                            onChangeText={hours => setSleepHours(hours)}
                         />
                     </View>    
 
@@ -65,13 +74,21 @@ export default function DailyLog({navigation}) {
                         <TextInput 
                             style={styles.entries}
                             placeholder='Total Hours'
-                            onChangeText={onChangeField('studyHours')}
+                            value={studyHours}
+                            onChangeText={hours => setStudyHours(hours)}
                         />
                     </View>
                     
                     <AppButton 
                         title="Update Daily Log" 
-                        onPress={handleSubmit(onSubmit)}
+                        onPress={()=>{
+                            addToDatabase(exerciseHours, stepsTaken, sleepHours, studyHours)
+                            setExerciseHours("") //clears the values in the text input
+                            setStepsTaken("")
+                            setSleepHours("")
+                            setStudyHours("")
+
+                        }}
                         buttonStyle={styles.appButtonContainer}
                         textStyle= {styles.appButtonText}
                     />

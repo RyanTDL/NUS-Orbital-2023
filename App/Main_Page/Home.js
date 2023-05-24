@@ -1,10 +1,11 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Animated, Dimensions, StyleSheet, Text, View, SafeAreaView} from 'react-native';
 import NavTab from "./NavTab";
+import {db} from "../../firebase";
+import {collection, getDocs} from "firebase/firestore";
 
 
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
-
 
 
 function ProgressBar({stat_name, stat_value, bar_color}) {
@@ -24,8 +25,45 @@ function ProgressBar({stat_name, stat_value, bar_color}) {
 }
 
 
-
 export default function HomeScreen({navigation}) {
+
+
+    const [char_strength, setCharStrength]= useState('')
+    const [char_agility, setCharAgility]= useState('')
+    const [char_stamina, setCharStamina]= useState('')
+    const [char_intellect, setCharIntellect]= useState('') 
+
+    const getFromDatabase = async() => {
+    
+        let strength_stat= 0
+        let agility_stat= 0
+        let stamina_stat= 0
+        let intellect_stat= 0
+    
+        const querySnapshot= await getDocs(collection(db, "Player"))
+        querySnapshot.forEach((doc)=>{
+            strength_stat += doc.data()['Strength']
+            agility_stat += doc.data()['Agility']
+            stamina_stat += doc.data()['Stamina']
+            intellect_stat += doc.data()['Intellect']
+        })
+    
+        //Converting hours/steps into the respective stat points
+        added_strength_points = strength_stat
+        added_agility_points = Math.trunc(agility_stat/10000)
+        added_stamina_points = Math.trunc(stamina_stat/7)
+        added_intellect_points =Math.trunc(intellect_stat/3)
+    
+        setCharStrength(added_strength_points);
+        setCharAgility(added_agility_points);
+        setCharStamina(added_stamina_points);
+        setCharIntellect(added_intellect_points);
+    }
+
+    useEffect(()=>{
+        getFromDatabase();
+    }, [])
+
     return (
         <SafeAreaView style={styles.container}>
 
@@ -42,10 +80,10 @@ export default function HomeScreen({navigation}) {
 
             <View style={[styles.child_container, {flex:4}]}>
                 <View style={styles.stats_grid}>
-                    <ProgressBar stat_name='Strength' stat_value='70' bar_color='red'/>
-                    <ProgressBar stat_name='Agility' stat_value='48' bar_color='blue'/>
-                    <ProgressBar stat_name='Stamina' stat_value='92' bar_color='green'/>
-                    <ProgressBar stat_name='Intellect' stat_value='81' bar_color='purple'/>
+                    <ProgressBar stat_name='Strength' stat_value={char_strength} bar_color='red'/>
+                    <ProgressBar stat_name='Agility' stat_value={char_agility} bar_color='blue'/>
+                    <ProgressBar stat_name='Stamina' stat_value={char_stamina} bar_color='green'/>
+                    <ProgressBar stat_name='Intellect' stat_value={char_intellect} bar_color='purple'/>
                 </View>
             </View>
             
