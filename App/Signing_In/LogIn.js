@@ -1,14 +1,29 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {TextInput, Dimensions, StyleSheet, Text, View, SafeAreaView} from 'react-native';
-import AppButton from './Button' 
-
+import AppButton from './Button'; 
+import {auth, logInWithEmailAndPassword} from "../../firebase";
+import {useAuthState} from "react-firebase-hooks/auth";
+// import { signInWithEmailAndPassword } from "firebase/auth";
 
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
 
 export default function LogIn({navigation}) {
 
-    const [userName, setUserName]= useState('')
-    const [passWord, setPassWord]= useState('')
+    const [email, setEmail]= useState('')
+    const [password, setPassword]= useState('')
+    const [user, loading, error]= useAuthState(auth)
+
+    //useEffect tracks authentication state of user, and automatically redirects to Home Screen once user is authenticated
+    useEffect( () => {
+        if (loading){
+            //maybe including a loading screen pop up
+            console.log("Loading")
+            return;
+        }
+        if (user){
+            navigation.replace('Home Screen')
+        }
+    }, [user, loading])
 
 
     return (
@@ -20,20 +35,20 @@ export default function LogIn({navigation}) {
 
             <View style={[styles.child_container, {flex:1}]}>
                 <View style={styles.inputs}>
-                    <Text style={styles.input_details}>Username</Text>
+                    <Text style={styles.input_details}>Email</Text>
                     <TextInput 
                         style={styles.input_box}
-                        placeholder="Username"
-                        onChangeText={newUsername => setUserName(newUsername)}
-                        defaultValue= {userName}
+                        placeholder="Email"
+                        onChangeText={newEmail => setEmail(newEmail)}
+                        defaultValue= {email}
                     />
                     <Text style={styles.input_details}>Password</Text>
                     <TextInput 
                         style={styles.input_box}
                         secureTextEntry={true}
                         placeholder="Password"
-                        onChangeText={newPassword => setPassWord(newPassword)}
-                        defaultValue= {passWord}
+                        onChangeText={newPassword => setPassword(newPassword)}
+                        defaultValue= {password}
                     />
                 </View>
             </View>
@@ -43,10 +58,7 @@ export default function LogIn({navigation}) {
                     <AppButton 
                         title="Sign into Account"
                         onPress={()=> {
-                            return (
-                                console.log('Button pressed'),
-                                navigation.replace('Home Screen')
-                            );
+                            logInWithEmailAndPassword(email, password)
                         }}
                         buttonStyle={styles.appButtonContainer}
                         textStyle= {styles.appButtonText}
