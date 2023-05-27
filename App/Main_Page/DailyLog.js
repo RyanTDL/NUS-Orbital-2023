@@ -3,25 +3,12 @@ import {Dimensions, StyleSheet, Text, TextInput, View, SafeAreaView} from 'react
 import NavTab from "./NavTab";
 import AppButton from "../Signing_In/Button";
 import {db} from "../../firebase";
-import {collection, addDoc} from "firebase/firestore";
-
+import {collection, addDoc, setDoc, doc} from "firebase/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
+import {auth} from "../../firebase";
 
 
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
-
-const addToDatabase = async(exercise, steps, sleep, study) => {
-    try {
-        const docRef = await addDoc(collection(db, "Player"), {
-            Strength: parseInt(exercise,10), //parseInt converts string to int, also deals with values like "12s2"(converted to 122) and "nasw" (converted to NaN)
-            Agility: parseInt(steps,10),
-            Stamina: parseInt(sleep,10),
-            Intellect: parseInt(study,10),
-        });
-    } 
-    catch (e) {
-        console.error("Error adding document: ", e);
-    }
-}
 
 
 export default function DailyLog({navigation}) {
@@ -30,7 +17,28 @@ export default function DailyLog({navigation}) {
     const [stepsTaken, setStepsTaken]= useState("")
     const [sleepHours, setSleepHours]= useState("")
     const [studyHours, setStudyHours]= useState("")
-    
+
+    const [current_user, loading, error]= useAuthState(auth);
+
+    const addToDatabase = async(exercise, steps, sleep, study, user) => {
+        try {
+            const updated_stats={
+                Strength: parseInt(exercise,10), //parseInt converts string to int, also deals with values like "12s2"(converted to 122) and "nasw" (converted to NaN)
+                Agility: parseInt(steps,10),
+                Stamina: parseInt(sleep,10),
+                Intellect: parseInt(study,10),
+            }
+            const docRef = await setDoc(
+                doc(db, 'users', user?.uid), //(database, collection name, document ID to be updated)
+                updated_stats, 
+                {merge:true}); //merge adds or replaces any new data, while leaving the rest of the data unchanged
+        } 
+        catch (e) {
+            console.error("Error adding document: ", e);
+        }
+    }
+
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={[styles.child_container, {flex:1}]}>
@@ -82,12 +90,11 @@ export default function DailyLog({navigation}) {
                     <AppButton 
                         title="Update Daily Log" 
                         onPress={()=>{
-                            addToDatabase(exerciseHours, stepsTaken, sleepHours, studyHours)
+                            addToDatabase(exerciseHours, stepsTaken, sleepHours, studyHours, current_user)
                             setExerciseHours("") //clears the values in the text input
                             setStepsTaken("")
                             setSleepHours("")
                             setStudyHours("")
-
                         }}
                         buttonStyle={styles.appButtonContainer}
                         textStyle= {styles.appButtonText}

@@ -1,11 +1,13 @@
 import React, {useEffect, useState} from "react";
 import {Animated, Dimensions, StyleSheet, Text, View, SafeAreaView} from 'react-native';
 import NavTab from "./NavTab";
-import {db} from "../../firebase";
-import {collection, getDocs} from "firebase/firestore";
+import {db, auth} from "../../firebase";
+import {collection, doc, getDocs, getDoc, query, where} from "firebase/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
+
 
 
 function ProgressBar({stat_name, stat_value, bar_color}) {
@@ -26,8 +28,28 @@ function ProgressBar({stat_name, stat_value, bar_color}) {
 
 
 export default function HomeScreen({navigation}) {
+    //Retrieve user data
+    const [current_user, loading, error]= useAuthState(auth);
+    const [name, setName]= useState("");
+    const fetchUser= async () => {
+        try {
+            // const userData= query(collection(db, "users"))
+            const userData= query(collection(db, "users"), where("uid", "==", current_user?.uid))
+            const doc= await getDocs(userData);
+            const data= doc.docs[0].data();
+            setName(data.username);
+        } catch (err) {
+            console.error(err);
+            alert("An error occured while fetching user data")
+        }
+    }
+    useEffect( () => {
+        if (loading) return;
+        if (!current_user) navigation.navigate('Welcome Page');
+        fetchUser();
+    }, [current_user, loading])
 
-
+    //Updating progress bars
     const [char_strength, setCharStrength]= useState('')
     const [char_agility, setCharAgility]= useState('')
     const [char_stamina, setCharStamina]= useState('')
@@ -40,13 +62,15 @@ export default function HomeScreen({navigation}) {
         let stamina_stat= 0
         let intellect_stat= 0
     
-        const querySnapshot= await getDocs(collection(db, "Player"))
-        querySnapshot.forEach((doc)=>{
-            strength_stat += doc.data()['Strength']
-            agility_stat += doc.data()['Agility']
-            stamina_stat += doc.data()['Stamina']
-            intellect_stat += doc.data()['Intellect']
-        })
+        const docRef= doc(db, "users", current_user?.uid)
+        const docSnapshot= await getDoc(docRef)
+
+        if (docSnapshot.exists()) {
+            strength_stat += docSnapshot.data()['Strength']
+            agility_stat += docSnapshot.data()['Agility']
+            stamina_stat += docSnapshot.data()['Stamina']
+            intellect_stat += docSnapshot.data()['Intellect']
+        }
     
         //Converting hours/steps into the respective stat points
         added_strength_points = strength_stat
@@ -63,14 +87,13 @@ export default function HomeScreen({navigation}) {
     useEffect(()=>{
         getFromDatabase();
     }, [])
-
+///////////////////////////////////////////////////
     return (
         <SafeAreaView style={styles.container}>
 
             <View style={[styles.child_container, {flex:1}]}>
-                <View style={{marginTop:30}}>
-                    <Text style={{color:'white', fontSize:20, fontWeight:'200'}}>Welcome back,</Text>
-                    <Text style={{color:'white', fontSize:20, fontWeight:'700'}}>Muthukumaran Yogeeswaran</Text>
+                <View style={{marginTop:30,}}>
+                    <Text style={{color:'white', fontSize:25, fontWeight:'500'}}>Welcome back, {name}</Text>
                 </View>
             </View>
 
