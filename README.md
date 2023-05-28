@@ -89,8 +89,8 @@ Our app will offer a variety of features, focusing on key areas such as focus an
 Over mobile app's frontend is made up of these main componenets:
 
 - Welcome page
-- Signing up Page
-- Signing in Page
+- Sign Up
+- Log in
 <div style="display: flex;">
 <img src="images_README/Welcome.jpg" style="max-width:20px; width:20%;">
 <img src="images_README/SignUp.jpg" style="max-width:20px; width:20%;">
@@ -118,7 +118,7 @@ Over mobile app's frontend is made up of these main componenets:
 
 
 ### <a name="features"></a>4.2 Features
-A **iOS mobile app** that supports 3 main features. The user will be able to input and store data on their duration of sleep, number of steps taken, duration of exercise and the time spent studying in order to upgrade their respective stats. 
+An **iOS mobile app** that supports 3 main features. The user will be able to input and store data on their duration of sleep, number of steps taken, duration of exercise and the time spent studying in order to upgrade their respective stats. 
 
 **Outlined below is how the battle system will be implemented, as well as how the avatar’s character stats come into play:**
 - Strength: Determines how much damage is done during each attack
@@ -140,19 +140,18 @@ a. Login to account
 
 b. User Profile
 - User information
-  - User's data are stored in the Firestone datatbase
+  - User's data are stored in the Firebase datatbase
 - Upgrading of Character
-  - When the user updates their progress under the daily log, the character’s progress bars will automatically re-render and update
+  - When the user updates their daily log, the character’s progress bars will automatically re-render and update as well
 
 
 ## <a name="architecture"></a>5. Architecture
 
 ### <a name="design-diagrams"></a>5.1 Design Diagrams
 
-**Entity diagram**
-
 ### UX Flowchart
-
+ ![](images_README/UXFlowchart.png)
+ 
 ### <a name="processes"></a>5.2 Processes
 
 **1. Tech Stack**
