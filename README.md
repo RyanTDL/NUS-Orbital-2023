@@ -1,4 +1,4 @@
-# NUS-Orbital-2023 
+# NUS-Orbital-2023
 ##GitHub repository for NUS CP2106: Independent Software Development Project
 
 - [1. Introduction](#introducton)
@@ -53,9 +53,15 @@ Our app will offer a variety of features, focusing on key areas such as focus an
 - Open Terminal
 - To start the **frontend** server:
   - cd into /NUS-Orbital-2023 directory
-  - Run `npx expo start` 
-  - Run `run yarn / npm install` if prompted by the terminal (This will install the dependencies required for project to run) and run `npx expo start` again
+
+    ![](images_README/dir.png)
+
+  - Run `run yarn / npm install` to install the dependencies required to run Expo Go 
+  - Run `npx expo start`
   - Once you see a QR Code, it means that it has compiled successfully and the server is active
+
+    ![](images_README/QRcode.png)
+
   - Install the Expo Go app on your iOS or Android phone and connect to the same wireless network as your computer. On Android, use the Expo Go app to scan the QR code from your terminal to start the app. On iOS, use the built-in QR code scanner of the default iOS Camera app.
 
 ## <a name="user-stories"></a>3. User Stories
@@ -80,12 +86,26 @@ Our app will offer a variety of features, focusing on key areas such as focus an
 Over mobile app's frontend is made up of these main componenets:
 
 - Welcome page
+<img src="images_README/Welcome.jpg" style="max-width:20px; width:20%;">
+
 - Signing up Page
+<img src="images_README/SignUp.jpg" style="max-width:20px; width:20%;">
 - Signing in Page
+<img src="images_README/LogIn.jpg" style="max-width:20px; width:20%;">
 - Daily Log
+<img src="images_README/DailyLog.jpg" style="max-width:20px; width:20%;">
 - Character Progress
+<img src="images_README/CharacterProgress.jpg" style="max-width:20px; width:20%;">
 - Weekly Activity
+
+<div style="display: flex;">
+<img src="images_README/WeeklyActivity 1.jpg" style="max-width:20px; width:20%;">
+<img src="images_README/WeeklyActivity 2.jpg" style="max-width:20px; width:20%;">
+<img src="images_README/WeeklyActivity 3.jpg" style="max-width:20px; width:20%;">
+</div>
+
 - Friends List
+<img src="images_README/FriendsList.jpg" style="max-width:20px; width:20%;">
 
 
 ### <a name="features"></a>4.2 Features
