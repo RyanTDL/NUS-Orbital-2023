@@ -57,6 +57,9 @@ Our app will offer a variety of features, focusing on key areas such as focus an
     ![](images_README/dir.png)
 
   - Run `run yarn / npm install` to install the dependencies required to run Expo Go 
+  
+    ![](images_README/updatesdir.png)
+    
   - Run `npx expo start`
   - Once you see a QR Code, it means that it has compiled successfully and the server is active
 
@@ -86,23 +89,29 @@ Our app will offer a variety of features, focusing on key areas such as focus an
 Over mobile app's frontend is made up of these main componenets:
 
 - Welcome page
-<img src="images_README/Welcome.jpg" style="max-width:20px; width:20%;">
-
 - Signing up Page
-<img src="images_README/SignUp.jpg" style="max-width:20px; width:20%;">
 - Signing in Page
+<div style="display: flex;">
+<img src="images_README/Welcome.jpg" style="max-width:20px; width:20%;">
+<img src="images_README/SignUp.jpg" style="max-width:20px; width:20%;">
 <img src="images_README/LogIn.jpg" style="max-width:20px; width:20%;">
-- Daily Log
-<img src="images_README/DailyLog.jpg" style="max-width:20px; width:20%;">
-- Character Progress
-<img src="images_README/CharacterProgress.jpg" style="max-width:20px; width:20%;">
-- Weekly Activity
+</div>
 
+
+- Daily Log
+- Character Progress
+<div style="display: flex;">
+<img src="images_README/DailyLog.jpg" style="max-width:20px; width:20%;">
+<img src="images_README/CharacterProgress.jpg" style="max-width:20px; width:20%;">
+</div>
+
+- Weekly Activity
 <div style="display: flex;">
 <img src="images_README/WeeklyActivity 1.jpg" style="max-width:20px; width:20%;">
 <img src="images_README/WeeklyActivity 2.jpg" style="max-width:20px; width:20%;">
 <img src="images_README/WeeklyActivity 3.jpg" style="max-width:20px; width:20%;">
 </div>
+
 
 - Friends List
 <img src="images_README/FriendsList.jpg" style="max-width:20px; width:20%;">
