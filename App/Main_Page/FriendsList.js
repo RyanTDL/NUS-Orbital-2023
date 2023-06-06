@@ -1,5 +1,5 @@
 import React from "react";
-import {Dimensions, StyleSheet, Text, View, SafeAreaView, FlatList, Image} from 'react-native';
+import {Dimensions, StyleSheet, ImageBackground, Text, View, SafeAreaView, FlatList, Image} from 'react-native';
 import NavTab from "./NavTab";
 import AppButton from "../Signing_In/Button";
 
@@ -101,44 +101,45 @@ const FriendsData= [
 export default function FriendsList({navigation}) {
     return (
         <SafeAreaView style={styles.container}>
-            <View style={[styles.child_container, {flex:1}]}>
-                <Text style={{color:'white', fontSize:20, fontWeight:'700',}}>Friends List</Text>
-            </View>
-            
-            <View style={[styles.child_container, {flex:6}]}>
-                    <View style={{width:334, height:400, borderWidth:2, borderRadius: 10, borderColor:'white', backgroundColor:'white'}}>
-                        <FriendSection />
-                    </View>
-                    
-            </View>
+            <ImageBackground source={require("../../assets/background/home_background.png")} resizeMode="contain" imageStyle={{opacity:0.2}}>
+                <View style={[styles.child_container, {flex:1}]}>
+                    <Text style={{color:'white', fontSize:20, fontWeight:'700',}}>Friends List</Text>
+                </View>
+                
+                <View style={[styles.child_container, {flex:6}]}>
+                        <View style={{width:334, height:400, borderWidth:2, borderRadius: 10, borderColor:'white', backgroundColor:'white'}}>
+                            <FriendSection />
+                        </View>
+                        
+                </View>
 
-            <View style={[styles.child_container, {flex:1, flexDirection:"row", gap:10}]}>
-                <AppButton 
-                    title="Add New Friend" 
-                    onPress={()=> {
-                        return (
-                            console.log('New friend added')
-                        );
-                    }}
-                    buttonStyle={styles.appButtonContainer}
-                    textStyle= {styles.appButtonText}
-                />
-                <AppButton 
-                    title="Remove Friend" 
-                    onPress={()=> {
-                        return (
-                            console.log('Friend Removed')
-                        );
-                    }}
-                    buttonStyle={styles.appButtonContainer}
-                    textStyle= {styles.appButtonText}
-                />
-            </View>   
+                <View style={[styles.child_container, {flex:1, flexDirection:"row", gap:10}]}>
+                    <AppButton 
+                        title="Add New Friend" 
+                        onPress={()=> {
+                            return (
+                                console.log('New friend added')
+                            );
+                        }}
+                        buttonStyle={styles.appButtonContainer}
+                        textStyle= {styles.appButtonText}
+                    />
+                    <AppButton 
+                        title="Remove Friend" 
+                        onPress={()=> {
+                            return (
+                                console.log('Friend Removed')
+                            );
+                        }}
+                        buttonStyle={styles.appButtonContainer}
+                        textStyle= {styles.appButtonText}
+                    />
+                </View>   
 
-            <View style={[styles.child_container, {flex:1}]}>
-                <NavTab navigation={navigation}/>
-            </View>    
-
+                <View style={[styles.child_container, {flex:1}]}>
+                    <NavTab navigation={navigation}/>
+                </View>    
+            </ImageBackground>
         </SafeAreaView>
         
     );

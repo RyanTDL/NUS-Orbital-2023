@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Animated, Dimensions, StyleSheet, Text, View, SafeAreaView} from 'react-native';
+import {Animated, Dimensions, ImageBackground, StyleSheet, Text, View, SafeAreaView} from 'react-native';
 import NavTab from "./NavTab";
 import {db, auth} from "../../firebase";
 import {collection, doc, getDocs, getDoc, query, where} from "firebase/firestore";
@@ -90,29 +90,30 @@ export default function HomeScreen({navigation}) {
 ///////////////////////////////////////////////////
     return (
         <SafeAreaView style={styles.container}>
-
-            <View style={[styles.child_container, {flex:1}]}>
-                <View style={{marginTop:30,}}>
-                    <Text style={{color:'white', fontSize:25, fontWeight:'500'}}>Welcome back, {name}</Text>
+            <ImageBackground source={require("../../assets/background/home_background.png")} resizeMode="contain" imageStyle={{opacity:1}}>
+                <View style={[styles.child_container, {flex:1}]}>
+                    <View style={{marginTop:30,}}>
+                        <Text style={{color:'white', fontSize:25, fontWeight:'500'}}>Welcome back, {name}</Text>
+                    </View>
                 </View>
-            </View>
 
-            <View style={[styles.child_container, {flex:3}]}>
-                <View style={{width:250, height:250, borderWidth:2, borderRadius: 200, borderColor:'white', backgroundColor: 'white'}}></View>
-            </View>
-
-            <View style={[styles.child_container, {flex:4}]}>
-                <View style={styles.stats_grid}>
-                    <ProgressBar stat_name='Strength' stat_value={char_strength} bar_color='red'/>
-                    <ProgressBar stat_name='Agility' stat_value={char_agility} bar_color='blue'/>
-                    <ProgressBar stat_name='Stamina' stat_value={char_stamina} bar_color='green'/>
-                    <ProgressBar stat_name='Intellect' stat_value={char_intellect} bar_color='purple'/>
+                <View style={[styles.child_container, {flex:3}]}>
+                    <View style={{width:250, height:250, borderWidth:2, borderRadius: 200, borderColor:'white', backgroundColor: 'white'}}></View>
                 </View>
-            </View>
-            
-            <View style={[styles.child_container, {flex:1}]}>
-                <NavTab navigation={navigation}/>
-            </View>
+
+                <View style={[styles.child_container, {flex:4}]}>
+                    <View style={styles.stats_grid}>
+                        <ProgressBar stat_name='Strength' stat_value={char_strength} bar_color='red'/>
+                        <ProgressBar stat_name='Agility' stat_value={char_agility} bar_color='blue'/>
+                        <ProgressBar stat_name='Stamina' stat_value={char_stamina} bar_color='green'/>
+                        <ProgressBar stat_name='Intellect' stat_value={char_intellect} bar_color='purple'/>
+                    </View>
+                </View>
+                
+                <View style={[styles.child_container, {flex:1}]}>
+                    <NavTab navigation={navigation}/>
+                </View>
+            </ImageBackground>
         </SafeAreaView>
         
     );

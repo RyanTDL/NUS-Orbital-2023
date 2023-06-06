@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useCallback, StrictMode} from "react";
-import {Dimensions, StyleSheet, Text, TextInput, View, SafeAreaView} from 'react-native';
+import {Dimensions, ImageBackground, StyleSheet, Text, TextInput, View, SafeAreaView} from 'react-native';
 import NavTab from "./NavTab";
 import AppButton from "../Signing_In/Button";
 import {db} from "../../firebase";
@@ -41,72 +41,73 @@ export default function DailyLog({navigation}) {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={[styles.child_container, {flex:1}]}>
-                <Text style={{color:'white', fontSize:20, fontWeight:'700',}}>Daily Log</Text>
-            </View>
-            
-            <View style={[styles.child_container, {flex:7}]}>
-                <View style={styles.form}>
-                    <View>
-                        <Text style={styles.form_text}>Number of Hours Exercised</Text>
-                        <TextInput 
-                            style={styles.entries}
-                            placeholder='Total Hours'
-                            value={exerciseHours}
-                            onChangeText={hours => setExerciseHours(hours)}
-                        />
-                    </View>
-                    
-                    <View>
-                        <Text style={styles.form_text}>Number of Steps Taken</Text>
-                        <TextInput 
-                            style={styles.entries}
-                            placeholder='Total Steps'
-                            value={stepsTaken}
-                            onChangeText={steps => setStepsTaken(steps)}
-                        />
-                    </View>
-                    
-                    <View>
-                        <Text style={styles.form_text}>Number of Hours of Sleep</Text>
-                        <TextInput 
-                            style={styles.entries}
-                            placeholder='Total Hours'
-                            value={sleepHours}
-                            onChangeText={hours => setSleepHours(hours)}
-                        />
-                    </View>    
-
-                    <View>
-                        <Text style={styles.form_text}>Number of Hours Spent Studying</Text>
-                        <TextInput 
-                            style={styles.entries}
-                            placeholder='Total Hours'
-                            value={studyHours}
-                            onChangeText={hours => setStudyHours(hours)}
-                        />
-                    </View>
-                    
-                    <AppButton 
-                        title="Update Daily Log" 
-                        onPress={()=>{
-                            addToDatabase(exerciseHours, stepsTaken, sleepHours, studyHours, current_user)
-                            setExerciseHours("") //clears the values in the text input
-                            setStepsTaken("")
-                            setSleepHours("")
-                            setStudyHours("")
-                        }}
-                        buttonStyle={styles.appButtonContainer}
-                        textStyle= {styles.appButtonText}
-                    />
+            <ImageBackground source={require("../../assets/background/home_background.png")} resizeMode="contain" imageStyle={{opacity:1}}>
+                <View style={[styles.child_container, {flex:1}]}>
+                    <Text style={{color:'white', fontSize:20, fontWeight:'700',}}>Daily Log</Text>
                 </View>
-            </View>
-            
+                
+                <View style={[styles.child_container, {flex:7}]}>
+                    <View style={styles.form}>
+                        <View>
+                            <Text style={styles.form_text}>Number of Hours Exercised</Text>
+                            <TextInput 
+                                style={styles.entries}
+                                placeholder='Total Hours'
+                                value={exerciseHours}
+                                onChangeText={hours => setExerciseHours(hours)}
+                            />
+                        </View>
+                        
+                        <View>
+                            <Text style={styles.form_text}>Number of Steps Taken</Text>
+                            <TextInput 
+                                style={styles.entries}
+                                placeholder='Total Steps'
+                                value={stepsTaken}
+                                onChangeText={steps => setStepsTaken(steps)}
+                            />
+                        </View>
+                        
+                        <View>
+                            <Text style={styles.form_text}>Number of Hours of Sleep</Text>
+                            <TextInput 
+                                style={styles.entries}
+                                placeholder='Total Hours'
+                                value={sleepHours}
+                                onChangeText={hours => setSleepHours(hours)}
+                            />
+                        </View>    
 
-            <View style={[styles.child_container, {flex:1}]}>
-                <NavTab navigation={navigation}/>
-            </View>    
+                        <View>
+                            <Text style={styles.form_text}>Number of Hours Spent Studying</Text>
+                            <TextInput 
+                                style={styles.entries}
+                                placeholder='Total Hours'
+                                value={studyHours}
+                                onChangeText={hours => setStudyHours(hours)}
+                            />
+                        </View>
+                        
+                        <AppButton 
+                            title="Update Daily Log" 
+                            onPress={()=>{
+                                addToDatabase(exerciseHours, stepsTaken, sleepHours, studyHours, current_user)
+                                setExerciseHours("") //clears the values in the text input
+                                setStepsTaken("")
+                                setSleepHours("")
+                                setStudyHours("")
+                            }}
+                            buttonStyle={styles.appButtonContainer}
+                            textStyle= {styles.appButtonText}
+                        />
+                    </View>
+                </View>
+                
 
+                <View style={[styles.child_container, {flex:1}]}>
+                    <NavTab navigation={navigation}/>
+                </View>    
+            </ImageBackground>
         </SafeAreaView>
         
     );
