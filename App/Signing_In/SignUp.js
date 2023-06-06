@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import {TextInput, Dimensions, StyleSheet, Text, View, SafeAreaView} from 'react-native';
+import {TextInput, ImageBackground, Dimensions, StyleSheet, Text, View, SafeAreaView, TouchableOpacity} from 'react-native';
 import { auth, registerWithEmailAndPassword } from "../../firebase";
 import AppButton from './Button' 
 
@@ -15,7 +15,7 @@ export default function SignUp({navigation}) {
     const [user, loading, error]= useAuthState(auth)
 
     const register= () => {
-        if (!username) alert("Please Enter Name");
+        // if (!username) alert("Please Enter Name");
         console.log("Registering")
         registerWithEmailAndPassword(username, email, password);
         console.log("Registered")
@@ -28,58 +28,61 @@ export default function SignUp({navigation}) {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={[styles.child_container, {flex:1}]}>
-                <Text style={styles.header}>Get Started Today</Text>
-            </View>
-            <View style={[styles.child_container, {flex:1}]}>
-                <View style={styles.inputs}>
-                    <Text style={styles.input_details}>Username</Text>
-                    <TextInput 
-                        style={styles.input_box}
-                        placeholder="Username"
-                        onChangeText={newUsername => setUsername(newUsername)}
-                        defaultValue= {username}
-                    />
-                    <Text style={styles.input_details}>Email</Text>
-                    <TextInput 
-                        style={styles.input_box}
-                        placeholder="Email"
-                        onChangeText={newEmail => setEmail(newEmail)}
-                        defaultValue= {email}
-                    />
-                    <Text style={styles.input_details}>Password</Text>
-                    <TextInput 
-                        style={styles.input_box}
-                        secureTextEntry={true}
-                        placeholder="Password"
-                        onChangeText={newPassword => setPassword(newPassword)}
-                        defaultValue= {password}
-                    />
+            <ImageBackground source={require("../../assets/background/signin_background.png")} resizeMode="contain" imageStyle={{opacity:0.5}}>
+                <View style={[styles.child_container, {flex:1}]}>
+                    <Text style={styles.header}>Get Started Today</Text>
                 </View>
-            </View>
+                <View style={[styles.child_container, {flex:1}]}>
+                    <View style={styles.inputs}>
+                        <Text style={styles.input_details}>Username</Text>
+                        <TextInput 
+                            style={styles.input_box}
+                            placeholder="Username"
+                            onChangeText={newUsername => setUsername(newUsername)}
+                            defaultValue= {username}
+                        />
+                        <Text style={styles.input_details}>Email</Text>
+                        <TextInput 
+                            style={styles.input_box}
+                            placeholder="Email"
+                            onChangeText={newEmail => setEmail(newEmail)}
+                            defaultValue= {email}
+                        />
+                        <Text style={styles.input_details}>Password</Text>
+                        <TextInput 
+                            style={styles.input_box}
+                            secureTextEntry={true}
+                            placeholder="Password"
+                            onChangeText={newPassword => setPassword(newPassword)}
+                            defaultValue= {password}
+                        />
+                    </View>
+                </View>
 
-            <View style={[styles.child_container, {flex:1}]}>
-                <AppButton 
-                    title="Sign Up Now"
-                    onPress={()=> {
-                        register()
-                        // console.log('Pressed')
-                    }}
-                    buttonStyle={styles.appButtonContainer}
-                    textStyle= {styles.appButtonText}
-                />
-                <AppButton 
-                    title="Return to Main Menu"
-                    onPress={()=> {
-                        return (
-                            console.log('Button pressed'),
-                            navigation.replace('Welcome Page')
-                        );
-                    }}
-                    buttonStyle={styles.appButtonContainer}
-                    textStyle= {styles.appButtonText}
-                />
-            </View>
+                <View style={[styles.child_container, {flex:1}]}>
+                    <AppButton 
+                        title="Sign Up Now"
+                        onPress={()=> {
+                            register()
+                            // console.log('Pressed')
+                        }}
+                        buttonStyle={styles.appButtonContainer}
+                        textStyle= {styles.appButtonText}
+                    />
+                    <View style={{flexDirection:'row', justifyContent:'center'}}>
+                        <Text style={{fontWeight: 500, fontSize:15, color: '#A4A4A4'}}>Already have an account? </Text>
+                        <TouchableOpacity 
+                            onPress={()=> {
+                                return (
+                                    console.log('Button pressed'),
+                                    navigation.navigate('Log In Page')
+                                );
+                            }}>
+                            <Text style={{fontWeight: 700, fontSize:15, color: '#FFFFFF'}}>Sign in</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </ImageBackground>
         </SafeAreaView>
     );
 }
@@ -134,7 +137,7 @@ const styles = StyleSheet.create({
     },
     
     appButtonContainer: {
-        marginVertical: 8,
+        marginVertical: 10,
         backgroundColor: "#009688",
         width: 328,
         borderRadius: 24,
