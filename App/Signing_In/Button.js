@@ -5,7 +5,7 @@ import {TouchableOpacity, Text } from "react-native";
 export default function AppButton({ onPress, title, buttonStyle, textStyle}){
     return (
         <TouchableOpacity onPress={onPress} style={buttonStyle}>
-            {/* <LinearGradient colors={["red", "blue"]}> */}
+            {/* <LinearGradient colors={['red', 'yellow']}> */}
             <Text style={textStyle}>{title}</Text>
             {/* </LinearGradient> */}
         </TouchableOpacity>
