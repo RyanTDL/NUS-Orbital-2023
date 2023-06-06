@@ -2,7 +2,6 @@ import React from "react";
 import {Image, Dimensions, StyleSheet, Text, View, SafeAreaView} from 'react-native';
 import AppButton from './Button' //Don't encapsulate AppButton in {}
 
-
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
 
 export default function Welcome({navigation}) {
