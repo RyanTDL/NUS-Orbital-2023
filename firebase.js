@@ -39,12 +39,6 @@ const registerWithEmailAndPassword = async (username, email, password) => {
     try {
         const res= await createUserWithEmailAndPassword(auth, email, password);
         const user= res.user;
-        // await addDoc(collection(db, "users"), {
-        //     uid: user.uid,
-        //     username,
-        //     authProivder: "local",
-        //     email,
-        // });
 
         //setDoc allows setting the specific document ID, unlike addDoc. Use doc() instead of collection() when using setDoc
         await setDoc(doc(db, "users", user.uid), {
