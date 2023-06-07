@@ -7,7 +7,6 @@ const {width, height}= Dimensions.get('window'); //retrieves dimensions of the s
 export default function Welcome({navigation}) {
     return (
             <SafeAreaView style={styles.container}>
-
                 <Image source={require('../../assets/app_icon.png')} style={[styles.child_container, {flex:3}]}/>
                 <View style={[styles.child_container, {flex:1}]}>
                     <Text style={styles.header_text}>LifeQuest</Text>

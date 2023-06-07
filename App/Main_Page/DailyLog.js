@@ -2,8 +2,8 @@ import React, {useState, useEffect, useCallback, StrictMode} from "react";
 import {Dimensions, ImageBackground, StyleSheet, Text, TextInput, View, SafeAreaView} from 'react-native';
 import NavTab from "./NavTab";
 import AppButton from "../Signing_In/Button";
-import {db} from "../../firebase";
-import {collection, addDoc, setDoc, doc} from "firebase/firestore";
+import {db, getDatabaseData} from "../../firebase";
+import {collection, getDoc, setDoc, doc, increment} from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import {auth} from "../../firebase";
 
@@ -17,22 +17,41 @@ export default function DailyLog({navigation}) {
     const [stepsTaken, setStepsTaken]= useState("")
     const [sleepHours, setSleepHours]= useState("")
     const [studyHours, setStudyHours]= useState("")
-
     const [current_user, loading, error]= useAuthState(auth);
 
+    
+
     const addToDatabase = async(exercise, steps, sleep, study, user) => {
+
+        //parseInt converts string to int, also deals with values like "12s2"(converted to 122) and "nasw" (converted to NaN)
+        daily_exercise= parseInt(exercise,10) 
+        daily_steps= parseInt(steps,10)
+        daily_sleep= parseInt(sleep,10)
+        daily_study= parseInt(study,10)
+
+        //Prevent input of strings
+        if (isNaN(daily_exercise) || isNaN(daily_steps) || isNaN(daily_sleep) || isNaN(daily_study)){
+            alert("Please ensure all fields have valid inputs")
+            return
+        }
+
+        //Update the new values into the database
         try {
-            const updated_stats={
-                Strength: parseInt(exercise,10), //parseInt converts string to int, also deals with values like "12s2"(converted to 122) and "nasw" (converted to NaN)
-                Agility: parseInt(steps,10),
-                Stamina: parseInt(sleep,10),
-                Intellect: parseInt(study,10),
+            const updated_stats={      
+                total_exercise: increment(daily_exercise), //increments the stat by given value
+                total_steps: increment(daily_steps),
+                total_sleep: increment(daily_sleep),
+                total_study: increment(daily_study), 
+                
             }
-            const docRef = await setDoc(
-                doc(db, 'users', user?.uid), //(database, collection name, document ID to be updated)
+
+            const docRef= doc(db, "users", user.uid)
+            const updateData = await setDoc(
+                docRef,
                 updated_stats, 
-                {merge:true}); //merge adds or replaces any new data, while leaving the rest of the data unchanged
-        } 
+                {merge:true} //merge adds or replaces any new data, while leaving the rest of the data unchanged
+                ); 
+            }
         catch (e) {
             console.error("Error adding document: ", e);
         }

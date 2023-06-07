@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Animated, Dimensions, ImageBackground, StyleSheet, Text, View, SafeAreaView} from 'react-native';
+import {Animated, Dimensions, ImageBackground, StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Image} from 'react-native';
 import NavTab from "./NavTab";
 import {db, auth} from "../../firebase";
 import {collection, doc, getDocs, getDoc, query, where} from "firebase/firestore";
@@ -28,12 +28,12 @@ function ProgressBar({stat_name, stat_value, bar_color}) {
 
 
 export default function HomeScreen({navigation}) {
+
     //Retrieve user data
     const [current_user, loading, error]= useAuthState(auth);
     const [name, setName]= useState("");
     const fetchUser= async () => {
         try {
-            // const userData= query(collection(db, "users"))
             const userData= query(collection(db, "users"), where("uid", "==", current_user?.uid))
             const doc= await getDocs(userData);
             const data= doc.docs[0].data();
@@ -49,39 +49,34 @@ export default function HomeScreen({navigation}) {
         fetchUser();
     }, [current_user, loading])
 
+
     //Updating progress bars
     const [char_strength, setCharStrength]= useState('')
     const [char_agility, setCharAgility]= useState('')
     const [char_stamina, setCharStamina]= useState('')
     const [char_intellect, setCharIntellect]= useState('') 
 
-    const getFromDatabase = async() => {
-    
-        let strength_stat= 0
-        let agility_stat= 0
-        let stamina_stat= 0
-        let intellect_stat= 0
-    
+    const getFromDatabase = async() => {    
         const docRef= doc(db, "users", current_user?.uid)
         const docSnapshot= await getDoc(docRef)
 
         if (docSnapshot.exists()) {
-            strength_stat += docSnapshot.data()['Strength']
-            agility_stat += docSnapshot.data()['Agility']
-            stamina_stat += docSnapshot.data()['Stamina']
-            intellect_stat += docSnapshot.data()['Intellect']
+            total_exercise= docSnapshot.data()['total_exercise']
+            total_steps= docSnapshot.data()['total_steps']
+            total_sleep= docSnapshot.data()['total_sleep']
+            total_study= docSnapshot.data()['total_study']
         }
     
         //Converting hours/steps into the respective stat points
-        added_strength_points = strength_stat
-        added_agility_points = Math.trunc(agility_stat/10000)
-        added_stamina_points = Math.trunc(stamina_stat/7)
-        added_intellect_points =Math.trunc(intellect_stat/3)
+        strength_points = Math.min(total_exercise, 100) //minimum used to ensure progress bar does not exceed when it hit 100 points
+        agility_points = Math.min(Math.trunc(total_steps/10000),100)
+        stamina_points = Math.min(Math.trunc(total_sleep/7), 100)
+        intellect_points = Math.min(Math.trunc(total_study/3), 100)
     
-        setCharStrength(added_strength_points);
-        setCharAgility(added_agility_points);
-        setCharStamina(added_stamina_points);
-        setCharIntellect(added_intellect_points);
+        setCharStrength(strength_points);
+        setCharAgility(agility_points);
+        setCharStamina(stamina_points);
+        setCharIntellect(intellect_points);
     }
 
     useEffect(()=>{
@@ -91,14 +86,16 @@ export default function HomeScreen({navigation}) {
     return (
         <SafeAreaView style={styles.container}>
             <ImageBackground source={require("../../assets/background/home_background.png")} resizeMode="contain" imageStyle={{opacity:1}}>
-                <View style={[styles.child_container, {flex:1}]}>
-                    <View style={{marginTop:30,}}>
-                        <Text style={{color:'white', fontSize:25, fontWeight:'500'}}>Welcome back, {name}</Text>
-                    </View>
+
+                <View style={[styles.child_container, {flex:1, alignItems: "flex-end", marginRight:30}]}>
+                    <TouchableOpacity onPress={()=>console.log('Pressed')}>
+                        <Image source={require('../../assets/navbar_icons/More.png')} style={{tintColor:'white',}}/>
+                    </TouchableOpacity>
                 </View>
 
-                <View style={[styles.child_container, {flex:3}]}>
-                    <View style={{width:250, height:250, borderWidth:2, borderRadius: 200, borderColor:'white', backgroundColor: 'white'}}></View>
+                <View style={[styles.child_container, {flex:3, gap:10}]}>
+                    <View style={{width:200, height:200, borderWidth:2, borderRadius: 100, borderColor:'white', backgroundColor: 'white'}}></View>
+                    <Text style={{color:'white', fontSize:25, fontWeight:'500'}}>{name}</Text>
                 </View>
 
                 <View style={[styles.child_container, {flex:4}]}>

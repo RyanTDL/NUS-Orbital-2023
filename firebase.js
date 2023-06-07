@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import {getFirestore, query, getDocs, collection, where, addDoc, setDoc, doc} from "firebase/firestore";
+import {getFirestore, query, getDoc, collection, where, addDoc, setDoc, doc} from "firebase/firestore";
 import {getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut} from "firebase/auth";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -43,13 +43,17 @@ const registerWithEmailAndPassword = async (username, email, password) => {
         //setDoc allows setting the specific document ID, unlike addDoc. Use doc() instead of collection() when using setDoc
         await setDoc(doc(db, "users", user.uid), {
             uid: user.uid,
-            username,
             authProivder: "local",
-            email,
-            strength: 10,
-            agility: 10,
-            stamina: 10,
-            intellect: 10,
+            email: email,
+            username: username,
+            total_exercise: 10,
+            total_steps: 10,
+            total_sleep: 10,
+            total_study: 10,
+            weekly_exercise: [0,0,0,0,0,0,0],
+            weekly_steps: [0,0,0,0,0,0,0],
+            weekly_sleep: [0,0,0,0,0,0,0],
+            weekly_study: [0,0,0,0,0,0,0],
         });
     }
     catch (err) {
@@ -72,7 +76,6 @@ const sendPasswordReset = async (email) => {
 const logout= () => {
     signOut(auth);
 };
-
 
 export {
     auth,
