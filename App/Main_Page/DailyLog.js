@@ -19,8 +19,35 @@ export default function DailyLog({navigation}) {
     const [studyHours, setStudyHours]= useState("")
     const [current_user, loading, error]= useAuthState(auth);
 
-    
+    //Retrieve the weekly log
+    const [exerciseWeek, setExerciseWeek]= useState([])
+    const [stepsWeek, setStepsWeek]= useState([])
+    const [sleepWeek, setSleepWeek]= useState([])
+    const [studyWeek, setStudyWeek]= useState([])
 
+    const getFromDatabase = async() => {    
+        const docRef= doc(db, "users", current_user.uid)
+        const docSnapshot= await getDoc(docRef)
+        if (docSnapshot.exists()) {
+            console.log('Database exist')
+            total_exercise= docSnapshot.data()['weekly_exercise']
+            total_steps= docSnapshot.data()['weekly_steps']
+            total_sleep= docSnapshot.data()['weekly_sleep']
+            total_study= docSnapshot.data()['weekly_study']
+            setExerciseWeek(total_exercise)
+            setStepsWeek(total_steps)
+            setSleepWeek(total_sleep)
+            setStudyWeek(total_study)
+        }
+    }
+
+    useEffect(()=>{
+        getFromDatabase();
+    }, [exerciseHours]) //updates everytime addToDatabase() is pressed, so that the new weekly log is retrieved
+
+
+    //Update the Cloud Firestore
+    //Updates the overall stats, as well as the weekly log
     const addToDatabase = async(exercise, steps, sleep, study, user) => {
 
         //parseInt converts string to int, also deals with values like "12s2"(converted to 122) and "nasw" (converted to NaN)
@@ -28,21 +55,30 @@ export default function DailyLog({navigation}) {
         daily_steps= parseInt(steps,10)
         daily_sleep= parseInt(sleep,10)
         daily_study= parseInt(study,10)
-
-        //Prevent input of strings
+        //Prevent input of strings, which will cause database to store value 'NaN'
         if (isNaN(daily_exercise) || isNaN(daily_steps) || isNaN(daily_sleep) || isNaN(daily_study)){
             alert("Please ensure all fields have valid inputs")
             return
         }
 
-        //Update the new values into the database
+        //Push the new values into the database
         try {
+            //Update the weekly log. Removes latest value, and adds in the new value
+            exercise_intermediate= exerciseWeek.slice(1,).concat([daily_exercise])
+            steps_intermediate= stepsWeek.slice(1,).concat([daily_steps])
+            sleep_intermediate= sleepWeek.slice(1,).concat([daily_sleep])
+            study_intermediate= studyWeek.slice(1,).concat([daily_study])
+            
             const updated_stats={      
+                //Update overall exercise/steps/sleep/study
                 total_exercise: increment(daily_exercise), //increments the stat by given value
                 total_steps: increment(daily_steps),
                 total_sleep: increment(daily_sleep),
-                total_study: increment(daily_study), 
-                
+                total_study: increment(daily_study),   
+                weekly_exercise: exercise_intermediate,
+                weekly_steps: steps_intermediate,
+                weekly_sleep: sleep_intermediate,
+                weekly_study: study_intermediate,
             }
 
             const docRef= doc(db, "users", user.uid)
@@ -51,6 +87,8 @@ export default function DailyLog({navigation}) {
                 updated_stats, 
                 {merge:true} //merge adds or replaces any new data, while leaving the rest of the data unchanged
                 ); 
+
+
             }
         catch (e) {
             console.error("Error adding document: ", e);

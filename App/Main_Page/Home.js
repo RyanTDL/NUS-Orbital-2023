@@ -93,8 +93,8 @@ export default function HomeScreen({navigation}) {
                     </TouchableOpacity>
                 </View>
 
-                <View style={[styles.child_container, {flex:3, gap:10}]}>
-                    <View style={{width:200, height:200, borderWidth:2, borderRadius: 100, borderColor:'white', backgroundColor: 'white'}}></View>
+                <View style={[styles.child_container, {flex:3, marginBottom:10}]}>
+                    <View style={{width:240, height:240, borderWidth:2, borderRadius: 120, borderColor:'white', backgroundColor: 'white'}}></View>
                     <Text style={{color:'white', fontSize:25, fontWeight:'500'}}>{name}</Text>
                 </View>
 
