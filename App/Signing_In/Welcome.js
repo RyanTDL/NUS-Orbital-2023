@@ -53,8 +53,6 @@ const styles = StyleSheet.create({
     },
 
     child_container: {
-        // borderWidth: 1, 
-        // borderColor:'red',
         alignItems:'center',
         justifyContent: 'center',     
     },

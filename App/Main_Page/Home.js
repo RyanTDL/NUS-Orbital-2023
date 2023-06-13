@@ -5,22 +5,19 @@ import {db, auth} from "../../firebase";
 import {collection, doc, getDocs, getDoc, query, where} from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
-
-
 
 function ProgressBar({stat_name, stat_value, bar_color}) {
     return (
         <View>
             <Text style={{color:'white', fontSize:25, marginVertical: 3}}>{stat_name}:{' '}  
-                <Text style={{fontWeight:200}}>
+                <Text style={{fontWeight:'200'}}>
                     {stat_value}/100
                 </Text>
             </Text>
 
             <View style={[styles.bar, {borderColor: 'white', backgroundColor:'white'}]}>
-                <Animated.View style={[StyleSheet.absoluteFill, {backgroundColor:bar_color, width:(stat_value +'%')}]}/>
+                <Animated.View style={[StyleSheet.absoluteFill, {backgroundColor:bar_color, width: (324*stat_value)/100}]}/>
             </View>
         </View>
     );
@@ -86,7 +83,6 @@ export default function HomeScreen({navigation}) {
     return (
         <SafeAreaView style={styles.container}>
             <ImageBackground source={require("../../assets/background/home_background.png")} resizeMode="contain" imageStyle={{opacity:1}}>
-
                 <View style={[styles.child_container, {flex:1, alignItems: "flex-end", marginRight:30}]}>
                     <TouchableOpacity onPress={()=>console.log('Pressed')}>
                         <Image source={require('../../assets/navbar_icons/More.png')} style={{tintColor:'white',}}/>
@@ -130,8 +126,6 @@ const styles = StyleSheet.create({
     },
 
     child_container: {
-        // borderWidth: 1, 
-        // borderColor:'red',
         alignItems:'center',
         justifyContent: 'center',     
     },
@@ -139,8 +133,6 @@ const styles = StyleSheet.create({
     stats_grid: {
         width:328, 
         height:328, 
-        // borderWidth:2, 
-        // borderColor:'white',
         justifyContent: 'center',
         alignItems: 'center',
         gap: 20,

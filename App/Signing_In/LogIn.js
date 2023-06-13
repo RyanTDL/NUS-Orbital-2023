@@ -219,12 +219,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         width:300,
         padding: 10,
-        // backgroundColor: '#A4A4A4',
     },
 
     modalButtonContainer: {
-        // marginVertical: 10,
-        // backgroundColor: "#009688",
         width: 300,
         borderRadius: 24,
         paddingVertical: 10,
@@ -232,7 +229,6 @@ const styles = StyleSheet.create({
 
     modalButtonText:{
         fontSize: 15,
-        // color: "#fff",
         fontWeight: "bold",
         alignSelf: "center",
     }
