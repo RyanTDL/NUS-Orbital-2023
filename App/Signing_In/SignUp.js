@@ -14,8 +14,8 @@ export default function SignUp({navigation}) {
     const [password, setPassword]= useState('')
     const [user, loading, error]= useAuthState(auth)
 
+    //Registering for an account
     const register= () => {
-        // if (!username) alert("Please Enter Name");
         console.log("Registering")
         registerWithEmailAndPassword(username, email, password);
         console.log("Registered")
@@ -25,6 +25,13 @@ export default function SignUp({navigation}) {
         if (loading) return;
         if (user) navigation.replace('Home Screen');
     }, [user, loading])
+
+    //Maximum of 12 characters for username & password, 40 characters for email
+    const checkUsernameLength= () => {
+        if (username.length>12){
+            return true;
+        }
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -65,7 +72,12 @@ export default function SignUp({navigation}) {
                         onPress={()=> {
                             if (email==''||username==''||password==''){
                                 alert('Please fill up all fields')
-                            } else {
+                            } 
+                            else if (checkUsernameLength()){
+                                alert("Username has a 12 character limit")
+                                setUsername("")
+                            }
+                            else {
                                 register()
                             }
                         }}

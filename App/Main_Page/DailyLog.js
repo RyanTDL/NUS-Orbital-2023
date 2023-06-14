@@ -29,7 +29,6 @@ export default function DailyLog({navigation}) {
         const docRef= doc(db, "users", current_user.uid)
         const docSnapshot= await getDoc(docRef)
         if (docSnapshot.exists()) {
-            console.log('Database exist')
             total_exercise= docSnapshot.data()['weekly_exercise']
             total_steps= docSnapshot.data()['weekly_steps']
             total_sleep= docSnapshot.data()['weekly_sleep']
@@ -52,12 +51,16 @@ export default function DailyLog({navigation}) {
 
         //parseInt converts string to int, also deals with values like "12s2"(converted to 122) and "nasw" (converted to NaN)
         daily_exercise= parseInt(exercise,10) 
-        daily_steps= parseInt(steps,10)
+        daily_steps= Math.round(parseInt(steps,10)/1000) //stores steps in the thousands: 1292 steps becomes 1k etc
         daily_sleep= parseInt(sleep,10)
         daily_study= parseInt(study,10)
         //Prevent input of strings, which will cause database to store value 'NaN'
         if (isNaN(daily_exercise) || isNaN(daily_steps) || isNaN(daily_sleep) || isNaN(daily_study)){
-            alert("Please ensure all fields have valid inputs")
+            alert("Please ensure all fields are filled correctly")
+            return
+        }
+        else if (daily_exercise>24||daily_steps>20||daily_sleep>24||daily_study>24){
+            alert("Please ensure all inputs are within 24 hours")
             return
         }
 
