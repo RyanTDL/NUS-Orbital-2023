@@ -16,6 +16,7 @@
     "expo-linear-gradient": "~12.1.2",
     "expo-status-bar": "~1.4.4",
     "firebase": "^9.22.0",
+    "native-base": "^3.4.28",
     "react": "18.2.0",
     "react-firebase-hooks": "^5.1.1",
     "react-hook-form": "^7.43.9",
