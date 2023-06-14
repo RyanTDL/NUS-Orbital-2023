@@ -30,7 +30,7 @@ const logInWithEmailAndPassword= async (email, password) => {
         await signInWithEmailAndPassword(auth, email, password);
     } 
     catch (err) {
-        // console.error(err);
+        console.error(err);
         alert("Invalid email/password");
     }
 };
@@ -57,7 +57,7 @@ const registerWithEmailAndPassword = async (username, email, password) => {
         });
     }
     catch (err) {
-        // console.error(err);
+        console.error(err);
         alert("Please enter a valid email");
     }
 }
@@ -68,7 +68,7 @@ const sendPasswordReset = async (email) => {
         alert("Password reset link sent!")
     }
     catch (err) {
-        // console.log(err);
+        console.log(err);
         alert("Please enter a valid email");
     }
 };

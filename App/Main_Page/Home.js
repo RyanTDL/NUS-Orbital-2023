@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {Animated, Dimensions, ImageBackground, StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Image} from 'react-native';
 import NavTab from "./NavTab";
-import {db, auth} from "../../firebase";
+import { MaterialIcons } from '@expo/vector-icons'; 
+import {db, auth, logout} from "../../firebase";
 import {collection, doc, getDocs, getDoc, query, where} from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -31,13 +32,18 @@ export default function HomeScreen({navigation}) {
     const [name, setName]= useState("");
     const fetchUser= async () => {
         try {
-            const userData= query(collection(db, "users"), where("uid", "==", current_user?.uid))
-            const doc= await getDocs(userData);
-            const data= doc.docs[0].data();
-            setName(data.username);
+            if (current_user==null){
+                console.log('Logging out')
+            } else {
+                const userData= query(collection(db, "users"), where("uid", "==", current_user?.uid))
+                const doc= await getDocs(userData);
+                const data= doc.docs[0].data();
+                setName(data.username);
+            }
+
         } catch (err) {
             console.error(err);
-            alert("An error occured while fetching user data")
+            alert("An error occured while fetching user data");
         }
     }
     useEffect( () => {
@@ -83,9 +89,12 @@ export default function HomeScreen({navigation}) {
     return (
         <SafeAreaView style={styles.container}>
             <ImageBackground source={require("../../assets/background/home_background.png")} resizeMode="contain" imageStyle={{opacity:1}}>
-                <View style={[styles.child_container, {flex:1, alignItems: "flex-end", marginRight:30}]}>
-                    <TouchableOpacity onPress={()=>console.log('Pressed')}>
-                        <Image source={require('../../assets/navbar_icons/More.png')} style={{tintColor:'white',}}/>
+                <View style={[styles.child_container, {flex:1, alignItems: "flex-end", marginRight:5}]}>
+                    <TouchableOpacity 
+                        style={styles.logout}
+                        onPress={()=>logout(auth)}>
+                        <Text style={{color:"#B3B3B3", fontSize:16, fontWeight:'bold'}}>Logout</Text>
+                        <MaterialIcons name="logout" size={24} color="#B3B3B3" />
                     </TouchableOpacity>
                 </View>
 
@@ -128,6 +137,16 @@ const styles = StyleSheet.create({
     child_container: {
         alignItems:'center',
         justifyContent: 'center',     
+    },
+
+    logout: {
+        flexDirection: "row", 
+        alignItems:'center', 
+        gap:5, 
+        borderWidth:1, 
+        borderRadius: 10,
+        borderColor:'white', 
+        padding:8,
     },
 
     stats_grid: {

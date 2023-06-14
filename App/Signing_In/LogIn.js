@@ -108,6 +108,7 @@ export default function LogIn({navigation}) {
                                 onPress={()=> {
                                     // console.log('Email sent')
                                     sendPasswordReset(email)
+                                    setIsModalVisible(!isModalVisible)
                                 }}
                                 buttonStyle={[styles.modalButtonContainer, {backgroundColor:'black'}]}
                                 textStyle= {[styles.modalButtonText, {color:'white'}]}

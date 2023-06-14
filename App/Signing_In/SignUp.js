@@ -63,8 +63,11 @@ export default function SignUp({navigation}) {
                     <AppButton 
                         title="Sign Up Now"
                         onPress={()=> {
-                            register()
-                            // console.log('Pressed')
+                            if (email==''||username==''||password==''){
+                                alert('Please fill up all fields')
+                            } else {
+                                register()
+                            }
                         }}
                         buttonStyle={styles.appButtonContainer}
                         textStyle= {styles.appButtonText}
