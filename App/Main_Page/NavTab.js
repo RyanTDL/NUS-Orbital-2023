@@ -1,6 +1,6 @@
-import React, {Component} from "react";
+import React from "react";
 import {TouchableOpacity, Image, View, Button, StyleSheet, Text } from "react-native";
-
+import { Ionicons, AntDesign, FontAwesome5 } from '@expo/vector-icons';
 
 export default function NavTab({navigation}){
     return (
@@ -10,19 +10,19 @@ export default function NavTab({navigation}){
             https://stackoverflow.com/questions/60182942/useeffect-not-called-in-react-native-when-back-to-screen */}
 
             <TouchableOpacity onPress={()=>navigation.replace('Home Screen')} style={styles.grid_box}>
-                <Image source={require('../../assets/navbar_icons/Home.png')}/>
+                <Ionicons name="home-outline" size={24} color="#B3B3B3" />                
                 <Text style={styles.nav_text}>Home</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={()=>navigation.replace('Daily Log')} style={styles.grid_box}>
-                <Image source={require('../../assets/navbar_icons/DailyLog.png')}/>
+                <AntDesign name="book" size={24} color="#B3B3B3" />
                 <Text style={styles.nav_text}>Daily Log</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={()=>navigation.replace('Weekly Activity')} style={styles.grid_box}>
-                <Image source={require('../../assets/navbar_icons/Activity.png')}/>
+                <AntDesign name="linechart" size={24} color="#B3B3B3" />
                 <Text style={styles.nav_text}>Activity</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={()=>navigation.replace('Friends List')} style={styles.grid_box}>
-                <Image source={require('../../assets/navbar_icons/Friends.png')}/>
+                <FontAwesome5 name="user-friends" size={24} color="#B3B3B3" />
                 <Text style={styles.nav_text}>Friends</Text>
             </TouchableOpacity>
         </View>
@@ -47,10 +47,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-
-    // nav_img : {
-    //     tintColor: 'red',
-    // },
 
     nav_text: {
         // fontWeight: ,
