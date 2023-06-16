@@ -25,6 +25,10 @@ export default function NavTab({navigation}){
                 <FontAwesome5 name="user-friends" size={24} color="#B3B3B3" />
                 <Text style={styles.nav_text}>Friends</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={()=>navigation.replace('Battle')} style={styles.grid_box}>
+                <FontAwesome5 name="user-friends" size={24} color="#B3B3B3" />
+                <Text style={styles.nav_text}>Battle</Text>
+            </TouchableOpacity>
         </View>
     );
 } 

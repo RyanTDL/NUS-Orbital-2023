@@ -8,11 +8,13 @@ import HomeScreen from './App/Main_Page/Home';
 import DailyLog from './App/Main_Page/DailyLog'
 import WeeklyActivity from './App/Main_Page/WeeklyActivity';
 import FriendsList from './App/Main_Page/FriendsList';
-
+import Battle from './App/Main_Page/Battle';
+import BattleStart from './App/Main_Page/BattleStart';
 
 const Stack= createNativeStackNavigator();
 
 export default function App() {
+
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{headerShown: false, animation: 'none'}}>
@@ -22,7 +24,9 @@ export default function App() {
         <Stack.Screen name='Home Screen' component={HomeScreen}/> 
         <Stack.Screen name='Daily Log' component={DailyLog}/> 
         <Stack.Screen name='Weekly Activity' component={WeeklyActivity}/> 
-        <Stack.Screen name='Friends List' component={FriendsList}/> 
+        <Stack.Screen name='Friends List' component={FriendsList}/>
+        <Stack.Screen name='Battle' component={Battle}/> 
+        <Stack.Screen name='BattleStart' component={BattleStart}/> 
       </Stack.Navigator>
     </NavigationContainer>
   );
