@@ -3,6 +3,12 @@ import {Dimensions, StyleSheet, ImageBackground, Text, TextInput, View, SafeArea
 import NavTab from "./NavTab";
 import AppButton from "../Signing_In/Button";
 import Modal from "react-native-modal";
+import {db, getDatabaseData} from "../../firebase";
+import {collection, getDoc, FieldValue, setDoc, query, where, doc, increment, getDocs, updateDoc, arrayUnion, arrayRemove} from "firebase/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
+import {auth} from "../../firebase";
+import { async } from "@firebase/util";
+
 
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
 
@@ -102,7 +108,67 @@ const FriendsData= [
 export default function FriendsList({navigation}) {
 
     const [isModalVisible, setIsModalVisible]= useState(false);
+    const [playerName, setPlayerName]= useState('');
     const [friendID, setFriendID]= useState('');
+    const [allFriends, setAllFriends]= useState([]);
+    const [current_user, loading, error]= useAuthState(auth);
+
+    //Retrieve my player info
+    const getMyDatabase = async() => {    
+        const myDocRef= doc(db, "users", current_user.uid)
+        const myDocSnapshot= await getDoc(myDocRef)
+        if (myDocSnapshot.exists()) {
+            setPlayerName(myDocSnapshot.data()['playerID'])
+        }
+    }
+    useEffect(()=>{
+        getMyDatabase();
+    }, [])
+
+    //Find & Add friend based on player ID
+    // https://firebase.google.com/docs/firestore/query-data/queries
+    const addFriend = async() => {   
+        //Finds friend, based on query using friend's player ID
+        const q= query(collection(db, "users"), where("playerID", "==", friendID))
+        const querySnapshot= await getDocs(q)
+        querySnapshot.forEach((doc) => {
+            stats= {
+                name: doc.data()['username'],
+                strength: doc.data()['total_exercise'],
+                agility: doc.data()['total_steps']/10,
+                stamina: doc.data()['total_sleep']/7,
+                intellect: doc.data()['total_study']/3
+            }
+        });
+        //Adds friends data (Name & stats) to my database under "Friends" section
+        const docRef= doc(db, "users", current_user.uid)
+        await updateDoc(docRef, {
+            friends: arrayUnion(stats)
+        });
+    }
+
+    //Find & Remove friend based on player ID
+    const removeFriend = async() => {   
+        //Finds friend, based on query using friend's player ID
+        const q= query(collection(db, "users"), where("playerID", "==", friendID))
+        const querySnapshot= await getDocs(q)
+        querySnapshot.forEach((doc) => {
+            stats= {
+                name: doc.data()['username'],
+                strength: doc.data()['total_exercise'],
+                agility: doc.data()['total_steps']/10,
+                stamina: doc.data()['total_sleep']/7,
+                intellect: doc.data()['total_study']/3
+            }
+        }
+        );
+        //Adds friends data (Name & stats) to my database under "Friends" section
+        const docRef= doc(db, "users", current_user.uid)
+        console.log(friendRemoved)
+        await updateDoc(docRef, {
+            friends: arrayRemove(stats)
+        });
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -148,9 +214,9 @@ export default function FriendsList({navigation}) {
                     style= {{justifyContent:'center', alignItems:'center'}}
                 >
                     <View style={styles.modalContainer}>
-                        <View style={{gap:5}}>
-                            <Text style={styles.modalText}>Forgot your password?</Text>
-                            <Text style={styles.modalSubtext}>We'll email you a link to reset your password</Text>
+                        <View style={{flexDirection: 'row', alignItems: 'center', gap:5}}>
+                            <Text style={styles.modalText}>Your Player ID is: </Text>
+                            <Text style={styles.modalSubtext}>{playerName}</Text>
                         </View>
                         <View>
                             <TextInput 
@@ -162,16 +228,22 @@ export default function FriendsList({navigation}) {
                         </View>
                         <View style={{gap:10}}>
                             <AppButton 
-                                title="Send link"
+                                title="Add friend"
                                 onPress={()=> {
+                                    // addFriend()
+                                    removeFriend()
                                     setIsModalVisible(!isModalVisible)
+                                    setFriendID('')
                                 }}
                                 buttonStyle={[styles.modalButtonContainer, {backgroundColor:'black'}]}
                                 textStyle= {[styles.modalButtonText, {color:'white'}]}
                             />
                             <AppButton 
                                 title="Cancel"
-                                onPress={()=> setIsModalVisible(!isModalVisible)}
+                                onPress={()=> {
+                                    setFriendID('')
+                                    setIsModalVisible(!isModalVisible)
+                                }}
                                 buttonStyle={[styles.modalButtonContainer, {backgroundColor:'#E0E0E0'}]}
                                 textStyle= {[styles.modalButtonText, {color:'black'}]}
                             />
@@ -189,7 +261,8 @@ export default function FriendsList({navigation}) {
 function Friend_Box({player, player_icon, strength, agility, stamina, intellect}) {
     return (
         <View style={styles.playerInfo}>
-            <Image source={player_icon}/>
+            {/* <Image source={player_icon}/> */}
+            <Image source={require('../../assets/player_avatars/gym_bro.png')}/>
             <View>
                 <Text style={{fontSize:12, fontWeight: 500}}>{player}</Text>
                 <Text style={{fontSize:12, fontWeight: 300}}> Strength: {strength}/100  Agility: {agility}/100</Text>
@@ -306,12 +379,12 @@ const styles = StyleSheet.create({
     },
 
     modalText: {
-        fontSize:26,
+        fontSize: 24,
         fontWeight: 600,
     },
 
     modalSubtext: {
-        fontSize:14 ,
+        fontSize: 20 ,
         fontWeight: 400,
     },
 

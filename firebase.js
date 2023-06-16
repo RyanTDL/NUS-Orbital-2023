@@ -46,6 +46,7 @@ const registerWithEmailAndPassword = async (username, email, password) => {
             authProivder: "local",
             email: email,
             username: username,
+            playerID: user.uid.slice(0,8),
             total_exercise: 0,
             total_steps: 0,
             total_sleep: 0,
@@ -54,6 +55,7 @@ const registerWithEmailAndPassword = async (username, email, password) => {
             weekly_steps: [0,0,0,0,0,0,0],
             weekly_sleep: [0,0,0,0,0,0,0],
             weekly_study: [0,0,0,0,0,0,0],
+            friends: {},
         });
     }
     catch (err) {
