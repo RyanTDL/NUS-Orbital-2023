@@ -12,98 +12,6 @@ import { async } from "@firebase/util";
 
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
 
-const FriendsData= [
-    {
-        id:'1',
-        title: 'James',
-        icon: require('../../assets/player_avatars/gym_bro.png'),
-        strength: '72',
-        agility: '43',
-        stamina: '41',
-        intellect: '91'
-    },
-
-    {
-        id:'2',
-        title: 'Zachary',
-        icon: require('../../assets/player_avatars/star_athlete.png'),
-        strength: '53',
-        agility: '53',
-        stamina: '72',
-        intellect: '52'
-    },
-
-    {
-        id:'3',
-        title: 'William',
-        icon: require('../../assets/player_avatars/always_late.png'),
-        strength: '81',
-        agility: '64',
-        stamina: '73',
-        intellect: '61'
-    },
-
-    {
-        id:'4',
-        title: 'Sarah',
-        icon: require('../../assets/player_avatars/gym_bro.png'),
-        strength: '42',
-        agility: '63',
-        stamina: '92',
-        intellect: '41'
-    },
-
-    {
-        id:'5',
-        title: 'Grace',
-        icon: require('../../assets/player_avatars/bell_curve.png'),
-        strength: '33',
-        agility: '73',
-        stamina: '78',
-        intellect: '79'
-    },
-
-    {
-        id:'6',
-        title: 'Dave',
-        icon: require('../../assets/player_avatars/star_athlete.png'),
-        strength: '72',
-        agility: '93',
-        stamina: '97',
-        intellect: '41'
-    },
-
-    {
-        id:'7',
-        title: 'Elias',
-        icon: require('../../assets/player_avatars/gym_bro.png'),
-        strength: '52',
-        agility: '73',
-        stamina: '72',
-        intellect: '81'
-    },
-
-    {
-        id:'8',
-        title: 'Karen',
-        icon: require('../../assets/player_avatars/bell_curve.png'),
-        strength: '63',
-        agility: '53',
-        stamina: '58',
-        intellect: '89'
-    },
-
-    {
-        id:'9',
-        title: 'Philip',
-        icon: require('../../assets/player_avatars/always_late.png'),
-        strength: '57',
-        agility: '46',
-        stamina: '77',
-        intellect: '43'
-    },
-]
-
 
 export default function FriendsList({navigation}) {
 
@@ -113,17 +21,22 @@ export default function FriendsList({navigation}) {
     const [allFriends, setAllFriends]= useState([]);
     const [current_user, loading, error]= useAuthState(auth);
 
-    //Retrieve my player info
+
+
+    //Retrieve my player name, and friends list
     const getMyDatabase = async() => {    
         const myDocRef= doc(db, "users", current_user.uid)
         const myDocSnapshot= await getDoc(myDocRef)
         if (myDocSnapshot.exists()) {
             setPlayerName(myDocSnapshot.data()['playerID'])
+            setAllFriends(myDocSnapshot.data()['friends'])
         }
     }
+
     useEffect(()=>{
         getMyDatabase();
     }, [])
+
 
     //Find & Add friend based on player ID
     // https://firebase.google.com/docs/firestore/query-data/queries
@@ -133,12 +46,13 @@ export default function FriendsList({navigation}) {
         const querySnapshot= await getDocs(q)
         querySnapshot.forEach((doc) => {
             stats= {
-                name: doc.data()['username'],
+                title: doc.data()['username'],
+                icon: '../../assets/player_avatars/gym_bro.png',
                 strength: doc.data()['total_exercise'],
-                agility: doc.data()['total_steps']/10,
-                stamina: doc.data()['total_sleep']/7,
-                intellect: doc.data()['total_study']/3
-            }
+                agility: doc.data()['total_steps'],
+                stamina: Math.trunc(doc.data()['total_sleep']/7),
+                intellect: Math.trunc(doc.data()['total_study']/3)
+            } 
         });
         //Adds friends data (Name & stats) to my database under "Friends" section
         const docRef= doc(db, "users", current_user.uid)
@@ -146,6 +60,7 @@ export default function FriendsList({navigation}) {
             friends: arrayUnion(stats)
         });
     }
+
 
     //Find & Remove friend based on player ID
     const removeFriend = async() => {   
@@ -155,6 +70,7 @@ export default function FriendsList({navigation}) {
         querySnapshot.forEach((doc) => {
             stats= {
                 name: doc.data()['username'],
+                icon: '../../assets/player_avatars/gym_bro.png',
                 strength: doc.data()['total_exercise'],
                 agility: doc.data()['total_steps']/10,
                 stamina: doc.data()['total_sleep']/7,
@@ -170,6 +86,7 @@ export default function FriendsList({navigation}) {
         });
     }
 
+
     return (
         <SafeAreaView style={styles.container}>
             <ImageBackground source={require("../../assets/background/home_background.png")} resizeMode="contain" imageStyle={{opacity:0.2}}>
@@ -179,7 +96,7 @@ export default function FriendsList({navigation}) {
                 
                 <View style={[styles.childContainer, {flex:6}]}>
                         <View style={{width:334, height:400, borderWidth:2, borderRadius: 10, borderColor:'white', backgroundColor:'white'}}>
-                            <FriendSection />
+                            <FriendSection data={allFriends}/>
                         </View>
                         
                 </View>
@@ -230,8 +147,8 @@ export default function FriendsList({navigation}) {
                             <AppButton 
                                 title="Add friend"
                                 onPress={()=> {
-                                    // addFriend()
-                                    removeFriend()
+                                    addFriend()
+                                    getMyDatabase()
                                     setIsModalVisible(!isModalVisible)
                                     setFriendID('')
                                 }}
@@ -283,10 +200,10 @@ function Friend_Box({player, player_icon, strength, agility, stamina, intellect}
     )
 }
 
-function FriendSection() {
+function FriendSection({data}){
     return (
         <FlatList
-        data={FriendsData}
+        data={data}
         renderItem={({item}) => 
             <Friend_Box
                 player={item.title}
@@ -344,6 +261,7 @@ const styles = StyleSheet.create({
         borderColor: '#DEE8EB',
         backgroundColor: '#DEE8EB',
         gap: 10,
+        paddingVertical: 10,
         margin:2,
     },
 
