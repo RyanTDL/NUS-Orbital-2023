@@ -1,7 +1,8 @@
-import React from "react";
-import {Dimensions, StyleSheet, ImageBackground, Text, View, SafeAreaView, FlatList, Image} from 'react-native';
+import {React, useState, useEffect} from "react";
+import {Dimensions, StyleSheet, ImageBackground, Text, TextInput, View, SafeAreaView, FlatList, Image} from 'react-native';
 import NavTab from "./NavTab";
 import AppButton from "../Signing_In/Button";
+import Modal from "react-native-modal";
 
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
 
@@ -99,28 +100,28 @@ const FriendsData= [
 
 
 export default function FriendsList({navigation}) {
+
+    const [isModalVisible, setIsModalVisible]= useState(false);
+    const [friendID, setFriendID]= useState('');
+
     return (
         <SafeAreaView style={styles.container}>
             <ImageBackground source={require("../../assets/background/home_background.png")} resizeMode="contain" imageStyle={{opacity:0.2}}>
-                <View style={[styles.child_container, {flex:1}]}>
+                <View style={[styles.childContainer, {flex:1}]}>
                     <Text style={{color:'white', fontSize:20, fontWeight:'700',}}>Friends List</Text>
                 </View>
                 
-                <View style={[styles.child_container, {flex:6}]}>
+                <View style={[styles.childContainer, {flex:6}]}>
                         <View style={{width:334, height:400, borderWidth:2, borderRadius: 10, borderColor:'white', backgroundColor:'white'}}>
                             <FriendSection />
                         </View>
                         
                 </View>
 
-                <View style={[styles.child_container, {flex:1, flexDirection:"row", gap:10}]}>
+                <View style={[styles.childContainer, {flex:1, flexDirection:"row", gap:10}]}>
                     <AppButton 
                         title="Add New Friend" 
-                        onPress={()=> {
-                            return (
-                                console.log('New friend added')
-                            );
-                        }}
+                        onPress={()=> setIsModalVisible(!isModalVisible)}
                         buttonStyle={styles.appButtonContainer}
                         textStyle= {styles.appButtonText}
                     />
@@ -136,9 +137,47 @@ export default function FriendsList({navigation}) {
                     />
                 </View>   
 
-                <View style={[styles.child_container, {flex:1}]}>
+                <View style={[styles.childContainer, {flex:1}]}>
                     <NavTab navigation={navigation}/>
                 </View>    
+
+                <Modal 
+                    isVisible={isModalVisible} 
+                    coverScreen= {false}
+                    backdropOpacity= {0.4}
+                    style= {{justifyContent:'center', alignItems:'center'}}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={{gap:5}}>
+                            <Text style={styles.modalText}>Forgot your password?</Text>
+                            <Text style={styles.modalSubtext}>We'll email you a link to reset your password</Text>
+                        </View>
+                        <View>
+                            <TextInput 
+                                style={styles.modalInputBox}
+                                placeholder="Enter player ID"
+                                onChangeText={newID => setFriendID(newID)}
+                                defaultValue= {friendID}
+                            />
+                        </View>
+                        <View style={{gap:10}}>
+                            <AppButton 
+                                title="Send link"
+                                onPress={()=> {
+                                    setIsModalVisible(!isModalVisible)
+                                }}
+                                buttonStyle={[styles.modalButtonContainer, {backgroundColor:'black'}]}
+                                textStyle= {[styles.modalButtonText, {color:'white'}]}
+                            />
+                            <AppButton 
+                                title="Cancel"
+                                onPress={()=> setIsModalVisible(!isModalVisible)}
+                                buttonStyle={[styles.modalButtonContainer, {backgroundColor:'#E0E0E0'}]}
+                                textStyle= {[styles.modalButtonText, {color:'black'}]}
+                            />
+                        </View>
+                    </View>
+                </Modal>
             </ImageBackground>
         </SafeAreaView>
         
@@ -149,7 +188,7 @@ export default function FriendsList({navigation}) {
 
 function Friend_Box({player, player_icon, strength, agility, stamina, intellect}) {
     return (
-        <View style={styles.player_info}>
+        <View style={styles.playerInfo}>
             <Image source={player_icon}/>
             <View>
                 <Text style={{fontSize:12, fontWeight: 500}}>{player}</Text>
@@ -199,7 +238,7 @@ const styles = StyleSheet.create({
         gap: 10,  
     },
 
-    child_container: {
+    childContainer: {
         // borderWidth: 1, 
         // borderColor:'red',
         alignItems:'center',
@@ -223,7 +262,7 @@ const styles = StyleSheet.create({
         textTransform: "uppercase"
     },
 
-    player_info: {
+    playerInfo: {
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
@@ -235,7 +274,7 @@ const styles = StyleSheet.create({
         margin:2,
     },
 
-    friend_section: {
+    friendSection: {
         gap: 8,
     },
 
@@ -254,4 +293,45 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         textTransform: "uppercase"
     },
+
+    modalContainer: {
+        justifyContent: 'space-around',
+        alignItems:'flex-start',
+        padding: 25,
+        // gap:5,
+        width: 350,
+        height: 300,
+        borderRadius: 30,
+        backgroundColor: 'white',
+    },
+
+    modalText: {
+        fontSize:26,
+        fontWeight: 600,
+    },
+
+    modalSubtext: {
+        fontSize:14 ,
+        fontWeight: 400,
+    },
+
+    modalInputBox : {
+        borderWidth: 1,
+        borderColor: 'black',
+        borderRadius: 10,
+        width:300,
+        padding: 10,
+    },
+
+    modalButtonContainer: {
+        width: 300,
+        borderRadius: 24,
+        paddingVertical: 10,
+    },
+
+    modalButtonText:{
+        fontSize: 15,
+        fontWeight: "bold",
+        alignSelf: "center",
+    }
 })

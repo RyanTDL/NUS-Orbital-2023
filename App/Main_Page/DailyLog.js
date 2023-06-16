@@ -102,14 +102,14 @@ export default function DailyLog({navigation}) {
     return (
         <SafeAreaView style={styles.container}>
             <ImageBackground source={require("../../assets/background/home_background.png")} resizeMode="contain" imageStyle={{opacity:1}}>
-                <View style={[styles.child_container, {flex:1}]}>
+                <View style={[styles.childContainer, {flex:1}]}>
                     <Text style={{color:'white', fontSize:20, fontWeight:'700',}}>Daily Log</Text>
                 </View>
                 
-                <View style={[styles.child_container, {flex:7}]}>
+                <View style={[styles.childContainer, {flex:7}]}>
                     <View style={styles.form}>
                         <View>
-                            <Text style={styles.form_text}>Number of Hours Exercised</Text>
+                            <Text style={styles.formText}>Number of Hours Exercised</Text>
                             <TextInput 
                                 style={styles.entries}
                                 placeholder='Total Hours'
@@ -119,7 +119,7 @@ export default function DailyLog({navigation}) {
                         </View>
                         
                         <View>
-                            <Text style={styles.form_text}>Number of Steps Taken</Text>
+                            <Text style={styles.formText}>Number of Steps Taken</Text>
                             <TextInput 
                                 style={styles.entries}
                                 placeholder='Total Steps'
@@ -129,7 +129,7 @@ export default function DailyLog({navigation}) {
                         </View>
                         
                         <View>
-                            <Text style={styles.form_text}>Number of Hours of Sleep</Text>
+                            <Text style={styles.formText}>Number of Hours of Sleep</Text>
                             <TextInput 
                                 style={styles.entries}
                                 placeholder='Total Hours'
@@ -139,7 +139,7 @@ export default function DailyLog({navigation}) {
                         </View>    
 
                         <View>
-                            <Text style={styles.form_text}>Number of Hours Spent Studying</Text>
+                            <Text style={styles.formText}>Number of Hours Spent Studying</Text>
                             <TextInput 
                                 style={styles.entries}
                                 placeholder='Total Hours'
@@ -164,7 +164,7 @@ export default function DailyLog({navigation}) {
                 </View>
                 
 
-                <View style={[styles.child_container, {flex:1}]}>
+                <View style={[styles.childContainer, {flex:1}]}>
                     <NavTab navigation={navigation}/>
                 </View>    
             </ImageBackground>
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',  
     },
 
-    child_container: {
+    childContainer: {
         // borderWidth: 1, 
         // borderColor:'red',
         alignItems:'center',
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
         gap: 20,
     },
 
-    form_text: {
+    formText: {
         color: 'white',
         fontSize: 18,
         marginBottom: 3,

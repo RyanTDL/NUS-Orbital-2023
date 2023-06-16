@@ -54,11 +54,11 @@ export default function WeeklyActivity({navigation}) {
     return (
         <SafeAreaView style={styles.container}>
             <ImageBackground source={require("../../assets/background/home_background.png")} resizeMode="contain" imageStyle={{opacity:0.4}}>
-                <View style={[styles.child_container, {flex:1}]}>
+                <View style={[styles.childContainer, {flex:1}]}>
                     <Text style={{color:'white', fontSize:20, fontWeight:'700'}}>Weekly Activity</Text>
                 </View>
 
-                <View style={[styles.child_container, {flex:6}]}>
+                <View style={[styles.childContainer, {flex:6}]}>
                     <ScrollView>
                         <View>
                             <Text style={[styles.subheader, {color:'#D21A1A'}]}>Number of hours of exercise</Text>
@@ -84,7 +84,7 @@ export default function WeeklyActivity({navigation}) {
                 </View>
 
                 
-                <View style={[styles.child_container, {flex:1}]}>
+                <View style={[styles.childContainer, {flex:1}]}>
                     <NavTab navigation={navigation}/>
                 </View>
             </ImageBackground>
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
         gap: 10,  
     },
 
-    child_container: {
+    childContainer: {
         alignItems:'center',
         justifyContent: 'center',     
     },

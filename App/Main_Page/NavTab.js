@@ -9,21 +9,21 @@ export default function NavTab({navigation}){
             {/* Use navigation.replace() instead of navigation.navigate() as it allows the screen to re-render when changing screens
             https://stackoverflow.com/questions/60182942/useeffect-not-called-in-react-native-when-back-to-screen */}
 
-            <TouchableOpacity onPress={()=>navigation.replace('Home Screen')} style={styles.grid_box}>
+            <TouchableOpacity onPress={()=>navigation.replace('Home Screen')} style={styles.gridBox}>
                 <Ionicons name="home-outline" size={24} color="#B3B3B3" />                
-                <Text style={styles.nav_text}>Home</Text>
+                <Text style={styles.navText}>Home</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={()=>navigation.replace('Daily Log')} style={styles.grid_box}>
+            <TouchableOpacity onPress={()=>navigation.replace('Daily Log')} style={styles.gridBox}>
                 <AntDesign name="book" size={24} color="#B3B3B3" />
-                <Text style={styles.nav_text}>Daily Log</Text>
+                <Text style={styles.navText}>Daily Log</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={()=>navigation.replace('Weekly Activity')} style={styles.grid_box}>
+            <TouchableOpacity onPress={()=>navigation.replace('Weekly Activity')} style={styles.gridBox}>
                 <AntDesign name="linechart" size={24} color="#B3B3B3" />
-                <Text style={styles.nav_text}>Activity</Text>
+                <Text style={styles.navText}>Activity</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={()=>navigation.replace('Friends List')} style={styles.grid_box}>
+            <TouchableOpacity onPress={()=>navigation.replace('Friends List')} style={styles.gridBox}>
                 <FontAwesome5 name="user-friends" size={24} color="#B3B3B3" />
-                <Text style={styles.nav_text}>Friends</Text>
+                <Text style={styles.navText}>Friends</Text>
             </TouchableOpacity>
         </View>
     );
@@ -41,14 +41,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 
-    grid_box: {
+    gridBox: {
         width: 70,
         height: 70,
         justifyContent: 'center',
         alignItems: 'center',
     },
 
-    nav_text: {
+    navText: {
         // fontWeight: ,
         fontSize: 14,
         color: '#B3B3B3',

@@ -7,12 +7,12 @@ const {width, height}= Dimensions.get('window'); //retrieves dimensions of the s
 export default function Welcome({navigation}) {
     return (
             <SafeAreaView style={styles.container}>
-                <Image source={require('../../assets/app_icon.png')} style={[styles.child_container, {flex:3}]}/>
-                <View style={[styles.child_container, {flex:1}]}>
-                    <Text style={styles.header_text}>LifeQuest</Text>
-                    <Text style={styles.subheader_text}>Level up your life, one step at a time</Text>
+                <Image source={require('../../assets/app_icon.png')} style={[styles.childContainer, {flex:3}]}/>
+                <View style={[styles.childContainer, {flex:1}]}>
+                    <Text style={styles.headerText}>LifeQuest</Text>
+                    <Text style={styles.subheaderText}>Level up your life, one step at a time</Text>
                 </View>
-                <View style={[styles.child_container, {flex:1}]}>
+                <View style={[styles.childContainer, {flex:1}]}>
                     <AppButton 
                         title="Log In"
                         onPress={()=> {
@@ -52,18 +52,18 @@ const styles = StyleSheet.create({
         justifyContent: 'center',     
     },
 
-    child_container: {
+    childContainer: {
         alignItems:'center',
         justifyContent: 'center',     
     },
 
-    header_text: {
+    headerText: {
         fontSize: 45,
         fontWeight: 700,
         color: '#FFFFFF',
     },
 
-    subheader_text: {
+    subheaderText: {
         paddingTop: 5,
         fontSize: 18,
         fontWeight: 400,
