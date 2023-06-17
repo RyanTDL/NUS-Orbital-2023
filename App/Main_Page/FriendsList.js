@@ -3,11 +3,10 @@ import {Dimensions, StyleSheet, ImageBackground, Text, TextInput, View, SafeArea
 import NavTab from "./NavTab";
 import AppButton from "../Signing_In/Button";
 import Modal from "react-native-modal";
-import {db, getDatabaseData} from "../../firebase";
+import {db,} from "../../firebase";
 import {collection, getDoc, FieldValue, setDoc, query, where, doc, increment, getDocs, updateDoc, arrayUnion, arrayRemove} from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import {auth} from "../../firebase";
-import { async } from "@firebase/util";
 
 
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
@@ -15,13 +14,12 @@ const {width, height}= Dimensions.get('window'); //retrieves dimensions of the s
 
 export default function FriendsList({navigation}) {
 
-    const [isModalVisible, setIsModalVisible]= useState(false);
+    const [isAddModalVisible, setIsAddModalVisible]= useState(false);
+    const [isRemoveModalVisible, setIsRemoveModalVisible]= useState(false);
     const [playerName, setPlayerName]= useState('');
     const [friendID, setFriendID]= useState('');
     const [allFriends, setAllFriends]= useState([]);
     const [current_user, loading, error]= useAuthState(auth);
-
-
 
     //Retrieve my player name, and friends list
     const getMyDatabase = async() => {    
@@ -37,7 +35,6 @@ export default function FriendsList({navigation}) {
         getMyDatabase();
     }, [])
 
-
     //Find & Add friend based on player ID
     // https://firebase.google.com/docs/firestore/query-data/queries
     const addFriend = async() => {   
@@ -47,9 +44,10 @@ export default function FriendsList({navigation}) {
         querySnapshot.forEach((doc) => {
             stats= {
                 title: doc.data()['username'],
+                friendID: doc.data()['playerID'],
                 icon: '../../assets/player_avatars/gym_bro.png',
                 strength: doc.data()['total_exercise'],
-                agility: doc.data()['total_steps'],
+                agility: Math.trunc(doc.data()['total_steps']/10),
                 stamina: Math.trunc(doc.data()['total_sleep']/7),
                 intellect: Math.trunc(doc.data()['total_study']/3)
             } 
@@ -69,18 +67,18 @@ export default function FriendsList({navigation}) {
         const querySnapshot= await getDocs(q)
         querySnapshot.forEach((doc) => {
             stats= {
-                name: doc.data()['username'],
+                title: doc.data()['username'],
+                friendID: doc.data()['playerID'],
                 icon: '../../assets/player_avatars/gym_bro.png',
                 strength: doc.data()['total_exercise'],
-                agility: doc.data()['total_steps']/10,
-                stamina: doc.data()['total_sleep']/7,
-                intellect: doc.data()['total_study']/3
+                agility: Math.trunc(doc.data()['total_steps']/10),
+                stamina: Math.trunc(doc.data()['total_sleep']/7),
+                intellect: Math.trunc(doc.data()['total_study']/3)
             }
         }
         );
         //Adds friends data (Name & stats) to my database under "Friends" section
         const docRef= doc(db, "users", current_user.uid)
-        console.log(friendRemoved)
         await updateDoc(docRef, {
             friends: arrayRemove(stats)
         });
@@ -104,17 +102,13 @@ export default function FriendsList({navigation}) {
                 <View style={[styles.childContainer, {flex:1, flexDirection:"row", gap:10}]}>
                     <AppButton 
                         title="Add New Friend" 
-                        onPress={()=> setIsModalVisible(!isModalVisible)}
+                        onPress={()=> setIsAddModalVisible(!isAddModalVisible)}
                         buttonStyle={styles.appButtonContainer}
                         textStyle= {styles.appButtonText}
                     />
                     <AppButton 
                         title="Remove Friend" 
-                        onPress={()=> {
-                            return (
-                                console.log('Friend Removed')
-                            );
-                        }}
+                        onPress={()=> setIsRemoveModalVisible(!isRemoveModalVisible)}
                         buttonStyle={styles.appButtonContainer}
                         textStyle= {styles.appButtonText}
                     />
@@ -124,8 +118,9 @@ export default function FriendsList({navigation}) {
                     <NavTab navigation={navigation}/>
                 </View>    
 
+                {/* Add Friend Modal */}
                 <Modal 
-                    isVisible={isModalVisible} 
+                    isVisible={isAddModalVisible} 
                     coverScreen= {false}
                     backdropOpacity= {0.4}
                     style= {{justifyContent:'center', alignItems:'center'}}
@@ -148,8 +143,7 @@ export default function FriendsList({navigation}) {
                                 title="Add friend"
                                 onPress={()=> {
                                     addFriend()
-                                    getMyDatabase()
-                                    setIsModalVisible(!isModalVisible)
+                                    setIsAddModalVisible(!isAddModalVisible)
                                     setFriendID('')
                                 }}
                                 buttonStyle={[styles.modalButtonContainer, {backgroundColor:'black'}]}
@@ -159,7 +153,50 @@ export default function FriendsList({navigation}) {
                                 title="Cancel"
                                 onPress={()=> {
                                     setFriendID('')
-                                    setIsModalVisible(!isModalVisible)
+                                    setIsAddModalVisible(!isAddModalVisible)
+                                }}
+                                buttonStyle={[styles.modalButtonContainer, {backgroundColor:'#E0E0E0'}]}
+                                textStyle= {[styles.modalButtonText, {color:'black'}]}
+                            />
+                        </View>
+                    </View>
+                </Modal>
+
+                {/* Remove Friend Modal */}
+                <Modal 
+                    isVisible={isRemoveModalVisible} 
+                    coverScreen= {false}
+                    backdropOpacity= {0.4}
+                    style= {{justifyContent:'center', alignItems:'center'}}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent:'center', gap:5}}>
+                            <Text style={styles.modalText}> Remove your friend </Text>
+                        </View>
+                        <View>
+                            <TextInput 
+                                style={styles.modalInputBox}
+                                placeholder="Enter player ID"
+                                onChangeText={newID => setFriendID(newID)}
+                                defaultValue= {friendID}
+                            />
+                        </View>
+                        <View style={{gap:10}}>
+                            <AppButton 
+                                title="Remove friend"
+                                onPress={()=> {
+                                    removeFriend()
+                                    setIsRemoveModalVisible(!isRemoveModalVisible)
+                                    setFriendID('')
+                                }}
+                                buttonStyle={[styles.modalButtonContainer, {backgroundColor:'black'}]}
+                                textStyle= {[styles.modalButtonText, {color:'white'}]}
+                            />
+                            <AppButton 
+                                title="Cancel"
+                                onPress={()=> {
+                                    setFriendID('')
+                                    setIsRemoveModalVisible(!isRemoveModalVisible)
                                 }}
                                 buttonStyle={[styles.modalButtonContainer, {backgroundColor:'#E0E0E0'}]}
                                 textStyle= {[styles.modalButtonText, {color:'black'}]}
@@ -174,14 +211,13 @@ export default function FriendsList({navigation}) {
 }
 
 
-
-function Friend_Box({player, player_icon, strength, agility, stamina, intellect}) {
+function Friend_Box({player, playerID, player_icon, strength, agility, stamina, intellect}) {
     return (
         <View style={styles.playerInfo}>
             {/* <Image source={player_icon}/> */}
             <Image source={require('../../assets/player_avatars/gym_bro.png')}/>
             <View>
-                <Text style={{fontSize:12, fontWeight: 500}}>{player}</Text>
+                <Text style={{fontSize:12, fontWeight: 500}}>{player} (Player ID: #{playerID})</Text>
                 <Text style={{fontSize:12, fontWeight: 300}}> Strength: {strength}/100  Agility: {agility}/100</Text>
                 <Text style={{fontSize:12, fontWeight: 300}}> Stamina: {stamina}/100  Intellect:{intellect}/100</Text>
             </View>
@@ -207,6 +243,7 @@ function FriendSection({data}){
         renderItem={({item}) => 
             <Friend_Box
                 player={item.title}
+                playerID={item.friendID}
                 player_icon={item.icon}
                 strength={item.strength}
                 agility={item.agility}
@@ -216,6 +253,8 @@ function FriendSection({data}){
         />
     );
 }
+
+
 
 const styles = StyleSheet.create({
     container: { 
@@ -254,14 +293,14 @@ const styles = StyleSheet.create({
 
     playerInfo: {
         flexDirection: 'row',
-        justifyContent: 'flex-start',
+        justifyContent: 'space-between',
         alignItems: 'center',
         borderRadius: 8,
         borderWidth: 1,
         borderColor: '#DEE8EB',
         backgroundColor: '#DEE8EB',
-        gap: 10,
         paddingVertical: 10,
+        paddingHorizontal: 5,
         margin:2,
     },
 
