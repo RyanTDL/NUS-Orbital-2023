@@ -19,6 +19,7 @@ export default function FriendsList({navigation}) {
     const [playerName, setPlayerName]= useState('');
     const [friendID, setFriendID]= useState('');
     const [allFriends, setAllFriends]= useState([]);
+    const [refreshFlatlist, setRefreshFlatlist]= useState(false);
     const [current_user, loading, error]= useAuthState(auth);
 
     //Retrieve my player name, and friends list
@@ -31,9 +32,11 @@ export default function FriendsList({navigation}) {
         }
     }
 
+    //Updates allFriends database whenever friend is added/removed, which re-renders the flatlist
     useEffect(()=>{
         getMyDatabase();
-    }, [])
+    }, [isAddModalVisible, isRemoveModalVisible])
+
 
     //Find & Add friend based on player ID
     // https://firebase.google.com/docs/firestore/query-data/queries
@@ -94,7 +97,20 @@ export default function FriendsList({navigation}) {
                 
                 <View style={[styles.childContainer, {flex:6}]}>
                         <View style={{width:334, height:400, borderWidth:2, borderRadius: 10, borderColor:'white', backgroundColor:'white'}}>
-                            <FriendSection data={allFriends}/>
+                            <FlatList
+                                data={allFriends}
+                                extraData={isAddModalVisible}
+                                renderItem={({item}) => 
+                                    <Friend_Box
+                                        player={item.title}
+                                        playerID={item.friendID}
+                                        player_icon={item.icon}
+                                        strength={item.strength}
+                                        agility={item.agility}
+                                        stamina={item.stamina}
+                                        intellect={item.intellect}
+                                    />}
+                            />
                         </View>
                         
                 </View>
@@ -235,25 +251,6 @@ function Friend_Box({player, playerID, player_icon, strength, agility, stamina, 
         </View>
     )
 }
-
-function FriendSection({data}){
-    return (
-        <FlatList
-        data={data}
-        renderItem={({item}) => 
-            <Friend_Box
-                player={item.title}
-                playerID={item.friendID}
-                player_icon={item.icon}
-                strength={item.strength}
-                agility={item.agility}
-                stamina={item.stamina}
-                intellect={item.intellect}
-            />}
-        />
-    );
-}
-
 
 
 const styles = StyleSheet.create({
