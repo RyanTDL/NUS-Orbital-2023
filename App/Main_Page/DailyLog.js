@@ -29,7 +29,6 @@ export default function DailyLog({navigation}) {
         const docRef= doc(db, "users", current_user.uid)
         const docSnapshot= await getDoc(docRef)
         if (docSnapshot.exists()) {
-            console.log('Database exist')
             total_exercise= docSnapshot.data()['weekly_exercise']
             total_steps= docSnapshot.data()['weekly_steps']
             total_sleep= docSnapshot.data()['weekly_sleep']
@@ -52,12 +51,16 @@ export default function DailyLog({navigation}) {
 
         //parseInt converts string to int, also deals with values like "12s2"(converted to 122) and "nasw" (converted to NaN)
         daily_exercise= parseInt(exercise,10) 
-        daily_steps= parseInt(steps,10)
+        daily_steps= Math.round(parseInt(steps,10)/1000) //stores steps in the thousands: 1292 steps becomes 1k etc
         daily_sleep= parseInt(sleep,10)
         daily_study= parseInt(study,10)
         //Prevent input of strings, which will cause database to store value 'NaN'
         if (isNaN(daily_exercise) || isNaN(daily_steps) || isNaN(daily_sleep) || isNaN(daily_study)){
-            alert("Please ensure all fields have valid inputs")
+            alert("Please ensure all fields are filled correctly")
+            return
+        }
+        else if (daily_exercise>24||daily_steps>20||daily_sleep>24||daily_study>24){
+            alert("Please ensure all inputs are within 24 hours")
             return
         }
 
@@ -99,14 +102,14 @@ export default function DailyLog({navigation}) {
     return (
         <SafeAreaView style={styles.container}>
             <ImageBackground source={require("../../assets/background/home_background.png")} resizeMode="contain" imageStyle={{opacity:1}}>
-                <View style={[styles.child_container, {flex:1}]}>
+                <View style={[styles.childContainer, {flex:1}]}>
                     <Text style={{color:'white', fontSize:20, fontWeight:'700',}}>Daily Log</Text>
                 </View>
                 
-                <View style={[styles.child_container, {flex:7}]}>
+                <View style={[styles.childContainer, {flex:7}]}>
                     <View style={styles.form}>
                         <View>
-                            <Text style={styles.form_text}>Number of Hours Exercised</Text>
+                            <Text style={styles.formText}>Number of Hours Exercised</Text>
                             <TextInput 
                                 style={styles.entries}
                                 placeholder='Total Hours'
@@ -116,7 +119,7 @@ export default function DailyLog({navigation}) {
                         </View>
                         
                         <View>
-                            <Text style={styles.form_text}>Number of Steps Taken</Text>
+                            <Text style={styles.formText}>Number of Steps Taken</Text>
                             <TextInput 
                                 style={styles.entries}
                                 placeholder='Total Steps'
@@ -126,7 +129,7 @@ export default function DailyLog({navigation}) {
                         </View>
                         
                         <View>
-                            <Text style={styles.form_text}>Number of Hours of Sleep</Text>
+                            <Text style={styles.formText}>Number of Hours of Sleep</Text>
                             <TextInput 
                                 style={styles.entries}
                                 placeholder='Total Hours'
@@ -136,7 +139,7 @@ export default function DailyLog({navigation}) {
                         </View>    
 
                         <View>
-                            <Text style={styles.form_text}>Number of Hours Spent Studying</Text>
+                            <Text style={styles.formText}>Number of Hours Spent Studying</Text>
                             <TextInput 
                                 style={styles.entries}
                                 placeholder='Total Hours'
@@ -161,7 +164,7 @@ export default function DailyLog({navigation}) {
                 </View>
                 
 
-                <View style={[styles.child_container, {flex:1}]}>
+                <View style={[styles.childContainer, {flex:1}]}>
                     <NavTab navigation={navigation}/>
                 </View>    
             </ImageBackground>
@@ -182,7 +185,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',  
     },
 
-    child_container: {
+    childContainer: {
         // borderWidth: 1, 
         // borderColor:'red',
         alignItems:'center',
@@ -194,7 +197,7 @@ const styles = StyleSheet.create({
         gap: 20,
     },
 
-    form_text: {
+    formText: {
         color: 'white',
         fontSize: 18,
         marginBottom: 3,

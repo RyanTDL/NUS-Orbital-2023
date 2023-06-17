@@ -1,0 +1,5 @@
+1. Users exceed stat value of 100
+2. Users key in more than 24hours for each daily log (Total hours for 3 fields should not exceed 24)
+3. Need character limit for password & username
+4. Check that users can't create a second account using the same email
+5. Deal with users entering strings/no values into the daily logs

@@ -4,7 +4,6 @@ import AppButton from './Button';
 import {auth, logInWithEmailAndPassword, sendPasswordReset} from "../../firebase";
 import {useAuthState} from "react-firebase-hooks/auth";
 import Modal from "react-native-modal";
-// import { signInWithEmailAndPassword } from "firebase/auth";
 
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
 
@@ -31,22 +30,22 @@ export default function LogIn({navigation}) {
     return (
         <SafeAreaView style={styles.container}>
             <ImageBackground source={require("../../assets/background/signin_background.png")} resizeMode="contain" imageStyle={{opacity:0.5}}>
-                <View style={[styles.child_container, {flex:1}]}>
+                <View style={[styles.childContainer, {flex:1}]}>
                     <Text style={styles.header}>Welcome Back!</Text>
                 </View>
 
-                <View style={[styles.child_container, {flex:1}]}>
+                <View style={[styles.childContainer, {flex:1}]}>
                     <View style={styles.inputs}>
-                        <Text style={styles.input_details}>Email</Text>
+                        <Text style={styles.inputDetails}>Email</Text>
                         <TextInput 
-                            style={styles.input_box}
+                            style={styles.inputBox}
                             placeholder="Email"
                             onChangeText={newEmail => setEmail(newEmail)}
                             defaultValue= {email}
                         />
-                        <Text style={styles.input_details}>Password</Text>
+                        <Text style={styles.inputDetails}>Password</Text>
                         <TextInput 
-                            style={styles.input_box}
+                            style={styles.inputBox}
                             secureTextEntry={true}
                             placeholder="Password"
                             onChangeText={newPassword => setPassword(newPassword)}
@@ -58,7 +57,7 @@ export default function LogIn({navigation}) {
                     </View>
                 </View>
 
-                <View style={[styles.child_container, {flex:1}]}>
+                <View style={[styles.childContainer, {flex:1}]}>
                     <View>
                         <AppButton 
                             title="Sign into Account"
@@ -89,14 +88,14 @@ export default function LogIn({navigation}) {
                     backdropOpacity= {0.4}
                     style= {{justifyContent:'center', alignItems:'center'}}
                 >
-                    <View style={styles.modal_container}>
+                    <View style={styles.modalContainer}>
                         <View style={{gap:5}}>
-                            <Text style={styles.modal_text}>Forgot your password?</Text>
-                            <Text style={styles.modal_subtext}>We'll email you a link to reset your password</Text>
+                            <Text style={styles.modalText}>Forgot your password?</Text>
+                            <Text style={styles.modalSubtext}>We'll email you a link to reset your password</Text>
                         </View>
                         <View>
                             <TextInput 
-                                style={styles.modal_input_box}
+                                style={styles.modalInputBox}
                                 placeholder="Email"
                                 onChangeText={newEmail => setEmail(newEmail)}
                                 defaultValue= {email}
@@ -139,7 +138,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
     },
 
-    child_container: {
+    childContainer: {
         // borderWidth: 1, 
         // borderColor:'red',
         alignItems:'center',
@@ -161,13 +160,13 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
 
-    input_details : {
+    inputDetails : {
         fontSize: 20,
         fontWeight: 500,
         color: '#A4A4A4',
     },
 
-    input_box : {
+    inputBox : {
         borderWidth: 2,
         borderColor: '#A4A4A4',
         borderRadius: 5,
@@ -193,7 +192,7 @@ const styles = StyleSheet.create({
         textTransform: "uppercase"
     },
 
-    modal_container: {
+    modalContainer: {
         justifyContent: 'space-around',
         alignItems:'flex-start',
         padding: 25,
@@ -204,17 +203,17 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
     },
 
-    modal_text: {
+    modalText: {
         fontSize:26,
         fontWeight: 600,
     },
 
-    modal_subtext: {
+    modalSubtext: {
         fontSize:14 ,
         fontWeight: 400,
     },
 
-    modal_input_box : {
+    modalInputBox : {
         borderWidth: 1,
         borderColor: 'black',
         borderRadius: 10,

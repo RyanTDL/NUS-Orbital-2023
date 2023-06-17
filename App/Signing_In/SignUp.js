@@ -14,8 +14,8 @@ export default function SignUp({navigation}) {
     const [password, setPassword]= useState('')
     const [user, loading, error]= useAuthState(auth)
 
+    //Registering for an account
     const register= () => {
-        // if (!username) alert("Please Enter Name");
         console.log("Registering")
         registerWithEmailAndPassword(username, email, password);
         console.log("Registered")
@@ -26,31 +26,38 @@ export default function SignUp({navigation}) {
         if (user) navigation.replace('Home Screen');
     }, [user, loading])
 
+    //Maximum of 12 characters for username & password, 40 characters for email
+    const checkUsernameLength= () => {
+        if (username.length>12){
+            return true;
+        }
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <ImageBackground source={require("../../assets/background/signin_background.png")} resizeMode="contain" imageStyle={{opacity:0.5}}>
-                <View style={[styles.child_container, {flex:1}]}>
+                <View style={[styles.childContainer, {flex:1}]}>
                     <Text style={styles.header}>Get Started Today</Text>
                 </View>
-                <View style={[styles.child_container, {flex:1}]}>
+                <View style={[styles.childContainer, {flex:1}]}>
                     <View style={styles.inputs}>
-                        <Text style={styles.input_details}>Username</Text>
+                        <Text style={styles.inputDetails}>Username</Text>
                         <TextInput 
-                            style={styles.input_box}
+                            style={styles.inputBox}
                             placeholder="Username"
                             onChangeText={newUsername => setUsername(newUsername)}
                             defaultValue= {username}
                         />
-                        <Text style={styles.input_details}>Email</Text>
+                        <Text style={styles.inputDetails}>Email</Text>
                         <TextInput 
-                            style={styles.input_box}
+                            style={styles.inputBox}
                             placeholder="Email"
                             onChangeText={newEmail => setEmail(newEmail)}
                             defaultValue= {email}
                         />
-                        <Text style={styles.input_details}>Password</Text>
+                        <Text style={styles.inputDetails}>Password</Text>
                         <TextInput 
-                            style={styles.input_box}
+                            style={styles.inputBox}
                             secureTextEntry={true}
                             placeholder="Password"
                             onChangeText={newPassword => setPassword(newPassword)}
@@ -59,13 +66,18 @@ export default function SignUp({navigation}) {
                     </View>
                 </View>
 
-                <View style={[styles.child_container, {flex:1}]}>
+                <View style={[styles.childContainer, {flex:1}]}>
                     <AppButton 
                         title="Sign Up Now"
                         onPress={()=> {
                             if (email==''||username==''||password==''){
                                 alert('Please fill up all fields')
-                            } else {
+                            } 
+                            else if (checkUsernameLength()){
+                                alert("Username has a 12 character limit")
+                                setUsername("")
+                            }
+                            else {
                                 register()
                             }
                         }}
@@ -102,7 +114,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
     },
 
-    child_container: {
+    childContainer: {
         alignItems:'center',
         justifyContent: 'center',     
     },
@@ -121,13 +133,13 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
 
-    input_details : {
+    inputDetails : {
         fontSize: 20,
         fontWeight: 500,
         color: '#A4A4A4',
     },
 
-    input_box : {
+    inputBox : {
         borderWidth: 2,
         borderColor: '#A4A4A4',
         borderRadius: 5,

@@ -29,7 +29,7 @@ export default function HomeScreen({navigation}) {
 
     //Retrieve user data
     const [current_user, loading, error]= useAuthState(auth);
-    const [name, setName]= useState("");
+    let [name, setName]= useState("");
     const fetchUser= async () => {
         try {
             if (current_user==null){
@@ -46,6 +46,7 @@ export default function HomeScreen({navigation}) {
             alert("An error occured while fetching user data");
         }
     }
+
     useEffect( () => {
         if (loading) return;
         if (!current_user) navigation.navigate('Welcome Page');
@@ -72,7 +73,7 @@ export default function HomeScreen({navigation}) {
     
         //Converting hours/steps into the respective stat points
         strength_points = Math.min(total_exercise, 100) //minimum used to ensure progress bar does not exceed when it hit 100 points
-        agility_points = Math.min(Math.trunc(total_steps/10000),100)
+        agility_points = Math.min(total_steps,100)
         stamina_points = Math.min(Math.trunc(total_sleep/7), 100)
         intellect_points = Math.min(Math.trunc(total_study/3), 100)
     
@@ -89,7 +90,7 @@ export default function HomeScreen({navigation}) {
     return (
         <SafeAreaView style={styles.container}>
             <ImageBackground source={require("../../assets/background/home_background.png")} resizeMode="contain" imageStyle={{opacity:1}}>
-                <View style={[styles.child_container, {flex:1, alignItems: "flex-end", marginRight:5}]}>
+                <View style={[styles.childContainer, {flex:1, alignItems: "flex-end", marginRight:5, marginTop: 5}]}>
                     <TouchableOpacity 
                         style={styles.logout}
                         onPress={()=>logout(auth)}>
@@ -98,13 +99,13 @@ export default function HomeScreen({navigation}) {
                     </TouchableOpacity>
                 </View>
 
-                <View style={[styles.child_container, {flex:3, marginBottom:10}]}>
+                <View style={[styles.childContainer, {flex:3, marginBottom:10}]}>
                     <View style={{width:240, height:240, borderWidth:2, borderRadius: 120, borderColor:'white', backgroundColor: 'white'}}></View>
                     <Text style={{color:'white', fontSize:25, fontWeight:'500'}}>{name}</Text>
                 </View>
 
-                <View style={[styles.child_container, {flex:4}]}>
-                    <View style={styles.stats_grid}>
+                <View style={[styles.childContainer, {flex:4}]}>
+                    <View style={styles.statsGrid}>
                         <ProgressBar stat_name='Strength' stat_value={char_strength} bar_color='red'/>
                         <ProgressBar stat_name='Agility' stat_value={char_agility} bar_color='blue'/>
                         <ProgressBar stat_name='Stamina' stat_value={char_stamina} bar_color='green'/>
@@ -112,7 +113,7 @@ export default function HomeScreen({navigation}) {
                     </View>
                 </View>
                 
-                <View style={[styles.child_container, {flex:1}]}>
+                <View style={[styles.childContainer, {flex:1}]}>
                     <NavTab navigation={navigation}/>
                 </View>
             </ImageBackground>
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
         gap: 10,    
     },
 
-    child_container: {
+    childContainer: {
         alignItems:'center',
         justifyContent: 'center',     
     },
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
         padding:8,
     },
 
-    stats_grid: {
+    statsGrid: {
         width:328, 
         height:328, 
         justifyContent: 'center',
