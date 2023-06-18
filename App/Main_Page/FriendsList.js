@@ -7,7 +7,7 @@ import {db,} from "../../firebase";
 import {collection, getDoc, FieldValue, setDoc, query, where, doc, increment, getDocs, updateDoc, arrayUnion, arrayRemove} from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import {auth} from "../../firebase";
-
+import { useNavigation } from '@react-navigation/native';
 
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
 
@@ -22,6 +22,10 @@ export default function FriendsList({navigation}) {
     const [refreshFlatlist, setRefreshFlatlist]= useState(false);
     const [current_user, loading, error]= useAuthState(auth);
 
+
+    //const [myStats, setMyStats]= useState({})
+    //const [myFriendStats, setMyFriendStats]= useState({})
+
     //Retrieve my player name, and friends list
     const getMyDatabase = async() => {    
         const myDocRef= doc(db, "users", current_user.uid)
@@ -29,6 +33,14 @@ export default function FriendsList({navigation}) {
         if (myDocSnapshot.exists()) {
             setPlayerName(myDocSnapshot.data()['playerID'])
             setAllFriends(myDocSnapshot.data()['friends'])
+
+
+
+            //my_stats= {name: myDocSnapshot.data()['playerID']
+        //                  strength: myDocSnapshot.data()['strength']
+        //                  .......
+        // }
+            // setMyStats(my_stats)
         }
     }
 
@@ -228,9 +240,12 @@ export default function FriendsList({navigation}) {
 
 
 function Friend_Box({player, playerID, player_icon, strength, agility, stamina, intellect}) {
+
+    const navigation = useNavigation();
+    let friendinfo = [player, player_icon, strength, agility, stamina, intellect ];
+
     return (
         <View style={styles.playerInfo}>
-            {/* <Image source={player_icon}/> */}
             <Image source={require('../../assets/player_avatars/gym_bro.png')}/>
             <View>
                 <Text style={{fontSize:12, fontWeight: 500}}>{player} (Player ID: #{playerID})</Text>
@@ -239,10 +254,12 @@ function Friend_Box({player, playerID, player_icon, strength, agility, stamina, 
             </View>
             <AppButton 
                 title="Fight"
-                onPress={()=> {
+                onPress={ () => {
                     return (
-                        console.log('Begin Battle!!')
-                    );
+                        console.log('Begin Battle!', player),
+                        navigation.navigate('BattleStart', {friendinfo})
+                    ); 
+
                 }}
                 buttonStyle={styles.battleButtonContainer}
                 textStyle= {styles.battleButtonText}
