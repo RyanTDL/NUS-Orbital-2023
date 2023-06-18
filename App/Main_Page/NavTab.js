@@ -25,6 +25,7 @@ export default function NavTab({navigation}){
                 <FontAwesome5 name="user-friends" size={24} color="#B3B3B3" />
                 <Text style={styles.navText}>Friends</Text>
             </TouchableOpacity>
+
         </View>
     );
 } 
