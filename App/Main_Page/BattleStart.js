@@ -1,22 +1,12 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {Dimensions, StyleSheet, ImageBackground, Text, View, SafeAreaView, FlatList, Image, Pressable} from 'react-native';
 import { StatusBar, Platform } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Center } from "native-base";
 
-
-
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
 
-
-
-
 export default function BattlePage({navigation, route}) {
-
-    console.log(route.params.friendinfo);
-    console.log(route.params.friendinfo[0]);
-
-
 
     //Load Font 
     const [loaded] = useFonts({
@@ -26,18 +16,88 @@ export default function BattlePage({navigation, route}) {
         return null;
     }
 
+    let friend_icon = route.params.friendinfo[1] ;
+    console.log(friend_icon);
+
+    //Heal button (Work in progress)
+    let healthstat = parseInt(route.params.friendinfo[4]);
+    // const [healthstat, sethealthstat] = useState(parseInt(route.params.friendinfo[4]));
+
     return(
         <SafeAreaView style={styles.container}>
-            <View style={styles.playerinfo}>
+            <View style={styles.players_info_container}>
        
-                <View style={styles.playerholderimage}> 
+                <View style={styles.player_info}> 
                     <ImageBackground
                   source={require('../../assets/battlesystem/playerholder.jpg')}
-                  style={styles.playerholderimage}
+                  style={styles.player_info}
                   > 
 
                   <View style={styles.playeridentity}>
-                      <Image source={require('../../assets/player_avatars/gym_bro.png')}/>
+                      <Image source={require('../../assets/player_avatars/star_athlete.png')}/>
+                      <Text style={styles.playername}>
+                      User203
+                      </Text>
+                  </View> 
+                  
+                  <View style={styles.playerstats}>
+                      <View style={styles.playerstats_child}>
+                          <View style={styles.playerstatsicon}>
+                              <Image
+                                  style={{
+                                      flex: 1,
+                                      width: 30,
+                                      resizeMode: 'contain',
+                                  }}
+                                  source={require('../../assets/battlesystem/heart.png')}
+                                  />
+
+                          </View>
+                          
+
+                          <View style={styles.statusbar}>
+                            <View style ={[styles.statusbar,{ backgroundColor:'#fc080d', width: healthstat}]}>
+                                
+                            </View>
+                          </View>
+
+                      </View>
+
+                      <View style={styles.playerstats_child}> 
+                          <View style={styles.playerstatsicon}>
+                              <Image
+                                  style={{
+                                      flex: 1,
+                                      width: 30,
+                                      resizeMode: 'contain',
+                                  }}
+                                  source={require('../../assets/battlesystem/power.png')}
+                                  />
+                          </View>
+
+                          <View style={styles.statusbar}>
+                            <View style ={[styles.statusbar,{backgroundColor:'#D5B71C', width: parseInt(route.params.friendinfo[5])}]}>
+                                
+                            </View>
+                          </View>
+
+                      </View>
+                  </View>
+                    </ImageBackground>
+
+                </View>
+
+                <View style={styles.player_info}> 
+                <ImageBackground
+                  source={require('../../assets/battlesystem/playerholder.jpg')}
+                  style={styles.player_info}
+                  > 
+
+                  <View style={styles.playeridentity}>
+                  <Image source={require('../../assets/player_avatars/star_athlete.png')}/>
+                  {/* <Image source={require({friend_icon})}/> */}
+
+
                       <Text style={styles.playername}>
                       {route.params.friendinfo[0]}
                       </Text>
@@ -48,16 +108,20 @@ export default function BattlePage({navigation, route}) {
                           <View style={styles.playerstatsicon}>
                               <Image
                                   style={{
-                                      flex: 0.2,
+                                      flex: 1,
                                       width: 30,
                                       resizeMode: 'contain',
                                   }}
-                                  source={require('../../assets/battlesystem/power.png')}
+                                  source={require('../../assets/battlesystem/heart.png')}
                                   />
 
                           </View>
+                          
 
-                          <View style={styles.powerbar}>
+                          <View style={styles.statusbar}>
+                            <View style ={[styles.statusbar,{backgroundColor:'#fc080d', width: parseInt(route.params.friendinfo[4])}]}>
+                                
+                            </View>
                           </View>
 
                       </View>
@@ -66,7 +130,7 @@ export default function BattlePage({navigation, route}) {
                           <View style={styles.playerstatsicon}>
                               <Image
                                   style={{
-                                      flex: 0.2,
+                                      flex: 1,
                                       width: 30,
                                       resizeMode: 'contain',
                                   }}
@@ -74,65 +138,16 @@ export default function BattlePage({navigation, route}) {
                                   />
                           </View>
 
-                          <View style={styles.powerbar}>
+                          <View style={styles.statusbar}>
+                            <View style ={[styles.statusbar,{backgroundColor:'#D5B71C', width: parseInt(route.params.friendinfo[5])}]}>
+                                
+                            </View>
                           </View>
 
                       </View>
                   </View>
                     </ImageBackground>
 
-                </View>
-
-                <View style={styles.playerholderimage}> 
-                    <ImageBackground
-                    source={require('../../assets/battlesystem/playerholder.jpg')}
-                    style={styles.playerholderimage}
-                    > 
-
-                    <View style={styles.playeridentity}>
-                        <Image source={require('../../assets/player_avatars/gym_bro.png')}/>
-                        <Text style={styles.playername}>
-                        {route.params.friendinfo[0]}
-                        </Text>
-                    </View> 
-                    
-                    <View style={styles.playerstats}>
-                        <View style={styles.playerstats_child}>
-                            <View style={styles.playerstatsicon}>
-                                <Image
-                                    style={{
-                                        flex: 0.2,
-                                        width: 30,
-                                        resizeMode: 'contain',
-                                    }}
-                                    source={require('../../assets/battlesystem/power.png')}
-                                    />
-
-                            </View>
-
-                            <View style={styles.powerbar}>
-                            </View>
-
-                        </View>
-
-                        <View style={styles.playerstats_child}> 
-                            <View style={styles.playerstatsicon}>
-                                <Image
-                                    style={{
-                                        flex: 0.2,
-                                        width: 30,
-                                        resizeMode: 'contain',
-                                    }}
-                                    source={require('../../assets/battlesystem/power.png')}
-                                    />
-                            </View>
-
-                            <View style={styles.powerbar}>
-                            </View>
-
-                        </View>
-                    </View>
-                    </ImageBackground>
 
                 </View>
 
@@ -156,8 +171,8 @@ export default function BattlePage({navigation, route}) {
 
                 <View style={styles.moves_container}>
                     <Pressable style={[styles.moves_button, {backgroundColor: '#fc080d',orderColor: '#8e0000'}]}  
-                    onPress = {() => console.log('FIGHT')}>
-                        <Text style={styles.text}> FIGHT </Text>
+                    onPress = {() => console.log('Attack')}>
+                        <Text style={styles.text}> ATTACK </Text>
                     </Pressable>
 
                     <Pressable style={[styles.moves_button, {backgroundColor: '#D5B71C',orderColor: '#635f09'}]} 
@@ -168,14 +183,25 @@ export default function BattlePage({navigation, route}) {
 
                 <View style={styles.moves_container}>
                     <Pressable style={[styles.moves_button, {backgroundColor: '#61A631',orderColor: '#0E6600'}]} 
-                    onPress = {() => console.log('HEAL')}>   
+                    // onPress = {() => console.log('HEAL')}>   
+
+                    onPress={ () => {
+                    return (
+                        console.log('HEAL'),
+                        healthstat += 10
+                    )}
+
+                }>
                         <Text style={styles.text}> HEAL </Text>
+
+
                         </Pressable>
+
 
                     <Pressable style={[styles.moves_button, {backgroundColor: '#76C4E8',orderColor: '#0098BA'}]} 
                     onPress={() => {
                         console.log('RUN');
-                        navigation.navigate('Battle');
+                        navigation.navigate('Friends List');
                       }}> 
                         <Text style={styles.text}> RUN </Text>
                     </Pressable>
@@ -191,28 +217,20 @@ const styles = StyleSheet.create({
         paddingTop: StatusBar.currentHeight,
         flex: 1,
         backgroundColor: 'black', 
-        gap: 1, 
-        padding: 0,
-        margin: 0, 
         
     },
 
-    playerinfo: {
+    players_info_container: {
         flex: 0.7,
         backgroundColor: 'black',
-        marginBottom: 0, 
         flexDirection: 'row', 
-        borderColor: 'blue',
-        justifyContent: 'center',
     },
 
-    playerholderimage: {
+    player_info: {
         flex: 1,
         borderWidth: 2,
         borderColor: 'black',
-        borderRadius: 20,
-
-        
+        borderRadius: 20,       
     },
 
 
@@ -242,38 +260,27 @@ const styles = StyleSheet.create({
     playerstats: {
         flex: 2,
         flexDirection: 'column',
-        borderColor: 'red',
-        borderWidth: 5,
+        // borderColor: 'red',
+        // borderWidth: 5,
     },
     playerstats_child: {
         flex: 1,
         flexDirection: 'row',
-        borderColor: 'white',
-        borderWidth: 2,
     },
 
     playerstatsicon: {
         flex: 0.2,
-        flexDirection: 'row',
-        borderColor: 'blue',
-        borderWidth: 1,
     },
 
-    healthbar: {
+    statusbar: {
         flex: 1,
-        borderColor: 'green',
-        borderWidth: 2,
-    },
-
-    powerbar: {
-        flex: 1,
-        borderColor: 'green',
-        borderWidth: 2,
-    },
-
-    box: {
-        flex: 1,
-        flexDirection: 'row',
+        width: 10,
+        height:25, 
+        borderWidth:2, 
+        borderRadius: 5, 
+        borderColor:'black', 
+        backgroundColor: 'grey',
+        
     },
 
     animationwindow: {
@@ -339,7 +346,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#FFFFFF',
         textShadowColor: '#000000',
-        textShadowOffset: { width: 2, height: 4 },
+        textShadowOffset: { width: 2, height: 3.5 },
         textShadowRadius: 4,
     
     },
