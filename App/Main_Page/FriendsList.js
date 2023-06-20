@@ -17,10 +17,13 @@ export default function FriendsList({navigation}) {
 
     const [isAddModalVisible, setIsAddModalVisible]= useState(false);
     const [isRemoveModalVisible, setIsRemoveModalVisible]= useState(false);
+    const [isFriendAddedModalVisible, setIsFriendAddedModalVisible]= useState(false);
+    const [isFriendRemovedModalVisible, setIsFriendRemovedModalVisible]= useState(false);
+
 
     const [myStats, setMyStats]= useState({});
     const [friendStats, setFriendStats]= useState({});
-
+    const [allFriends, setAllFriends]= useState([]);
     const [myFriendID, setMyFriendID]= useState('');
     const [current_user, loading, error]= useAuthState(auth);
 
@@ -47,36 +50,42 @@ export default function FriendsList({navigation}) {
         // https://firebase.google.com/docs/firestore/query-data/queries
         const q= query(collection(db, "users"), where("playerID", "==", myFriendID))
         const querySnapshot= await getDocs(q)
-        querySnapshot.forEach((doc) => {
-            setFriendStats({
-                title: doc.data()['username'],
-                uid: doc.data()['uid'],
-                friendID: doc.data()['playerID'],
-                icon: '../../assets/player_avatars/gym_bro.png',
-                strength: doc.data()['total_exercise'],
-                agility: Math.trunc(doc.data()['total_steps']/10),
-                stamina: Math.trunc(doc.data()['total_sleep']/7),
-                intellect: Math.trunc(doc.data()['total_study']/3)
-            }) 
-        });
+        const playerStatsArray= querySnapshot.docs[0].data()
+        setFriendStats({
+            title: playerStatsArray['username'],
+            uid: playerStatsArray['uid'],
+            friendID: playerStatsArray['playerID'],
+            icon: '../../assets/player_avatars/gym_bro.png',
+            strength: playerStatsArray['total_exercise'],
+            agility: Math.trunc(playerStatsArray['total_steps']/10),
+            stamina: Math.trunc(playerStatsArray['total_sleep']/7),
+            intellect: Math.trunc(playerStatsArray['total_study']/3)
+        }) 
+    }
+
+    //Retrieve my player's friendsList
+    const getFriendList = async() => {    
+        const myDocRef= doc(db, "friends", current_user.uid)
+        const myDocSnapshot= await getDoc(myDocRef)
+        if (myDocSnapshot.exists()) {
+            setAllFriends(myDocSnapshot.data()['friends'])
+        }
     }
 
     //Updates database whenever friend is added/removed, which re-renders the flatlist
     useEffect(()=>{
         getMyDatabase();
+        getFriendList();
     }, [isAddModalVisible, isRemoveModalVisible])
 
 
     // //Find & Add friend based on player ID
     const addFriend = async() => {   
-        getFriendDatabase();
-
         if (current_user.uid==friendStats.uid){
             alert('Cannot add your own ID')
             return
         }
-        console.log('gotten')
-        console.log(friendStats)
+
         const myDocRef= doc(db, "friends", current_user.uid)
         await updateDoc(myDocRef, {
             friends: arrayUnion(friendStats)
@@ -110,23 +119,22 @@ export default function FriendsList({navigation}) {
                 </View>
                 
                 <View style={[styles.childContainer, {flex:6}]}>
-                        <View style={{width:334, height:400, borderWidth:2, borderRadius: 10, borderColor:'white', backgroundColor:'white'}}>
-                            {/* <FlatList
-                                data={allFriends}
-                                extraData={isAddModalVisible}
-                                renderItem={({item}) => 
-                                    <Friend_Box
-                                        player={item.title}
-                                        playerID={item.friendID}
-                                        player_icon={item.icon}
-                                        strength={item.strength}
-                                        agility={item.agility}
-                                        stamina={item.stamina}
-                                        intellect={item.intellect}
-                                    />}
-                            /> */}
-                        </View>
-                        
+                    <View style={{width:334, height:400, borderWidth:2, borderRadius: 10, borderColor:'white', backgroundColor:'white'}}>
+                        <FlatList
+                            data={allFriends}
+                            extraData={isAddModalVisible}
+                            renderItem={({item}) => 
+                                <Friend_Box
+                                    player={item.title}
+                                    playerID={item.friendID}
+                                    player_icon={item.icon}
+                                    strength={item.strength}
+                                    agility={item.agility}
+                                    stamina={item.stamina}
+                                    intellect={item.intellect}
+                                />}
+                        />
+                    </View>
                 </View>
 
                 <View style={[styles.childContainer, {flex:1, flexDirection:"row", gap:10}]}>
@@ -148,6 +156,8 @@ export default function FriendsList({navigation}) {
                     <NavTab navigation={navigation}/>
                 </View>    
 
+
+                {/* Modal to add your friends */}
                 {/* Add Friend Modal */}
                 <Modal 
                     isVisible={isAddModalVisible} 
@@ -158,7 +168,7 @@ export default function FriendsList({navigation}) {
                     <View style={styles.modalContainer}>
                         <View style={{flexDirection: 'row', alignItems: 'center', gap:5}}>
                             <Text style={styles.modalText}>Your Player ID is: </Text>
-                            {/* <Text style={styles.modalSubtext}>{playerName}</Text> */}
+                            <Text style={styles.modalSubtext}>{myStats.friendID}</Text>
                         </View>
                         <View>
                             <TextInput 
@@ -172,9 +182,9 @@ export default function FriendsList({navigation}) {
                             <AppButton 
                                 title="Add friend"
                                 onPress={()=> {
-                                    addFriend()
+                                    getFriendDatabase()
                                     setIsAddModalVisible(!isAddModalVisible)
-                                    // setMyFriendID('')
+                                    setIsFriendAddedModalVisible(!isFriendAddedModalVisible)
                                 }}
                                 buttonStyle={[styles.modalButtonContainer, {backgroundColor:'black'}]}
                                 textStyle= {[styles.modalButtonText, {color:'white'}]}
@@ -191,7 +201,29 @@ export default function FriendsList({navigation}) {
                         </View>
                     </View>
                 </Modal>
+                {/* Friend added confirmation */}
+                <Modal 
+                    isVisible={isFriendAddedModalVisible} 
+                    coverScreen= {false}
+                    backdropOpacity= {0.4}
+                    style= {{justifyContent:'center', alignItems:'center'}}
+                >
+                    <View style={styles.modalConfirmationContainer}>
+                        <Text style={styles.modalText}> New friend added! </Text>
+                        <AppButton 
+                            title="Return"
+                            onPress={()=> {
+                                addFriend()
+                                setIsFriendAddedModalVisible(!isFriendAddedModalVisible)
+                                setMyFriendID('')
+                            }}
+                            buttonStyle={[styles.modalButtonContainer, {backgroundColor:'black'}]}
+                            textStyle= {[styles.modalButtonText, {color:'white'}]}
+                        />
+                    </View>
+                </Modal>
 
+                {/* Modal to remove friends */}
                 {/* Remove Friend Modal */}
                 <Modal 
                     isVisible={isRemoveModalVisible} 
@@ -215,9 +247,9 @@ export default function FriendsList({navigation}) {
                             <AppButton 
                                 title="Remove friend"
                                 onPress={()=> {
-                                    // removeFriend()
+                                    getFriendDatabase()
                                     setIsRemoveModalVisible(!isRemoveModalVisible)
-                                    // setMyFriendID('')
+                                    setIsFriendRemovedModalVisible(!isFriendRemovedModalVisible)
                                 }}
                                 buttonStyle={[styles.modalButtonContainer, {backgroundColor:'black'}]}
                                 textStyle= {[styles.modalButtonText, {color:'white'}]}
@@ -232,6 +264,28 @@ export default function FriendsList({navigation}) {
                                 textStyle= {[styles.modalButtonText, {color:'black'}]}
                             />
                         </View>
+                    </View>
+                </Modal>
+
+                {/* Modal to confirm removal of friend */}
+                <Modal 
+                    isVisible={isFriendRemovedModalVisible} 
+                    coverScreen= {false}
+                    backdropOpacity= {0.4}
+                    style= {{justifyContent:'center', alignItems:'center'}}
+                >
+                    <View style={styles.modalConfirmationContainer}>
+                        <Text style={styles.modalText}> A friend has removed! </Text>
+                        <AppButton 
+                            title="Return"
+                            onPress={()=> {
+                                removeFriend()
+                                setIsFriendRemovedModalVisible(!isFriendRemovedModalVisible)
+                                setMyFriendID('')
+                            }}
+                            buttonStyle={[styles.modalButtonContainer, {backgroundColor:'black'}]}
+                            textStyle= {[styles.modalButtonText, {color:'white'}]}
+                        />
                     </View>
                 </Modal>
             </ImageBackground>
@@ -348,6 +402,17 @@ const styles = StyleSheet.create({
         width: 350,
         height: 300,
         borderRadius: 30,
+        backgroundColor: 'white',
+    },
+
+    modalConfirmationContainer: {
+        justifyContent: 'space-around',
+        alignItems:'center',
+        padding: 25,
+        // gap:5,
+        width: 350,
+        height: 200,
+        borderRadius: 20,
         backgroundColor: 'white',
     },
 
