@@ -20,12 +20,12 @@ export default function FriendsList({navigation}) {
     const [isFriendAddedModalVisible, setIsFriendAddedModalVisible]= useState(false);
     const [isFriendRemovedModalVisible, setIsFriendRemovedModalVisible]= useState(false);
 
-
     const [myStats, setMyStats]= useState({});
     const [friendStats, setFriendStats]= useState({});
     const [allFriends, setAllFriends]= useState([]);
     const [myFriendID, setMyFriendID]= useState('');
     const [current_user, loading, error]= useAuthState(auth);
+
 
     //Retrieve my player name, and my stats
     const getMyDatabase = async() => {    
@@ -69,8 +69,10 @@ export default function FriendsList({navigation}) {
         const myDocSnapshot= await getDoc(myDocRef)
         if (myDocSnapshot.exists()) {
             setAllFriends(myDocSnapshot.data()['friends'])
+
         }
     }
+    // console.log(myStats);
 
     //Updates database whenever friend is added/removed, which re-renders the flatlist
     useEffect(()=>{
