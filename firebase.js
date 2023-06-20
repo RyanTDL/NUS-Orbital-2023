@@ -41,21 +41,27 @@ const registerWithEmailAndPassword = async (username, email, password) => {
         const user= res.user;
 
         //setDoc allows setting the specific document ID, unlike addDoc. Use doc() instead of collection() when using setDoc
+        //This sets the player's database under "users" collection
         await setDoc(doc(db, "users", user.uid), {
             uid: user.uid,
             authProivder: "local",
             email: email,
             username: username,
             playerID: user.uid.slice(0,8),
-            total_exercise: 0,
-            total_steps: 0,
-            total_sleep: 0,
-            total_study: 0,
+            //Set the base stats to (Strength:5, Agility:5, Health:20, Intellect:5)
+            total_exercise: 5,
+            total_steps: 50,
+            total_sleep: 140,
+            total_study: 15,
             weekly_exercise: [0,0,0,0,0,0,0],
             weekly_steps: [0,0,0,0,0,0,0],
             weekly_sleep: [0,0,0,0,0,0,0],
             weekly_study: [0,0,0,0,0,0,0],
-            friends: {},
+        });
+
+        //This sets the player's database under "friends" collection
+        await setDoc(doc(db, "friends", user.uid), {
+            friends: {}
         });
     }
     catch (err) {
