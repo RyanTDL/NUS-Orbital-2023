@@ -23,7 +23,7 @@ export default function FriendsList({navigation}) {
     const [current_user, loading, error]= useAuthState(auth);
 
 
-    //const [myStats, setMyStats]= useState({})
+    // let [myStats, setMyStats]= useState({})
     //const [myFriendStats, setMyFriendStats]= useState({})
 
     //Retrieve my player name, and friends list
@@ -34,15 +34,19 @@ export default function FriendsList({navigation}) {
             setPlayerName(myDocSnapshot.data()['playerID'])
             setAllFriends(myDocSnapshot.data()['friends'])
 
-
-
-            //my_stats= {name: myDocSnapshot.data()['playerID']
-        //                  strength: myDocSnapshot.data()['strength']
-        //                  .......
+        //     myStats= {
+        //         name: myDocSnapshot.data()['playerID'],
+        //         icon: myDocSnapshot.data()['icon'],
+        //         strength: myDocSnapshot.data()['strength'],
+        //         agility: myDocSnapshot.data()['agility'],
+        //         stamina: myDocSnapshot.data()['stamina'],
+        //         intellect: myDocSnapshot.data()['intellect'],
+        //         // friends: myDocSnapshot.data()['friends']
         // }
-            // setMyStats(my_stats)
+        //     setMyStats(myStats)
         }
     }
+    // console.log(myStats);
 
     //Updates allFriends database whenever friend is added/removed, which re-renders the flatlist
     useEffect(()=>{

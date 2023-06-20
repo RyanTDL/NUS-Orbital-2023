@@ -24,10 +24,11 @@ export default function BattlePage({navigation, route}) {
     const friendIcon = route.params.friendinfo[1] ;
     console.log(friendIcon);
 
-
     const healClick = () => {
-        sethealstat(healstat+50);
-    }
+        const newHealstat = healstat + 20;
+        sethealstat(newHealstat <= 100 ? newHealstat : 100);
+      };
+      
 
     return(
         <SafeAreaView style={styles.container}>
@@ -55,7 +56,7 @@ export default function BattlePage({navigation, route}) {
                                 </View>
                                 
                                 <View style={styles.statusbar}>
-                                    <View style ={[styles.statusbar,{ backgroundColor:'#fc080d', width: healstat }]}>
+                                    <View style ={[styles.statusbar,{ backgroundColor:'#fc080d', width: `${healstat}%`}]}>
                                     </View>
                                 </View>
                             </View>
@@ -142,7 +143,7 @@ export default function BattlePage({navigation, route}) {
                 <View style={styles.movesContainer}>
                     <Pressable style={[styles.movesButton, {backgroundColor: '#fc080d',borderColor: '#8e0000'}]}  
                     onPress = {() => console.log('Attack')}>
-                        <Text style={[styles.text, {fontSize: 21}]}> ATTACK </Text>
+                        <Text style={[styles.text, {fontSize: 20}]}> ATTACK </Text>
                     </Pressable>
 
                     <Pressable style={[styles.movesButton, {backgroundColor: '#D5B71C',borderColor: '#635f09'}]} 
