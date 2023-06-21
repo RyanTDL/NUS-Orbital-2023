@@ -3,14 +3,22 @@ import {Dimensions, StyleSheet, ImageBackground, Text, View, SafeAreaView, FlatL
 import { StatusBar, Platform } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Center } from "native-base";
-
+ 
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
 
 export default function BattlePage({navigation, route}) {
+    console.log(route.params.myFriendStats);
 
+    //username
+    const username = route.params.myFriendStats[0];
+
+    //Icons
+    // const friendIcon = require(route.params.myFriendStats[1]);
+    const friendIcon = require('../../assets/player_avatars/star_athlete.png');
+    
     //Heal button
-    const stamina = parseInt(route.params.friendinfo[4]);
-    console.log(`original stamina is ${stamina}`);
+    const stamina = parseInt(route.params.myFriendStats[4]);
+    // console.log(`original stamina is ${stamina}`);
     const [healstat, sethealstat] = useState(stamina);
 
     //Load Font 
@@ -21,15 +29,14 @@ export default function BattlePage({navigation, route}) {
         return null;
     }
 
-    const friendIcon = route.params.friendinfo[1] ;
-    console.log(friendIcon);
-
     const healClick = () => {
         const newHealstat = healstat + 20;
         sethealstat(newHealstat <= 100 ? newHealstat : 100);
+        console.log(`updated ${healstat}`);
       };
-      
 
+    
+    
     return(
         <SafeAreaView style={styles.container}>
             <View style={styles.playersInfoContainer}>
@@ -84,9 +91,9 @@ export default function BattlePage({navigation, route}) {
                         > 
 
                         <View style={styles.playerIcon}>
-                            <Image source={require('../../assets/player_avatars/star_athlete.png')}/>
+                            <Image source={friendIcon}/>
                             <Text style={styles.playerName}>
-                            {route.params.friendinfo[0]}
+                            {username}
                             </Text>
                         </View> 
 
@@ -158,7 +165,6 @@ export default function BattlePage({navigation, route}) {
                     onPress={() => {
                         console.log('HEAL');
                         healClick();
-                        console.log(`updated ${healstat}`);
                       }}
                     > 
                         <Text style={styles.text} > HEAL </Text>

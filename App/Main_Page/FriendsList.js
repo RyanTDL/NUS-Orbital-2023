@@ -23,8 +23,8 @@ export default function FriendsList({navigation}) {
     const [current_user, loading, error]= useAuthState(auth);
 
 
-    // let [myStats, setMyStats]= useState({})
-    //const [myFriendStats, setMyFriendStats]= useState({})
+    let [myStats, setMyStats]= useState({})
+    let [myFriendStats, setMyFriendStats]= useState({})
 
     //Retrieve my player name, and friends list
     const getMyDatabase = async() => {    
@@ -34,19 +34,26 @@ export default function FriendsList({navigation}) {
             setPlayerName(myDocSnapshot.data()['playerID'])
             setAllFriends(myDocSnapshot.data()['friends'])
 
-        //     myStats= {
-        //         name: myDocSnapshot.data()['playerID'],
-        //         icon: myDocSnapshot.data()['icon'],
-        //         strength: myDocSnapshot.data()['strength'],
-        //         agility: myDocSnapshot.data()['agility'],
-        //         stamina: myDocSnapshot.data()['stamina'],
-        //         intellect: myDocSnapshot.data()['intellect'],
-        //         // friends: myDocSnapshot.data()['friends']
-        // }
-        //     setMyStats(myStats)
+            myStats= {
+                name: myDocSnapshot.data()['username'],
+                // icon: myDocSnapshot.data()['icon'],
+                strength: myDocSnapshot.data()['total_exercise'],
+                agility: Math.trunc(myDocSnapshot.data()['total_steps']/10),
+                stamina: Math.trunc(myDocSnapshot.data()['total_sleep']/7),
+                intellect: Math.trunc(myDocSnapshot.data()['total_study']/3),
+        }
+
+            myFriendStats= {
+                friend: myDocSnapshot.data()['friends'],
+        }   
+
+            setMyStats(myStats)
+            setMyFriendStats(myFriendStats)
         }
     }
     // console.log(myStats);
+    // console.log(myFriendStats);  
+
 
     //Updates allFriends database whenever friend is added/removed, which re-renders the flatlist
     useEffect(()=>{
@@ -243,11 +250,12 @@ export default function FriendsList({navigation}) {
 }
 
 
+
 function Friend_Box({player, playerID, player_icon, strength, agility, stamina, intellect}) {
 
     const navigation = useNavigation();
-    let friendinfo = [player, player_icon, strength, agility, stamina, intellect ];
-
+    let myFriendStats = [player, player_icon, strength, agility, stamina, intellect];
+  
     return (
         <View style={styles.playerInfo}>
             <Image source={require('../../assets/player_avatars/gym_bro.png')}/>
@@ -261,7 +269,7 @@ function Friend_Box({player, playerID, player_icon, strength, agility, stamina, 
                 onPress={ () => {
                     return (
                         console.log('Begin Battle!', player),
-                        navigation.navigate('BattleStart', {friendinfo})
+                        navigation.navigate('BattleStart', {myFriendStats})
                     ); 
 
                 }}
