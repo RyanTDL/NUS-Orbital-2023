@@ -73,7 +73,7 @@ export default function HomeScreen({navigation}) {
     
         //Converting hours/steps into the respective stat points
         strength_points = Math.min(total_exercise, 100) //minimum used to ensure progress bar does not exceed when it hit 100 points
-        agility_points = Math.min(total_steps,100)
+        agility_points = Math.min(Math.trunc(total_steps/10),100)
         stamina_points = Math.min(Math.trunc(total_sleep/7), 100)
         intellect_points = Math.min(Math.trunc(total_study/3), 100)
     
