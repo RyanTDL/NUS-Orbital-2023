@@ -1,25 +1,50 @@
-import React, { useContext, useState } from "react";
-import {Dimensions, StyleSheet, ImageBackground, Text, View, SafeAreaView, FlatList, Image, Pressable} from 'react-native';
+import {React, useState, useEffect} from "react";
+import {Dimensions, Alert, StyleSheet, ImageBackground, Text, View, SafeAreaView, Modal, Image, Pressable} from 'react-native';
 import { StatusBar, Platform } from 'react-native';
 import { useFonts } from 'expo-font';
-import { Center } from "native-base";
- 
+
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
 
 export default function BattlePage({navigation, route}) {
-    console.log(route.params.myFriendStats);
 
-    //username
-    const username = route.params.myFriendStats[0];
+    let userStats = {
+        name: route.params.userStats['title'],
+        uid: route.params.userStats['uid'],
+        friendID: route.params.userStats['friendID'],
+        icon: route.params.userStats['icon'],
+        strength: route.params.userStats['strength'],
+        agility: route.params.userStats['agility'],
+        stamina: route.params.userStats['stamina'],
+        intellect: route.params.userStats['intellect']
+    };
 
-    //Icons
-    // const friendIcon = require(route.params.myFriendStats[1]);
-    const friendIcon = require('../../assets/player_avatars/star_athlete.png');
-    
-    //Heal button
-    const stamina = parseInt(route.params.myFriendStats[4]);
-    // console.log(`original stamina is ${stamina}`);
-    const [healstat, sethealstat] = useState(stamina);
+    let friendStats = {
+        name: route.params.friendStats[0],
+        icon: route.params.friendStats[1],
+        strength: route.params.friendStats[2],
+        agility: route.params.friendStats[3],
+        stamina: route.params.friendStats[4],
+        intellect: route.params.friendStats[5]
+    };
+
+    //player icons, keep getting call stack error :(
+    const userIcon = require('../../assets/player_avatars/always_late.png');
+    const friendIcon = require('../../assets/player_avatars/star_athlete.png');  
+    // const userIcon = require(userStats.icon);
+    // const friendIcon = require(friendStats.icon);
+
+
+    const [healStat, setHealStat] = useState(userStats.stamina+40);
+    const [friendHealStat, setFriendHealStat] = useState(friendStats.stamina+40);
+
+    const [attackStat, setAttackStat] = useState(userStats.strength);
+    const [friendAttackStat, setFriendAttackStat] = useState(friendStats.strength);
+
+    const [ultiStat, setUltiStat] = useState(userStats.strength);
+    const [friendUltiStat, setFriendUltiStat] = useState(friendStats.strength);
+
+    const [runModalVisible, setRunModalVisible]= useState(false);
+
 
     //Load Font 
     const [loaded] = useFonts({
@@ -30,10 +55,22 @@ export default function BattlePage({navigation, route}) {
     }
 
     const healClick = () => {
-        const newHealstat = healstat + 20;
-        sethealstat(newHealstat <= 100 ? newHealstat : 100);
-        console.log(`updated ${healstat}`);
-      };
+        const newHealstat = healStat + 10;
+        setHealStat(newHealstat <= 100 ? newHealstat : 100);
+        console.log(`updated ${healStat}`);
+        };
+
+    const attackClick = () => {
+        const newFriendHealstat = friendHealStat - attackStat;
+        setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
+        console.log(`updated ${friendHealStat}`);
+        };
+    
+    const ultiClick = () => {
+        const newFriendHealstat = friendHealStat - ultiStat;
+        setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
+        console.log(`updated ${friendHealStat}`);
+        };
 
     
     
@@ -47,9 +84,9 @@ export default function BattlePage({navigation, route}) {
                         > 
 
                         <View style={styles.playerIcon}>
-                            <Image source={require('../../assets/player_avatars/star_athlete.png')}/>
+                            <Image source={userIcon}/>
                             <Text style={styles.playerName}>
-                            User203
+                            {userStats.name}
                             </Text>
                         </View> 
 
@@ -63,7 +100,7 @@ export default function BattlePage({navigation, route}) {
                                 </View>
                                 
                                 <View style={styles.statusbar}>
-                                    <View style ={[styles.statusbar,{ backgroundColor:'#fc080d', width: `${healstat}%`}]}>
+                                    <View style ={[styles.statusbarinside,{ backgroundColor:'#fc080d', width: `${healStat}%`}]}>
                                     </View>
                                 </View>
                             </View>
@@ -77,7 +114,7 @@ export default function BattlePage({navigation, route}) {
                                 </View>
 
                                 <View style={styles.statusbar}>
-                                    <View style ={[styles.statusbar,{backgroundColor:'#D5B71C', width: '100%'}]}>
+                                    <View style ={[styles.statusbarinside,{backgroundColor:'#D5B71C', width: '100%'}]}>
                                     </View>
                                 </View>
                             </View>
@@ -93,7 +130,7 @@ export default function BattlePage({navigation, route}) {
                         <View style={styles.playerIcon}>
                             <Image source={friendIcon}/>
                             <Text style={styles.playerName}>
-                            {username}
+                            {friendStats.name}
                             </Text>
                         </View> 
 
@@ -107,7 +144,7 @@ export default function BattlePage({navigation, route}) {
                                 </View>
                                 
                                 <View style={styles.statusbar}>
-                                    <View style ={[styles.statusbar,{ backgroundColor:'#fc080d', width: '100%' }]}>
+                                    <View style ={[styles.statusbarinside,{ backgroundColor:'#fc080d', width: `${friendHealStat}%` }]}>
                                     </View>
                                 </View>
                             </View>
@@ -121,7 +158,7 @@ export default function BattlePage({navigation, route}) {
                                 </View>
 
                                 <View style={styles.statusbar}>
-                                    <View style ={[styles.statusbar,{backgroundColor:'#D5B71C', width: '100%'}]}>
+                                    <View style ={[styles.statusbarinside,{backgroundColor:'#D5B71C', width: '100%'}]}>
                                     </View>
                                 </View>
                             </View>
@@ -148,38 +185,91 @@ export default function BattlePage({navigation, route}) {
             <View style={styles.inputbox}>
 
                 <View style={styles.movesContainer}>
-                    <Pressable style={[styles.movesButton, {backgroundColor: '#fc080d',borderColor: '#8e0000'}]}  
-                    onPress = {() => console.log('Attack')}>
-                        <Text style={[styles.text, {fontSize: 20}]}> ATTACK </Text>
+                    <Pressable 
+                        style={({pressed}) => [
+                            styles.attackButton,
+                            pressed && {opacity: 0.7}, 
+                        ]}  
+                        onPress = {() => {
+                            console.log('Attack');
+                            attackClick();
+                            }}
+                        >
+                        {({ pressed }) => (<Text style={[styles.text, {fontSize: 20}]}>{pressed ? 'ATTACK!' : 'ATTACK'}</Text>
+                        )}
                     </Pressable>
 
-                    <Pressable style={[styles.movesButton, {backgroundColor: '#D5B71C',borderColor: '#635f09'}]} 
-                    onPress = {() => console.log('ULTIMATE')}>
-                        <Text style={[styles.text, {fontSize: 17}]}> ULTIMATE </Text>
+                    <Pressable 
+                        style={({pressed}) => [
+                            styles.ultimateButton,
+                            pressed && {opacity: 0.7}, 
+                        ]} 
+                        
+
+                        onPress = {() => console.log('ULTIMATE')}>
+                        {({ pressed }) => (<Text style={[styles.text, {fontSize: 17}]}>{pressed ? 'CHARGING!' : 'ULTIMATE'}</Text>
+                        )}
                     </Pressable>
                 </View>
 
                 <View style={styles.movesContainer}>
-                    <Pressable style={[styles.movesButton, {backgroundColor: '#61A631',borderColor: '#0E6600' }]}
+                    <Pressable 
+                        style={({pressed}) => [
+                            styles.healButton,
+                            pressed && {opacity: 0.7}, 
+                        ]} 
 
-                    onPress={() => {
-                        console.log('HEAL');
-                        healClick();
-                      }}
-                    > 
-                        <Text style={styles.text} > HEAL </Text>
+                        onPress={() => {
+                            console.log('HEAL');
+                            healClick();
+                        }}
+                        > 
+                        {({ pressed }) => (<Text style={[styles.text, {fontSize: 20}]}>{pressed ? 'HEALING!' : 'HEAL'}</Text>
+                        )}
+                        </Pressable>            
+                        
+                        <Pressable 
+                            style={({pressed}) => [
+                                styles.runButton,
+                                pressed && {opacity: 0.7}, 
+                            ]} 
+                        onPress={() => {
+                            console.log('RUN');
+                            setRunModalVisible(true);
+                        }}> 
+                            <Text style={styles.text}> RUN </Text>
                         </Pressable>
+                        <Modal
+                            animationType="slide"
+                            transparent={true}
+                            visible={runModalVisible}
+                            >
+                            <View style={styles.modalContainer}>
+                                <View style={styles.modalContent}>
+                                    <Text style={styles.abandonText}>Abandon Battle?</Text>
 
+                                    <View style={styles.modalContentChild}>
+                                        <Pressable
+                                            onPress={() => {
+                                                setRunModalVisible(!runModalVisible);
+                                                navigation.navigate('Friends List');
+                                            }}
+                                            style={styles.modalButton}
+                                        >
+                                            <Text style={styles.yesNoText}>YES</Text>
+                                        </Pressable>
+                                        <Pressable
+                                            onPress={() => setRunModalVisible(!runModalVisible)}
+                                            style={styles.modalButton}
+                                        >
+                                            <Text style={styles.yesNoText}>NO</Text>
+                                        </Pressable>
+                                    </View>
 
-                    <Pressable style={[styles.movesButton, {backgroundColor: '#76C4E8',borderColor: '#0098BA'}]} 
-                    onPress={() => {
-                        console.log('RUN');
-                        navigation.navigate('Friends List');
-                      }}> 
-                        <Text style={styles.text}> RUN </Text>
-                    </Pressable>
+                                </View>
+                            </View>
+                        </Modal>             
                 </View>
-
             </View>
         </SafeAreaView>
     )
@@ -234,14 +324,18 @@ const styles = StyleSheet.create({
 
     statusbar: {
         flex: 1,
-        width: 10,
         height:25, 
-        borderWidth:2, 
-        borderRadius: 5, 
-        borderColor:'black', 
-        backgroundColor: 'grey',
         marginEnd: 8,
-        
+        overflow: 'hidden',
+    },
+
+    statusbarinside: {
+        flex: 1,
+        height:25, 
+        borderWidth:1.5, 
+        borderRadius: 6, 
+        borderColor:'black', 
+        marginEnd: 8,
     },
 
     animationwindow: {
@@ -285,13 +379,48 @@ const styles = StyleSheet.create({
         flexDirection: "row",
     },
 
-    movesButton:{
+    attackButton:{
         flex: 1,
         margin: 3,
         borderWidth: 8,
-        borderRadius: 15,
+        borderRadius: 16,
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: '#fc080d',
+        borderColor: '#8e0000' 
+    },
+
+    ultimateButton:{
+        flex: 1,
+        margin: 3,
+        borderWidth: 8,
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#D5B71C',
+        borderColor: '#635f09'
+    },
+
+    healButton:{
+        flex: 1,
+        margin: 3,
+        borderWidth: 8,
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#61A631',
+        borderColor: '#0E6600' 
+    },
+
+    runButton:{
+        flex: 1,
+        margin: 3,
+        borderWidth: 8,
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#76C4E8',
+        borderColor: '#0098BA' 
     },
 
     text:{
@@ -304,5 +433,51 @@ const styles = StyleSheet.create({
         textShadowOffset: { width: 2.2, height: 3.5 },
         textShadowRadius: 4,
     },
+
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#00000080', // Semi-transparent background
+      },
+      modalContent: {
+        flexDirection: 'column',
+        backgroundColor: 'white',
+        height: 200,
+        width: 300,
+        borderRadius: 5,
+        borderWidth: 10,
+        borderColor: '#76C4E8'
+      },
+
+      modalContentChild: {
+        flex: 1.2,
+        flexDirection: 'row',
+        padding: 15,
+      },
+
+      modalButton: {
+        flex: 1,
+        backgroundColor: '#0098BA',
+        borderRadius: 5,
+        padding: 10,
+        margin: 5,
+      },
+
+      abandonText: {
+        flex: 1,
+        fontFamily: "PressStart2P-Regular",
+        fontWeight: '700',
+        fontSize: 30,
+        textAlign: 'center',
+        verticalAlign: 'middle',
+      },
+
+      yesNoText: {
+        color: 'white',
+        fontWeight: '800',
+        fontSize: 30,
+        textAlign: 'center',
+      },
 
 })

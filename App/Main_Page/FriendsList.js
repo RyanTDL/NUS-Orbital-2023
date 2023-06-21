@@ -26,10 +26,6 @@ export default function FriendsList({navigation}) {
     const [myFriendID, setMyFriendID]= useState('');
     const [current_user, loading, error]= useAuthState(auth);
 
-
-    // let [myStats, setMyStats]= useState({})
-    //const [myFriendStats, setMyFriendStats]= useState({})
-
     //Retrieve my player name, and friends list
     const getMyDatabase = async() => {    
         const myDocRef= doc(db, "users", current_user.uid)
@@ -48,6 +44,7 @@ export default function FriendsList({navigation}) {
         }
     }
 
+
     const getFriendDatabase = async() => {   
         //Finds friend, based on query using friend's player ID
         // https://firebase.google.com/docs/firestore/query-data/queries
@@ -65,6 +62,7 @@ export default function FriendsList({navigation}) {
             intellect: Math.trunc(playerStatsArray['total_study']/3)
         }) 
     }
+    
 
     //Retrieve my player's friendsList
     const getFriendList = async() => {    
@@ -72,22 +70,8 @@ export default function FriendsList({navigation}) {
         const myDocSnapshot= await getDoc(myDocRef)
         if (myDocSnapshot.exists()) {
             setAllFriends(myDocSnapshot.data()['friends'])
-
-        //     myStats= {
-        //         name: myDocSnapshot.data()['playerID'],
-        //         icon: myDocSnapshot.data()['icon'],
-        //         strength: myDocSnapshot.data()['strength'],
-        //         agility: myDocSnapshot.data()['agility'],
-        //         stamina: myDocSnapshot.data()['stamina'],
-        //         intellect: myDocSnapshot.data()['intellect'],
-        //         // friends: myDocSnapshot.data()['friends']
-        // }
-        //     setMyStats(myStats)
         }
     }
-    // console.log(myStats);
-    // console.log(myFriendStats);  
-
 
     //Updates database whenever friend is added/removed, which re-renders the flatlist
     useEffect(()=>{
@@ -149,6 +133,7 @@ export default function FriendsList({navigation}) {
                                     agility={item.agility}
                                     stamina={item.stamina}
                                     intellect={item.intellect}
+                                    myStats={myStats}
                                 />}
                         />
                     </View>
@@ -311,13 +296,12 @@ export default function FriendsList({navigation}) {
     );
 }
 
-
-
-function Friend_Box({player, playerID, player_icon, strength, agility, stamina, intellect}) {
+function Friend_Box({player, playerID, player_icon, strength, agility, stamina, intellect, myStats}) {
 
     const navigation = useNavigation();
-    let myFriendStats = [player, player_icon, strength, agility, stamina, intellect];
-  
+    const friendStats = [player, player_icon, strength, agility, stamina, intellect];
+    const userStats = myStats;
+
     return (
         <View style={styles.playerInfo}>
             <Image source={require('../../assets/player_avatars/gym_bro.png')}/>
@@ -330,8 +314,8 @@ function Friend_Box({player, playerID, player_icon, strength, agility, stamina, 
                 title="Fight"
                 onPress={ () => {
                     return (
-                        console.log('Begin Battle!', player),
-                        navigation.navigate('BattleStart', {myFriendStats})
+                        console.log('Begin Battle!', `with ${player}`),
+                        navigation.navigate('BattleStart', {friendStats, userStats})
                     ); 
 
                 }}
