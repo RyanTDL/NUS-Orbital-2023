@@ -204,9 +204,11 @@ export default function BattlePage({navigation, route}) {
                             styles.ultimateButton,
                             pressed && {opacity: 0.7}, 
                         ]} 
-                        
-
-                        onPress = {() => console.log('ULTIMATE')}>
+                        onPress = {() => {
+                            console.log('ULTIMATE');
+                            ultiClick();
+                            }}
+                        >
                         {({ pressed }) => (<Text style={[styles.text, {fontSize: 17}]}>{pressed ? 'CHARGING!' : 'ULTIMATE'}</Text>
                         )}
                     </Pressable>
