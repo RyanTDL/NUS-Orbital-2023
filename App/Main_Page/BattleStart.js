@@ -37,8 +37,8 @@ export default function BattlePage({navigation, route}) {
     
     const [runModalVisible, setRunModalVisible]= useState(false);
 
-    const [healStat, setHealStat] = useState(userStats.stamina+40);
-    const [friendHealStat, setFriendHealStat] = useState(friendStats.stamina+40);
+    const [healStat, setHealStat] = useState(userStats.stamina+50);
+    const [friendHealStat, setFriendHealStat] = useState(friendStats.stamina+50);
 
     const [attackStat, setAttackStat] = useState(userStats.strength);
     const [friendAttackStat, setFriendAttackStat] = useState(friendStats.strength);
@@ -48,7 +48,7 @@ export default function BattlePage({navigation, route}) {
     const [friendUltiLimit, setFriendUltiLimit] = useState(friendStats.intellect+10);
 
     const [ultiUsed, setUltiUsed] = useState(0);
-    const [friendUltiUsed, setFriendUltiUsed] = useState(0);
+    const [friendUltiUsed, setFriendUltiUsed] = useState(false);
 
     const [ultiLeft, setUltiLeft] = useState(0);
     const [friendUltiLeft, setFriendUltiLeft] = useState(0);
@@ -58,6 +58,18 @@ export default function BattlePage({navigation, route}) {
     const [isUltiButtonDisabled, setIsUltiButtonDisabled] = useState(false);
     const [ultiButtonLabel, setUltiButtonLabel] = useState('ULTIMATE');
 
+    //Auto battle
+    const [autoBattle, setAutoBattle] = useState(false);
+
+    useEffect(() => {
+        if (autoBattle) {
+          // Automatically perform bot move after the user's move
+          performBotMove();
+          setAutoBattle(false);
+        }
+      }, [autoBattle]); // Triggers the bot move
+
+    //Ulti charging feature
     useEffect(() => {
         console.log(`Ulti is reset: ${ultiUsed}`);
     }, [ultiUsed]);
@@ -70,10 +82,13 @@ export default function BattlePage({navigation, route}) {
         } else if (ultiUsed >= ultiLimit) {
           setIsUltiButtonDisabled(true); // Disable the ultimate button when the limit is reached
           setUltiButtonLabel('CHARGED!'); // Change the label to "CHARGED" when the button is disabled
+          setInfoText("Your ULIIMATE is charged!");
         }
       }, [ultiUsed, ultiLimit]);
+
+
       
-      const startCharging = () => {
+    const startCharging = () => {
         setIsCharging(true);
         const id = setInterval(() => {
           setUltiLeft((prevUltiLeft) => {
@@ -95,7 +110,7 @@ export default function BattlePage({navigation, route}) {
             clearInterval(intervalId); // Stop the charging interval
             setIntervalId(null);
           }
-        }, 600); // Adjust the interval duration as needed
+        }, 100); // Adjust the interval duration as needed
         setIntervalId(id);
       };
       
@@ -106,9 +121,8 @@ export default function BattlePage({navigation, route}) {
           setIntervalId(null);
         }
         setIsUltiButtonDisabled(true); // Disable the ultimate button on onPressOut
-      };
-
-
+        setAutoBattle(true);
+    };
     
     //Load Font 
     const [loaded] = useFonts({
@@ -118,29 +132,104 @@ export default function BattlePage({navigation, route}) {
         return null;
     }
 
-    const healClick = () => {
-        const newHealstat = healStat + 10;
-        setHealStat(newHealstat <= 100 ? newHealstat : 100);
-        console.log(`updated ${healStat}`);
-        };
-
+    //Usermoves
     const attackClick = () => {
         if (ultiUsed === 0) {
             // Regular attack
             const newFriendHealstat = friendHealStat - attackStat;
             setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
-            console.log(`Damage dealt: ${attackStat}`);
+            console.log(`Damage dealt by user: ${attackStat}`);
+            setInfoText("You attacked the enemy!");
+            setAutoBattle(true);
         } else {
             // Attack with ultimate
             const newFriendHealstat = friendHealStat - ultiUsed;
             setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
-            console.log(`Damage dealt by Ulti: ${ultiUsed}`);
+            console.log(`Ultimate Damage dealt by user: ${ultiUsed}`);
             setUltiUsed(0);
+            setInfoText("You used your utimate!");
+            setAutoBattle(true);
         }
         };
 
+    const healClick = () => {
+        const newHealstat = healStat + 10;
+        setHealStat(newHealstat <= 100 ? newHealstat : 100);
+        console.log(`User's current ${healStat}`);
+        setInfoText("You healed yourself!");
+        setAutoBattle(true);
+        };
 
+    //Botmoves
+    const friendAttackClick = () => {
+        if (friendUltiUsed) {
+          // Attack with ultimate
+          const newUserHealstat = healStat - friendUltiLimit;
+          setHealStat(newUserHealstat >= 0 ? newUserHealstat : 0);
+          console.log(`Ultimate damage dealt by bot: ${friendUltiLimit}`);
+          setFriendUltiUsed(false);
+          setAutoBattle(false);
+          setInfoText("The enemy used ultimate!");
+        } else {
+          // Regular attack
+          const newUserHealstat = healStat - friendAttackStat;
+          setHealStat(newUserHealstat >= 0 ? newUserHealstat : 0);
+          console.log(`Damage dealt by bot: ${friendAttackStat}`);
+          setInfoText("The enemy attacked you!");
+          setAutoBattle(false);
+        }
+      };
+
+    const friendHealClick = () => {
+        const newfriendHealstat = friendHealStat + 10;
+        setFriendHealStat(newfriendHealstat <= 100 ? newfriendHealstat : 100);
+        console.log(`Bot's current health ${friendHealStat}`);
+        setInfoText("The enemy healed!");
+        console.log(`Bot's current health ${friendHealStat}`);
+        setAutoBattle(false);
+        };
+
+    //Auto Battle
+    const startAutoBattle = () => {
+        setAutoBattle(true);
+        performBotMove();
+      };
     
+      const performBotMove = () => {
+        // Bot logic to choose a move
+        const moves = ["attack", "ultimate", "heal"];
+        const randomMoveIndex = Math.floor(Math.random() * moves.length);
+        const randomMove = moves[randomMoveIndex];
+      
+        // Check if the ultimate has already been charged
+        if (randomMove === "ultimate" && friendUltiUsed) {
+          friendAttackClick(); // Perform a regular attack instead
+          return;
+        }
+      
+        // Perform the chosen move after a delay
+        setTimeout(() => {
+          switch (randomMove) {
+            case "attack":
+              friendAttackClick();
+              break;
+            case "ultimate":
+              setInfoText("The enemy charged his ultimate!");
+              setFriendUltiLeft((prev) => prev + friendUltiLimit);
+              setTimeout(() => {
+                setFriendUltiUsed(true);
+              }, 1000); // Delay of 2000 milliseconds (2 seconds)
+              break;
+            case "heal":
+              friendHealClick();
+              break;
+            default:
+              break;
+          }
+        }, 2000); // Delay of 4000 milliseconds (4 seconds)
+      };
+
+
         
     
     return(
@@ -227,7 +316,7 @@ export default function BattlePage({navigation, route}) {
                                 </View>
 
                                 <View style={styles.statusbar}>
-                                    <View style ={[styles.statusbarinside,{backgroundColor:'#D5B71C', width: '100%'}]}>
+                                    <View style ={[styles.statusbarinside,{backgroundColor:'#D5B71C', width: (100 - friendUltiLeft) + '%'}]}>
                                     </View>
                                 </View>
                             </View>
@@ -519,7 +608,7 @@ const styles = StyleSheet.create({
     text:{
         fontFamily: "PressStart2P-Regular",
         fontWeight: '400',
-        fontSize: 25,
+        fontSize: 20,
         lineHeight: 30,
         color: '#FFFFFF',
         textShadowColor: '#000000',
