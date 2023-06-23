@@ -33,6 +33,9 @@ export default function BattlePage({navigation, route}) {
     // const userIcon = require(userStats.icon);
     // const friendIcon = require(friendStats.icon);
 
+    const [infoText, setInfoText]= useState('Choose your next move!');
+    
+    const [runModalVisible, setRunModalVisible]= useState(false);
 
     const [healStat, setHealStat] = useState(userStats.stamina+40);
     const [friendHealStat, setFriendHealStat] = useState(friendStats.stamina+40);
@@ -40,12 +43,73 @@ export default function BattlePage({navigation, route}) {
     const [attackStat, setAttackStat] = useState(userStats.strength);
     const [friendAttackStat, setFriendAttackStat] = useState(friendStats.strength);
 
-    const [ultiStat, setUltiStat] = useState(userStats.strength);
-    const [friendUltiStat, setFriendUltiStat] = useState(friendStats.strength);
+    //Ulti Button with charging feature
+    const [ultiLimit, setUltiLimit] = useState(userStats.intellect+10);
+    const [friendUltiLimit, setFriendUltiLimit] = useState(friendStats.intellect+10);
 
-    const [runModalVisible, setRunModalVisible]= useState(false);
+    const [ultiUsed, setUltiUsed] = useState(0);
+    const [friendUltiUsed, setFriendUltiUsed] = useState(0);
+
+    const [ultiLeft, setUltiLeft] = useState(0);
+    const [friendUltiLeft, setFriendUltiLeft] = useState(0);
+
+    const [isCharging, setIsCharging] = useState(false);
+    const [intervalId, setIntervalId] = useState(null);
+    const [isUltiButtonDisabled, setIsUltiButtonDisabled] = useState(false);
+    const [ultiButtonLabel, setUltiButtonLabel] = useState('ULTIMATE');
+
+    useEffect(() => {
+        console.log(`Ulti is reset: ${ultiUsed}`);
+    }, [ultiUsed]);
 
 
+    useEffect(() => {
+        if (ultiUsed === 0) {
+          setIsUltiButtonDisabled(false); // Enable the ultimate button
+          setUltiButtonLabel('ULTIMATE'); // Reset the label
+        } else if (ultiUsed >= ultiLimit) {
+          setIsUltiButtonDisabled(true); // Disable the ultimate button when the limit is reached
+          setUltiButtonLabel('CHARGED!'); // Change the label to "CHARGED" when the button is disabled
+        }
+      }, [ultiUsed, ultiLimit]);
+      
+      const startCharging = () => {
+        setIsCharging(true);
+        const id = setInterval(() => {
+          setUltiLeft((prevUltiLeft) => {
+            if (!isUltiButtonDisabled) {
+              return prevUltiLeft + 1;
+            }
+            return prevUltiLeft;
+          });
+      
+          setUltiUsed((prevUltiUsed) => {
+            if (prevUltiUsed < ultiLimit) {
+              return prevUltiUsed + 1;
+            }
+            return prevUltiUsed;
+          });
+      
+          if (ultiUsed >= ultiLimit) {
+            setIsUltiButtonDisabled(true); // Disable the ultimate button
+            clearInterval(intervalId); // Stop the charging interval
+            setIntervalId(null);
+          }
+        }, 600); // Adjust the interval duration as needed
+        setIntervalId(id);
+      };
+      
+      const stopCharging = () => {
+        setIsCharging(false);
+        if (intervalId) {
+          clearInterval(intervalId);
+          setIntervalId(null);
+        }
+        setIsUltiButtonDisabled(true); // Disable the ultimate button on onPressOut
+      };
+
+
+    
     //Load Font 
     const [loaded] = useFonts({
         'PressStart2P-Regular': require('../../assets/fonts/PressStart2P-Regular.ttf'),      
@@ -61,18 +125,23 @@ export default function BattlePage({navigation, route}) {
         };
 
     const attackClick = () => {
-        const newFriendHealstat = friendHealStat - attackStat;
-        setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
-        console.log(`updated ${friendHealStat}`);
-        };
-    
-    const ultiClick = () => {
-        const newFriendHealstat = friendHealStat - ultiStat;
-        setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
-        console.log(`updated ${friendHealStat}`);
+        if (ultiUsed === 0) {
+            // Regular attack
+            const newFriendHealstat = friendHealStat - attackStat;
+            setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
+            console.log(`Damage dealt: ${attackStat}`);
+        } else {
+            // Attack with ultimate
+            const newFriendHealstat = friendHealStat - ultiUsed;
+            setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
+            console.log(`Damage dealt by Ulti: ${ultiUsed}`);
+            setUltiUsed(0);
+        }
         };
 
+
     
+        
     
     return(
         <SafeAreaView style={styles.container}>
@@ -114,7 +183,7 @@ export default function BattlePage({navigation, route}) {
                                 </View>
 
                                 <View style={styles.statusbar}>
-                                    <View style ={[styles.statusbarinside,{backgroundColor:'#D5B71C', width: '100%'}]}>
+                                    <View style ={[styles.statusbarinside,{backgroundColor:'#D5B71C', width: (100 - ultiLeft) + '%'}]}>
                                     </View>
                                 </View>
                             </View>
@@ -178,7 +247,7 @@ export default function BattlePage({navigation, route}) {
 
             <View style={styles.infobox}>
                 <Text style={[styles.text, {textAlign: "left", paddingLeft: 15}]}> 
-                    Choose your next move!
+                    {infoText}
                 </Text>
             </View>
 
@@ -202,15 +271,29 @@ export default function BattlePage({navigation, route}) {
                     <Pressable 
                         style={({pressed}) => [
                             styles.ultimateButton,
-                            pressed && {opacity: 0.7}, 
-                        ]} 
-                        onPress = {() => {
-                            console.log('ULTIMATE');
-                            ultiClick();
-                            }}
+                            pressed && {opacity: 0.7},
+                            isUltiButtonDisabled && {opacity: 0.5, backgroundColor: 'gray'}, // Apply styling to disable the button
+                        ]}
+                        disabled={isUltiButtonDisabled} // Disable the button
+                        onPressIn={() => {
+                            if (ultiUsed>=ultiLimit) {
+                                console.log('CHARGED!');
+                                stopCharging();
+                            }
+                            console.log('CHARGING!');
+                            startCharging();
+                        }}
+                        onPressOut={() => {
+                            console.log('CHARGED!');
+                            stopCharging();
+                        }}
                         >
-                        {({ pressed }) => (<Text style={[styles.text, {fontSize: 17}]}>{pressed ? 'CHARGING!' : 'ULTIMATE'}</Text>
+                        {({ pressed }) => (
+                        <Text style={[styles.text, {fontSize: 17}]}>
+                            {pressed ? 'CHARGING!' : isUltiButtonDisabled ? 'CHARGED!' : 'ULTIMATE'}
+                        </Text>
                         )}
+                        
                     </Pressable>
                 </View>
 
@@ -252,17 +335,25 @@ export default function BattlePage({navigation, route}) {
 
                                     <View style={styles.modalContentChild}>
                                         <Pressable
+                                            style={({pressed}) => [
+                                                styles.modalButton,
+                                                pressed && {opacity: 0.7}, 
+                                            ]}  
                                             onPress={() => {
                                                 setRunModalVisible(!runModalVisible);
                                                 navigation.navigate('Friends List');
                                             }}
-                                            style={styles.modalButton}
+
                                         >
                                             <Text style={styles.yesNoText}>YES</Text>
                                         </Pressable>
                                         <Pressable
+                                            style={({pressed}) => [
+                                                styles.modalButton,
+                                                pressed && {opacity: 0.7}, 
+                                            ]} 
                                             onPress={() => setRunModalVisible(!runModalVisible)}
-                                            style={styles.modalButton}
+
                                         >
                                             <Text style={styles.yesNoText}>NO</Text>
                                         </Pressable>
@@ -461,6 +552,8 @@ const styles = StyleSheet.create({
       modalButton: {
         flex: 1,
         backgroundColor: '#0098BA',
+        borderColor: '#76C4E8',
+        borderWidth: 5,
         borderRadius: 5,
         padding: 10,
         margin: 5,
