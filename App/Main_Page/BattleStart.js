@@ -36,6 +36,8 @@ export default function BattlePage({navigation, route}) {
     const [infoText, setInfoText]= useState('Choose your next move!');
     
     const [runModalVisible, setRunModalVisible]= useState(false);
+    const [runGameOverModal, setRunGameOverModal]= useState(false);
+    const [winner, setWinner] = useState();
 
     const [healStat, setHealStat] = useState(userStats.stamina+50);
     const [friendHealStat, setFriendHealStat] = useState(friendStats.stamina+50);
@@ -60,6 +62,7 @@ export default function BattlePage({navigation, route}) {
 
     //Auto battle
     const [autoBattle, setAutoBattle] = useState(false);
+    const [isBotMakingMove, setIsBotMakingMove] = useState(false); // Track if bot is making a move
 
     useEffect(() => {
         if (autoBattle) {
@@ -86,14 +89,21 @@ export default function BattlePage({navigation, route}) {
         }
       }, [ultiUsed, ultiLimit]);
 
+    useEffect(() => {
+        if (autoBattle && !isBotMakingMove) {
+            setIsBotMakingMove(true); // Disable buttons when it's the bot's turn
+            performBotMove();
+            setAutoBattle(false);
+        }
+    }, [autoBattle, isBotMakingMove]);
 
-      
     const startCharging = () => {
         setIsCharging(true);
         const id = setInterval(() => {
           setUltiLeft((prevUltiLeft) => {
-            if (!isUltiButtonDisabled) {
-              return prevUltiLeft + 1;
+            if (!isUltiButtonDisabled && prevUltiLeft < 100) {
+              const newUltiLeft = prevUltiLeft + 1;
+              return newUltiLeft <= 100 ? newUltiLeft : 100; // Limit ultileft to 100
             }
             return prevUltiLeft;
           });
@@ -107,12 +117,13 @@ export default function BattlePage({navigation, route}) {
       
           if (ultiUsed >= ultiLimit) {
             setIsUltiButtonDisabled(true); // Disable the ultimate button
+            setIsBotMakingMove(true); // Disable buttons when it's the bot's turn
             clearInterval(intervalId); // Stop the charging interval
             setIntervalId(null);
           }
         }, 100); // Adjust the interval duration as needed
         setIntervalId(id);
-      };
+    };
       
       const stopCharging = () => {
         setIsCharging(false);
@@ -121,6 +132,7 @@ export default function BattlePage({navigation, route}) {
           setIntervalId(null);
         }
         setIsUltiButtonDisabled(true); // Disable the ultimate button on onPressOut
+        setIsBotMakingMove(true); // Disable buttons after the user's move
         setAutoBattle(true);
     };
     
@@ -140,7 +152,9 @@ export default function BattlePage({navigation, route}) {
             setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
             console.log(`Damage dealt by user: ${attackStat}`);
             setInfoText("You attacked the enemy!");
+            setIsBotMakingMove(true); // Disable buttons after the user's move
             setAutoBattle(true);
+       
         } else {
             // Attack with ultimate
             const newFriendHealstat = friendHealStat - ultiUsed;
@@ -148,8 +162,23 @@ export default function BattlePage({navigation, route}) {
             console.log(`Ultimate Damage dealt by user: ${ultiUsed}`);
             setUltiUsed(0);
             setInfoText("You used your utimate!");
+            setIsBotMakingMove(true); // Disable buttons after the user's move
             setAutoBattle(true);
+            
+            
         }
+
+        if (healStat <= 0 || friendHealStat <= 0) {
+            if (healStat <= 0 && friendHealStat <= 0) {
+              setWinner("It's a tie!");
+            } else if (healStat <= 0) {
+              setWinner("You lost!");
+            } else {
+              setWinner("You won!");
+            }
+            setRunGameOverModal(true);
+          }
+
         };
 
     const healClick = () => {
@@ -157,6 +186,7 @@ export default function BattlePage({navigation, route}) {
         setHealStat(newHealstat <= 100 ? newHealstat : 100);
         console.log(`User's current ${healStat}`);
         setInfoText("You healed yourself!");
+        setIsBotMakingMove(true); // Disable buttons after the user's move
         setAutoBattle(true);
         };
 
@@ -168,6 +198,7 @@ export default function BattlePage({navigation, route}) {
           setHealStat(newUserHealstat >= 0 ? newUserHealstat : 0);
           console.log(`Ultimate damage dealt by bot: ${friendUltiLimit}`);
           setFriendUltiUsed(false);
+          setIsBotMakingMove(false); // Enable buttons after the user's move
           setAutoBattle(false);
           setInfoText("The enemy used ultimate!");
         } else {
@@ -176,8 +207,20 @@ export default function BattlePage({navigation, route}) {
           setHealStat(newUserHealstat >= 0 ? newUserHealstat : 0);
           console.log(`Damage dealt by bot: ${friendAttackStat}`);
           setInfoText("The enemy attacked you!");
+          setIsBotMakingMove(false); // Enable buttons after the user's move
           setAutoBattle(false);
         }
+
+        if (healStat <= 0 || friendHealStat <= 0) {
+            if (healStat <= 0 && friendHealStat <= 0) {
+              setWinner("It's a tie!");
+            } else if (healStat <= 0) {
+              setWinner("You lost!");
+            } else {
+              setWinner("You won!");
+            }
+            setRunGameOverModal(true);
+          }
       };
 
     const friendHealClick = () => {
@@ -186,6 +229,7 @@ export default function BattlePage({navigation, route}) {
         console.log(`Bot's current health ${friendHealStat}`);
         setInfoText("The enemy healed!");
         console.log(`Bot's current health ${friendHealStat}`);
+        setIsBotMakingMove(false); // Enable buttons after the user's move
         setAutoBattle(false);
         };
 
@@ -195,7 +239,8 @@ export default function BattlePage({navigation, route}) {
         performBotMove();
       };
     
-      const performBotMove = () => {
+    const performBotMove = () => {
+
         // Bot logic to choose a move
         const moves = ["attack", "ultimate", "heal"];
         const randomMoveIndex = Math.floor(Math.random() * moves.length);
@@ -215,6 +260,7 @@ export default function BattlePage({navigation, route}) {
               break;
             case "ultimate":
               setInfoText("The enemy charged his ultimate!");
+              setIsBotMakingMove(false); // Enable buttons after the user's move
               setFriendUltiLeft((prev) => prev + friendUltiLimit);
               setTimeout(() => {
                 setFriendUltiUsed(true);
@@ -227,7 +273,7 @@ export default function BattlePage({navigation, route}) {
               break;
           }
         }, 2000); // Delay of 4000 milliseconds (4 seconds)
-      };
+    };
 
 
         
@@ -346,8 +392,10 @@ export default function BattlePage({navigation, route}) {
                     <Pressable 
                         style={({pressed}) => [
                             styles.attackButton,
-                            pressed && {opacity: 0.7}, 
-                        ]}  
+                            pressed && {opacity: 0.7},
+                            isBotMakingMove && {opacity: 0.3, backgroundColor: 'gray'}, // Apply styling to disable all the button 
+                        ]}
+                        disabled={isBotMakingMove} // Disable the button
                         onPress = {() => {
                             console.log('Attack');
                             attackClick();
@@ -361,9 +409,10 @@ export default function BattlePage({navigation, route}) {
                         style={({pressed}) => [
                             styles.ultimateButton,
                             pressed && {opacity: 0.7},
-                            isUltiButtonDisabled && {opacity: 0.5, backgroundColor: 'gray'}, // Apply styling to disable the button
+                            (isUltiButtonDisabled && !isBotMakingMove) && {opacity: 0.5, backgroundColor: 'gray'}, // Apply styling to disable the isUltiButtonDisabled button
+                            isBotMakingMove && {opacity: 0.3, backgroundColor: 'gray'}, // Apply styling to disable the isBotMakingMove button
                         ]}
-                        disabled={isUltiButtonDisabled} // Disable the button
+                        disabled={isUltiButtonDisabled || isBotMakingMove} // Disable the button
                         onPressIn={() => {
                             if (ultiUsed>=ultiLimit) {
                                 console.log('CHARGED!');
@@ -390,9 +439,10 @@ export default function BattlePage({navigation, route}) {
                     <Pressable 
                         style={({pressed}) => [
                             styles.healButton,
-                            pressed && {opacity: 0.7}, 
+                            pressed && {opacity: 0.7},
+                            isBotMakingMove && {opacity: 0.3, backgroundColor: 'gray'}, // Apply styling to disable all the button  
                         ]} 
-
+                        disabled={isBotMakingMove} // Disable the button
                         onPress={() => {
                             console.log('HEAL');
                             healClick();
@@ -450,7 +500,36 @@ export default function BattlePage({navigation, route}) {
 
                                 </View>
                             </View>
-                        </Modal>             
+                        </Modal>    
+                        <Modal
+                            animationType="slide"
+                            transparent={true}
+                            visible={runGameOverModal}
+                            >
+                            <View style={styles.modalContainer}>
+                                <View style={styles.modalContent}>
+                                    <Text style={styles.abandonText}>{winner}</Text>
+
+                                    <View style={styles.modalContentChild}>
+                                        <Pressable
+                                            style={({pressed}) => [
+                                                styles.modalButton,
+                                                pressed && {opacity: 0.7}, 
+                                            ]}  
+                                            onPress={() => {
+                                                setRunGameOverModal(!runGameOverModal);
+                                                navigation.navigate('Friends List');
+                                            }}
+
+                                        >
+                                            <Text style={styles.gameOverText}>RETURN HOME!</Text>
+                                        </Pressable>
+
+                                    </View>
+
+                                </View>
+                            </View>
+                        </Modal>           
                 </View>
             </View>
         </SafeAreaView>
@@ -661,6 +740,13 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: '800',
         fontSize: 30,
+        textAlign: 'center',
+      },
+
+      gameOverText: {
+        color: 'white',
+        fontWeight: '700',
+        fontSize: 28,
         textAlign: 'center',
       },
 
