@@ -26,8 +26,7 @@ export default function FriendsList({navigation}) {
     const [myFriendID, setMyFriendID]= useState('');
     const [current_user, loading, error]= useAuthState(auth);
 
-
-    //Retrieve my player name, and my stats
+    //Retrieve my player name, and friends list
     const getMyDatabase = async() => {    
         const myDocRef= doc(db, "users", current_user.uid)
         const myDocSnapshot= await getDoc(myDocRef)
@@ -44,6 +43,7 @@ export default function FriendsList({navigation}) {
             })
         }
     }
+
 
     const getFriendDatabase = async() => {   
         //Finds friend, based on query using friend's player ID
@@ -67,6 +67,7 @@ export default function FriendsList({navigation}) {
             console.log("Database doesn't exist")
         }
     }
+    
 
     //Retrieve my player's friendsList
     const getFriendList = async() => {    
@@ -76,7 +77,6 @@ export default function FriendsList({navigation}) {
             setAllFriends(myDocSnapshot.data()['friends'])
         }
     }
-    // console.log(myStats);
 
     //Updates database whenever friend is added/removed, which re-renders the flatlist
     useEffect(()=>{
@@ -133,6 +133,7 @@ export default function FriendsList({navigation}) {
                                     agility={item.agility}
                                     stamina={item.stamina}
                                     intellect={item.intellect}
+                                    myStats={myStats}
                                 />}
                         />
                     </View>
@@ -311,11 +312,11 @@ export default function FriendsList({navigation}) {
     );
 }
 
-
-function Friend_Box({player, playerID, player_icon, strength, agility, stamina, intellect}) {
+function Friend_Box({player, playerID, player_icon, strength, agility, stamina, intellect, myStats}) {
 
     const navigation = useNavigation();
-    let friendinfo = [player, player_icon, strength, agility, stamina, intellect ];
+    const friendStats = [player, player_icon, strength, agility, stamina, intellect];
+    const userStats = myStats;
 
     return (
         <View style={styles.playerInfo}>
@@ -329,8 +330,8 @@ function Friend_Box({player, playerID, player_icon, strength, agility, stamina, 
                 title="Fight"
                 onPress={ () => {
                     return (
-                        console.log('Begin Battle!', player),
-                        navigation.navigate('BattleStart', {friendinfo})
+                        console.log('Begin Battle!', `with ${player}`),
+                        navigation.navigate('BattleStart', {friendStats, userStats})
                     ); 
 
                 }}
