@@ -72,10 +72,11 @@ export default function BattlePage({navigation, route}) {
         }
       }, [autoBattle]); // Triggers the bot move
 
-    //Ulti charging feature
+    //Console log ulti charging feature
     useEffect(() => {
-        console.log(`Ulti is reset: ${ultiUsed}`);
-    }, [ultiUsed]);
+        console.log(`Ulti used: ${ultiUsed}`);
+        console.log(`Ulti left: ${ultiLeft}`);
+    }, [ultiUsed,ultiLeft]);
 
 
     useEffect(() => {
@@ -84,13 +85,16 @@ export default function BattlePage({navigation, route}) {
           setUltiButtonLabel('ULTIMATE'); // Reset the label
         } else if (ultiUsed >= ultiLimit) {
           setIsUltiButtonDisabled(true); // Disable the ultimate button when the limit is reached
-          setUltiButtonLabel('CHARGED!'); // Change the label to "CHARGED" when the button is disabled
-          setInfoText("Your ULIIMATE is charged!");
+          setInfoText("WARNING!\nULIIMATE is charged!");
         }
       }, [ultiUsed, ultiLimit]);
 
     useEffect(() => {
-        if (autoBattle && !isBotMakingMove) {
+        if (ultiLeft >= 100) {
+            setIsUltiButtonDisabled(true); // Disable the ultimate button when ultiLeft reaches 100
+          }
+          
+        else if (autoBattle && !isBotMakingMove) {
             setIsBotMakingMove(true); // Disable buttons when it's the bot's turn
             performBotMove();
             setAutoBattle(false);
@@ -125,7 +129,7 @@ export default function BattlePage({navigation, route}) {
         setIntervalId(id);
     };
       
-      const stopCharging = () => {
+    const stopCharging = () => {
         setIsCharging(false);
         if (intervalId) {
           clearInterval(intervalId);
@@ -151,7 +155,7 @@ export default function BattlePage({navigation, route}) {
             const newFriendHealstat = friendHealStat - attackStat;
             setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
             console.log(`Damage dealt by user: ${attackStat}`);
-            setInfoText("You attacked the enemy!");
+            setInfoText(`You dealt ${attackStat} damage!`);
             setIsBotMakingMove(true); // Disable buttons after the user's move
             setAutoBattle(true);
        
@@ -161,7 +165,7 @@ export default function BattlePage({navigation, route}) {
             setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
             console.log(`Ultimate Damage dealt by user: ${ultiUsed}`);
             setUltiUsed(0);
-            setInfoText("You used your utimate!");
+            setInfoText(`You dealt ${friendUltiLimit} damage using ultimate!`);
             setIsBotMakingMove(true); // Disable buttons after the user's move
             setAutoBattle(true);
             
@@ -185,7 +189,7 @@ export default function BattlePage({navigation, route}) {
         const newHealstat = healStat + 10;
         setHealStat(newHealstat <= 100 ? newHealstat : 100);
         console.log(`User's current ${healStat}`);
-        setInfoText("You healed yourself!");
+        setInfoText(`You healed 10 health!`);
         setIsBotMakingMove(true); // Disable buttons after the user's move
         setAutoBattle(true);
         };
@@ -200,13 +204,13 @@ export default function BattlePage({navigation, route}) {
           setFriendUltiUsed(false);
           setIsBotMakingMove(false); // Enable buttons after the user's move
           setAutoBattle(false);
-          setInfoText("The enemy used ultimate!");
+          setInfoText(`The enemy dealt ${friendUltiLimit} damage using ultimate!`);
         } else {
           // Regular attack
           const newUserHealstat = healStat - friendAttackStat;
           setHealStat(newUserHealstat >= 0 ? newUserHealstat : 0);
           console.log(`Damage dealt by bot: ${friendAttackStat}`);
-          setInfoText("The enemy attacked you!");
+          setInfoText(`The enemy dealt ${friendAttackStat} damage!`);
           setIsBotMakingMove(false); // Enable buttons after the user's move
           setAutoBattle(false);
         }
@@ -227,7 +231,7 @@ export default function BattlePage({navigation, route}) {
         const newfriendHealstat = friendHealStat + 10;
         setFriendHealStat(newfriendHealstat <= 100 ? newfriendHealstat : 100);
         console.log(`Bot's current health ${friendHealStat}`);
-        setInfoText("The enemy healed!");
+        setInfoText(`The enemy healed 10 health!`);
         console.log(`Bot's current health ${friendHealStat}`);
         setIsBotMakingMove(false); // Enable buttons after the user's move
         setAutoBattle(false);
@@ -428,7 +432,7 @@ export default function BattlePage({navigation, route}) {
                         >
                         {({ pressed }) => (
                         <Text style={[styles.text, {fontSize: 17}]}>
-                            {pressed ? 'CHARGING!' : isUltiButtonDisabled ? 'CHARGED!' : 'ULTIMATE'}
+                            {pressed ? 'CHARGING!' : ultiLeft === 100 ? 'EMPTY!' : isUltiButtonDisabled ? 'CHARGED!' : 'ULTIMATE'}
                         </Text>
                         )}
                         
