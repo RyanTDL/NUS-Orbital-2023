@@ -4,7 +4,6 @@ import { StatusBar, Platform } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Center } from "native-base";
 
-const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
 
 export default function BattlePage({navigation, route}) {
 
@@ -27,8 +26,7 @@ export default function BattlePage({navigation, route}) {
     const healClick = () => {
         const newHealstat = healstat + 20;
         sethealstat(newHealstat <= 100 ? newHealstat : 100);
-      };
-      
+    };
 
     return(
         <SafeAreaView style={styles.container}>
@@ -159,7 +157,7 @@ export default function BattlePage({navigation, route}) {
                         console.log('HEAL');
                         healClick();
                         console.log(`updated ${healstat}`);
-                      }}
+                    }}
                     > 
                         <Text style={styles.text} > HEAL </Text>
                         </Pressable>
@@ -169,7 +167,7 @@ export default function BattlePage({navigation, route}) {
                     onPress={() => {
                         console.log('RUN');
                         navigation.navigate('Friends List');
-                      }}> 
+                    }}> 
                         <Text style={styles.text}> RUN </Text>
                     </Pressable>
                 </View>

@@ -48,19 +48,24 @@ export default function FriendsList({navigation}) {
     const getFriendDatabase = async() => {   
         //Finds friend, based on query using friend's player ID
         // https://firebase.google.com/docs/firestore/query-data/queries
-        const q= query(collection(db, "users"), where("playerID", "==", myFriendID))
-        const querySnapshot= await getDocs(q)
-        const playerStatsArray= querySnapshot.docs[0].data()
-        setFriendStats({
-            title: playerStatsArray['username'],
-            uid: playerStatsArray['uid'],
-            friendID: playerStatsArray['playerID'],
-            icon: '../../assets/player_avatars/gym_bro.png',
-            strength: playerStatsArray['total_exercise'],
-            agility: Math.trunc(playerStatsArray['total_steps']/10),
-            stamina: Math.trunc(playerStatsArray['total_sleep']/7),
-            intellect: Math.trunc(playerStatsArray['total_study']/3)
-        }) 
+        try {
+            const q= query(collection(db, "users"), where("playerID", "==", myFriendID))
+            const querySnapshot= await getDocs(q)
+            const playerStatsArray= querySnapshot.docs[0].data()
+            setFriendStats({
+                title: playerStatsArray['username'],
+                uid: playerStatsArray['uid'],
+                friendID: playerStatsArray['playerID'],
+                icon: '../../assets/player_avatars/gym_bro.png',
+                strength: playerStatsArray['total_exercise'],
+                agility: Math.trunc(playerStatsArray['total_steps']/10),
+                stamina: Math.trunc(playerStatsArray['total_sleep']/7),
+                intellect: Math.trunc(playerStatsArray['total_study']/3)
+            }) 
+        }
+        catch {
+            console.log("Database doesn't exist")
+        }
     }
 
     //Retrieve my player's friendsList
@@ -69,7 +74,6 @@ export default function FriendsList({navigation}) {
         const myDocSnapshot= await getDoc(myDocRef)
         if (myDocSnapshot.exists()) {
             setAllFriends(myDocSnapshot.data()['friends'])
-
         }
     }
     // console.log(myStats);
@@ -83,11 +87,6 @@ export default function FriendsList({navigation}) {
 
     // //Find & Add friend based on player ID
     const addFriend = async() => {   
-        if (current_user.uid==friendStats.uid){
-            alert('Cannot add your own ID')
-            return
-        }
-
         const myDocRef= doc(db, "friends", current_user.uid)
         await updateDoc(myDocRef, {
             friends: arrayUnion(friendStats)
@@ -184,9 +183,13 @@ export default function FriendsList({navigation}) {
                             <AppButton 
                                 title="Add friend"
                                 onPress={()=> {
-                                    getFriendDatabase()
-                                    setIsAddModalVisible(!isAddModalVisible)
-                                    setIsFriendAddedModalVisible(!isFriendAddedModalVisible)
+                                    if (myStats.friendID==myFriendID){
+                                        alert('Cannot enter your own ID')
+                                    } else {
+                                        getFriendDatabase()
+                                        setIsAddModalVisible(!isAddModalVisible)
+                                        setIsFriendAddedModalVisible(!isFriendAddedModalVisible)
+                                    }
                                 }}
                                 buttonStyle={[styles.modalButtonContainer, {backgroundColor:'black'}]}
                                 textStyle= {[styles.modalButtonText, {color:'white'}]}
@@ -211,11 +214,15 @@ export default function FriendsList({navigation}) {
                     style= {{justifyContent:'center', alignItems:'center'}}
                 >
                     <View style={styles.modalConfirmationContainer}>
-                        <Text style={styles.modalText}> New friend added! </Text>
+                        <Text style={styles.modalText}>Adding new friend...</Text>
                         <AppButton 
-                            title="Return"
+                            title="Proceed"
                             onPress={()=> {
-                                addFriend()
+                                if (friendStats.uid==null){
+                                    alert('Invalid player ID entered')
+                                } else {
+                                    addFriend()
+                                }
                                 setIsFriendAddedModalVisible(!isFriendAddedModalVisible)
                                 setMyFriendID('')
                             }}
@@ -249,9 +256,13 @@ export default function FriendsList({navigation}) {
                             <AppButton 
                                 title="Remove friend"
                                 onPress={()=> {
-                                    getFriendDatabase()
-                                    setIsRemoveModalVisible(!isRemoveModalVisible)
-                                    setIsFriendRemovedModalVisible(!isFriendRemovedModalVisible)
+                                    if (myStats.friendID==myFriendID){
+                                        alert('Cannot enter your own ID')
+                                    } else {
+                                        getFriendDatabase()
+                                        setIsRemoveModalVisible(!isRemoveModalVisible)
+                                        setIsFriendRemovedModalVisible(!isFriendRemovedModalVisible)
+                                    }
                                 }}
                                 buttonStyle={[styles.modalButtonContainer, {backgroundColor:'black'}]}
                                 textStyle= {[styles.modalButtonText, {color:'white'}]}
@@ -277,11 +288,15 @@ export default function FriendsList({navigation}) {
                     style= {{justifyContent:'center', alignItems:'center'}}
                 >
                     <View style={styles.modalConfirmationContainer}>
-                        <Text style={styles.modalText}> A friend has removed! </Text>
+                        <Text style={styles.modalText}> Removing your friend... </Text>
                         <AppButton 
-                            title="Return"
+                            title="Proceed"
                             onPress={()=> {
-                                removeFriend()
+                                if (friendStats.uid==null){
+                                    alert('Invalid player ID entered')
+                                } else {
+                                    removeFriend()
+                                }
                                 setIsFriendRemovedModalVisible(!isFriendRemovedModalVisible)
                                 setMyFriendID('')
                             }}
@@ -306,7 +321,7 @@ function Friend_Box({player, playerID, player_icon, strength, agility, stamina, 
         <View style={styles.playerInfo}>
             <Image source={require('../../assets/player_avatars/gym_bro.png')}/>
             <View>
-                <Text style={{fontSize:12, fontWeight: 500}}>{player} (Player ID: #{playerID})</Text>
+                <Text style={{fontSize:12, fontWeight: 500}}>{player} (Player ID: {playerID})</Text>
                 <Text style={{fontSize:12, fontWeight: 300}}> Strength: {strength}/100  Agility: {agility}/100</Text>
                 <Text style={{fontSize:12, fontWeight: 300}}> Stamina: {stamina}/100  Intellect:{intellect}/100</Text>
             </View>
