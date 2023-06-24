@@ -34,13 +34,17 @@ export default function BattlePage({navigation, route}) {
     // const friendIcon = require(friendStats.icon);
 
     const [infoText, setInfoText]= useState('Choose your next move!');
-    
+
+    const [runInstructionsVisible, setRunInstructionsVisible]= useState(false);
     const [runModalVisible, setRunModalVisible]= useState(false);
     const [runGameOverModal, setRunGameOverModal]= useState(false);
     const [winner, setWinner] = useState();
 
     const [healStat, setHealStat] = useState(userStats.stamina+50);
     const [friendHealStat, setFriendHealStat] = useState(friendStats.stamina+50);
+    const [healCount, setHealCount] = useState(0);
+    const [friendHealCount, setFriendHealCount] = useState(0);
+    const [isHealButtonDisabled, setIsHealButtonDisabled] = useState(false);
 
     const [attackStat, setAttackStat] = useState(userStats.strength);
     const [friendAttackStat, setFriendAttackStat] = useState(friendStats.strength);
@@ -186,13 +190,22 @@ export default function BattlePage({navigation, route}) {
         };
 
     const healClick = () => {
-        const newHealstat = healStat + 10;
-        setHealStat(newHealstat <= 100 ? newHealstat : 100);
-        console.log(`User's current ${healStat}`);
-        setInfoText(`You healed 10 health!`);
-        setIsBotMakingMove(true); // Disable buttons after the user's move
-        setAutoBattle(true);
-        };
+        if (healCount < 2) {
+            const newHealstat = healStat + 10;
+            setHealStat(newHealstat <= 100 ? newHealstat : 100);
+            console.log(`User's current ${healStat}`);
+            setInfoText(`You healed 10 health!`);
+            setIsBotMakingMove(true); // Disable buttons after the user's move
+            setAutoBattle(true);
+            setHealCount(healCount + 1);
+        } else {
+            setHealCount(healCount + 1);
+            console.log(`Heal button clicked for ${healCount} times `);
+            setIsHealButtonDisabled(true);
+        }
+    
+    };
+          
 
     //Botmoves
     const friendAttackClick = () => {
@@ -228,14 +241,18 @@ export default function BattlePage({navigation, route}) {
       };
 
     const friendHealClick = () => {
-        const newfriendHealstat = friendHealStat + 10;
-        setFriendHealStat(newfriendHealstat <= 100 ? newfriendHealstat : 100);
-        console.log(`Bot's current health ${friendHealStat}`);
-        setInfoText(`The enemy healed 10 health!`);
-        console.log(`Bot's current health ${friendHealStat}`);
-        setIsBotMakingMove(false); // Enable buttons after the user's move
-        setAutoBattle(false);
-        };
+        if (friendHealCount < 3) {
+          const newfriendHealstat = friendHealStat + 10;
+          setFriendHealStat(newfriendHealstat <= 100 ? newfriendHealstat : 100);
+          console.log(`Bot's current health ${friendHealStat}`);
+          setInfoText(`The enemy healed 10 health!`);
+          console.log(`Bot's current health ${friendHealStat}`);
+          setIsBotMakingMove(false); // Enable buttons after the user's move
+          setAutoBattle(false);
+          setFriendHealCount(friendHealCount + 1);
+        }
+    };
+      
 
     //Auto Battle
     const startAutoBattle = () => {
@@ -243,17 +260,24 @@ export default function BattlePage({navigation, route}) {
         performBotMove();
       };
     
-    const performBotMove = () => {
-
+      const performBotMove = () => {
         // Bot logic to choose a move
         const moves = ["attack", "ultimate", "heal"];
         const randomMoveIndex = Math.floor(Math.random() * moves.length);
-        const randomMove = moves[randomMoveIndex];
+        let randomMove = moves[randomMoveIndex];
       
         // Check if the ultimate has already been charged
         if (randomMove === "ultimate" && friendUltiUsed) {
           friendAttackClick(); // Perform a regular attack instead
           return;
+        }
+      
+        // Check if the friend has already used the heal move three times
+        if (randomMove === "heal" && friendHealCount >= 3) {
+          // Choose a different move if the heal move limit is reached
+          const availableMoves = moves.filter((move) => move !== "heal");
+          const newRandomMoveIndex = Math.floor(Math.random() * availableMoves.length);
+          randomMove = availableMoves[newRandomMoveIndex];
         }
       
         // Perform the chosen move after a delay
@@ -268,7 +292,7 @@ export default function BattlePage({navigation, route}) {
               setFriendUltiLeft((prev) => prev + friendUltiLimit);
               setTimeout(() => {
                 setFriendUltiUsed(true);
-              }, 1000); // Delay of 2000 milliseconds (2 seconds)
+              }, 2000); // Delay of 2000 milliseconds 
               break;
             case "heal":
               friendHealClick();
@@ -276,8 +300,8 @@ export default function BattlePage({navigation, route}) {
             default:
               break;
           }
-        }, 2000); // Delay of 4000 milliseconds (4 seconds)
-    };
+        }, 2000); // Delay of 2000 milliseconds 
+      };
 
 
         
@@ -311,10 +335,11 @@ export default function BattlePage({navigation, route}) {
                                     <View style ={[styles.statusbarinside,{ backgroundColor:'#fc080d', width: `${healStat}%`}]}>
                                     </View>
                                 </View>
+                                <Text style ={[styles.statusbarinfo,{color: 'red'}]}> {healStat} </Text>
                             </View>
 
                             <View style={styles.playerStats}> 
-                                <View style={{flex: 0.2}}>
+                                <View style={styles.playerStatsIcon}>
                                     <Image
                                         style={{flex: 1, width: 30, resizeMode: 'contain',}}
                                         source={require('../../assets/battlesystem/power.png')}
@@ -325,6 +350,7 @@ export default function BattlePage({navigation, route}) {
                                     <View style ={[styles.statusbarinside,{backgroundColor:'#D5B71C', width: (100 - ultiLeft) + '%'}]}>
                                     </View>
                                 </View>
+                                <Text style ={[styles.statusbarinfo,{color: 'yellow'}]}> {(100 - ultiLeft) + '%'} </Text>
                             </View>
                         </View>
                     </ImageBackground>
@@ -355,10 +381,11 @@ export default function BattlePage({navigation, route}) {
                                     <View style ={[styles.statusbarinside,{ backgroundColor:'#fc080d', width: `${friendHealStat}%` }]}>
                                     </View>
                                 </View>
+                                <Text style ={[styles.statusbarinfo,{color: 'red'}]}> {friendHealStat} </Text>
                             </View>
 
                             <View style={styles.playerStats}> 
-                                <View style={{flex: 0.2}}>
+                                <View style={styles.playerStatsIcon}>
                                     <Image
                                         style={{flex: 1, width: 30, resizeMode: 'contain',}}
                                         source={require('../../assets/battlesystem/power.png')}
@@ -369,6 +396,7 @@ export default function BattlePage({navigation, route}) {
                                     <View style ={[styles.statusbarinside,{backgroundColor:'#D5B71C', width: (100 - friendUltiLeft) + '%'}]}>
                                     </View>
                                 </View>
+                                <Text style ={[styles.statusbarinfo,{color: 'yellow'}]}> {(100 - friendUltiLeft) + '%'} </Text>
                             </View>
                         </View>
                     </ImageBackground>
@@ -385,7 +413,7 @@ export default function BattlePage({navigation, route}) {
             </View>
 
             <View style={styles.infobox}>
-                <Text style={[styles.text, {textAlign: "left", paddingLeft: 15}]}> 
+                <Text style={styles.infoBoxText}> 
                     {infoText}
                 </Text>
             </View>
@@ -431,7 +459,7 @@ export default function BattlePage({navigation, route}) {
                         }}
                         >
                         {({ pressed }) => (
-                        <Text style={[styles.text, {fontSize: 17}]}>
+                        <Text style={[styles.text, {fontSize: 18}]}>
                             {pressed ? 'CHARGING!' : ultiLeft === 100 ? 'EMPTY!' : isUltiButtonDisabled ? 'CHARGED!' : 'ULTIMATE'}
                         </Text>
                         )}
@@ -444,15 +472,19 @@ export default function BattlePage({navigation, route}) {
                         style={({pressed}) => [
                             styles.healButton,
                             pressed && {opacity: 0.7},
-                            isBotMakingMove && {opacity: 0.3, backgroundColor: 'gray'}, // Apply styling to disable all the button  
+                            isHealButtonDisabled && {opacity: 0.5, backgroundColor: 'gray'}, // Apply styling to disable the Heal button
+                            isBotMakingMove && {opacity: 0.3, backgroundColor: 'gray'}, // Apply styling to disable all the button
                         ]} 
-                        disabled={isBotMakingMove} // Disable the button
+                        disabled={isHealButtonDisabled || isBotMakingMove} // Disable the button
                         onPress={() => {
                             console.log('HEAL');
                             healClick();
                         }}
                         > 
-                        {({ pressed }) => (<Text style={[styles.text, {fontSize: 20}]}>{pressed ? 'HEALING!' : 'HEAL'}</Text>
+                        {({ pressed }) => (
+                        <Text style={[styles.text, { fontSize: 18 }]}>
+                            {pressed ? 'HEALING!' : healCount <3  ? 'HEAL' : 'EMPTY!'}
+                        </Text>
                         )}
                         </Pressable>            
                         
@@ -603,6 +635,13 @@ const styles = StyleSheet.create({
         marginEnd: 8,
     },
 
+    statusbarinfo: {
+        flex: 0.3, 
+        fontSize: 10,
+        fontWeight: '900',
+        paddingRight: 0,
+    },
+
     animationwindow: {
         flex: 1,
         backgroundColor: 'black',
@@ -628,6 +667,18 @@ const styles = StyleSheet.create({
         boxSizing: 'border-box',
         justifyContent: 'space-evenly',
 
+    },
+
+    infoBoxText:{
+        fontFamily: "PressStart2P-Regular",
+        fontSize: 18,
+        lineHeight: 30,
+        textAlign: "left",
+        paddingLeft: 15,
+        color: '#FFFFFF',
+        textShadowColor: '#000000',
+        textShadowOffset: { width: 2.2, height: 3.5 },
+        textShadowRadius: 4,
     },
 
     inputbox: {
