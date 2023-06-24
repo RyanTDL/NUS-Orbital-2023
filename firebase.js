@@ -66,7 +66,7 @@ const registerWithEmailAndPassword = async (username, email, password) => {
     }
     catch (err) {
         console.error(err);
-        alert("Please enter a valid email");
+        alert("Email already in use. Please enter a valid email");
     }
 }
 
