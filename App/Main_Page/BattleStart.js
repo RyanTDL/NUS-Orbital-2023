@@ -1,7 +1,8 @@
 import {React, useState, useEffect} from "react";
-import {Dimensions, Alert, StyleSheet, ImageBackground, Text, View, SafeAreaView, Modal, Image, Pressable} from 'react-native';
+import {Dimensions, Alert, StyleSheet, ImageBackground, Text, View, SafeAreaView, Modal, Image, Pressable, TouchableOpacity} from 'react-native';
 import { StatusBar, Platform } from 'react-native';
 import { useFonts } from 'expo-font';
+import { MaterialIcons } from '@expo/vector-icons'; 
 
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
 
@@ -77,10 +78,10 @@ export default function BattlePage({navigation, route}) {
       }, [autoBattle]); // Triggers the bot move
 
     //Console log ulti charging feature
-    useEffect(() => {
-        console.log(`Ulti used: ${ultiUsed}`);
-        console.log(`Ulti left: ${ultiLeft}`);
-    }, [ultiUsed,ultiLeft]);
+    // useEffect(() => {
+    //     console.log(`Ulti used: ${ultiUsed}`);
+    //     console.log(`Ulti left: ${ultiLeft}`);
+    // }, [ultiUsed,ultiLeft]);
 
 
     useEffect(() => {
@@ -193,6 +194,7 @@ export default function BattlePage({navigation, route}) {
         if (healCount < 2) {
             const newHealstat = healStat + 10;
             setHealStat(newHealstat <= 100 ? newHealstat : 100);
+            console.log(`User's gained 10 health!`);
             console.log(`User's current ${healStat}`);
             setInfoText(`You healed 10 health!`);
             setIsBotMakingMove(true); // Disable buttons after the user's move
@@ -200,7 +202,6 @@ export default function BattlePage({navigation, route}) {
             setHealCount(healCount + 1);
         } else {
             setHealCount(healCount + 1);
-            console.log(`Heal button clicked for ${healCount} times `);
             setIsHealButtonDisabled(true);
         }
     
@@ -244,8 +245,8 @@ export default function BattlePage({navigation, route}) {
         if (friendHealCount < 3) {
           const newfriendHealstat = friendHealStat + 10;
           setFriendHealStat(newfriendHealstat <= 100 ? newfriendHealstat : 100);
-          console.log(`Bot's current health ${friendHealStat}`);
           setInfoText(`The enemy healed 10 health!`);
+          console.log('Bot healed 10 health!');
           console.log(`Bot's current health ${friendHealStat}`);
           setIsBotMakingMove(false); // Enable buttons after the user's move
           setAutoBattle(false);
@@ -287,18 +288,19 @@ export default function BattlePage({navigation, route}) {
               friendAttackClick();
               break;
             case "ultimate":
-              setInfoText("The enemy charged his ultimate!");
-              setIsBotMakingMove(false); // Enable buttons after the user's move
-              setFriendUltiLeft((prev) => prev + friendUltiLimit);
-              setTimeout(() => {
-                setFriendUltiUsed(true);
-              }, 2000); // Delay of 2000 milliseconds 
-              break;
-            case "heal":
-              friendHealClick();
-              break;
-            default:
-              break;
+                console.log('Bot charged its ultimate!');
+                setInfoText("The enemy charged his ultimate!");
+                setIsBotMakingMove(false); // Enable buttons after the user's move
+                setFriendUltiLeft((prev) => prev + friendUltiLimit);
+                setTimeout(() => {
+                    setFriendUltiUsed(true);
+                }, 2000); // Delay of 2000 milliseconds 
+                break;
+                case "heal":
+                friendHealClick();
+                break;
+                default:
+                break;
           }
         }, 2000); // Delay of 2000 milliseconds 
       };
@@ -406,10 +408,18 @@ export default function BattlePage({navigation, route}) {
             </View>
 
             <View style={styles.animationwindow}>
-                <Image 
-                    style={styles.battlebackgroundimage}
-                    source={require('../../assets/battlesystem/battlebackground.jpg')}
-                />
+                <ImageBackground
+                style={styles.battlebackgroundimage}
+                source={require('../../assets/battlesystem/battlebackground.jpg')}>
+                    <TouchableOpacity onPress={() => setRunInstructionsVisible(true)} >
+                    <MaterialIcons
+                        name="help-outline"
+                        size={35}
+                        style={styles.instructionsIcon}
+                    />  
+                    </TouchableOpacity>
+
+                </ImageBackground> 
             </View>
 
             <View style={styles.infobox}>
@@ -499,6 +509,40 @@ export default function BattlePage({navigation, route}) {
                         }}> 
                             <Text style={styles.text}> RUN </Text>
                         </Pressable>
+                        <Modal
+                            animationType="slide"
+                            transparent={true}
+                            visible={runInstructionsVisible}
+                            >
+                            <View style={styles.modalContainer}>
+                                <View style={[styles.modalContent, {height: 500, width: 350}]}>
+                                    <Text style={[styles.abandonText, {verticalAlign: 'top', textDecorationLine: 'underline', flex: 0.5, marginTop: 10}]}>How to Play?</Text>
+                                    <Text style={styles.howToPlayText}>
+                                        1. First player to lose all health loses! {'\n'}
+                                        2. ATTACK deals damage equivilant to Strength  {'\n'}
+                                        3. ULTIMATE charges up the attack for the next turn {'\n'}
+                                        4. Maximum charge depends on Intellect and POWER BAR Level {'\n'}
+                                        5. HEAL heals 10 health {'\n'}
+                                        6. Each Player has 3 HEALS! {'\n'}
+                                    </Text>
+
+                                    <Pressable
+                                        style={({pressed}) => [
+                                            styles.modalButton,
+                                            {flex: 0.4},
+                                            pressed && {opacity: 0.7}, 
+                                        ]}  
+                                        onPress={() => {
+                                            setRunInstructionsVisible(!runInstructionsVisible);
+                            
+                                        }}
+                                    >
+                                        <Text style={styles.returnBattleButton}>RETURN TO BATTLE!</Text>
+                                    </Pressable>
+
+                                </View>
+                            </View>
+                        </Modal> 
                         <Modal
                             animationType="slide"
                             transparent={true}
@@ -650,12 +694,14 @@ const styles = StyleSheet.create({
 
     battlebackgroundimage: {
         flex: 1,
-        width: null,
-        height: null,
         resizeMode: 'cover',
         borderWidth: 4,
         borderColor: 'black',
         borderRadius: 7,
+    },
+
+    instructionsIcon: {
+        textAlign: 'right',
     },
 
     infobox: {
@@ -803,6 +849,23 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         fontSize: 28,
         textAlign: 'center',
+      },
+
+      howToPlayText: {
+        flex: 4,
+        color: 'black',
+        fontWeight: '600',
+        fontSize: 17,
+        margin: 20,
+        lineHeight: 30,
+
+      },
+    
+      returnBattleButton: {
+        color: 'white',
+        fontWeight: '600',
+        fontSize: 25,
+        textAlign: 'center'
       },
 
 })
