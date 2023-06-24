@@ -4,7 +4,6 @@ import { StatusBar, Platform } from 'react-native';
 import { useFonts } from 'expo-font';
 import { MaterialIcons } from '@expo/vector-icons'; 
 
-const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
 
 export default function BattlePage({navigation, route}) {
 
@@ -259,6 +258,7 @@ export default function BattlePage({navigation, route}) {
     };
       
 
+
     //Auto Battle
     const startAutoBattle = () => {
         setAutoBattle(true);
@@ -512,6 +512,7 @@ export default function BattlePage({navigation, route}) {
                             setRunModalVisible(true);
                         }}> 
                             <Text style={styles.text}> RUN </Text>
+
                         </Pressable>
                         <Modal
                             animationType="slide"
@@ -608,8 +609,8 @@ export default function BattlePage({navigation, route}) {
                                         >
                                             <Text style={styles.gameOverText}>RETURN HOME!</Text>
                                         </Pressable>
-
                                     </View>
+
 
                                 </View>
                             </View>
