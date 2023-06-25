@@ -40,8 +40,9 @@ export default function BattlePage({navigation, route}) {
     const [runGameOverModal, setRunGameOverModal]= useState(false);
     const [winner, setWinner] = useState();
 
-    const [healStat, setHealStat] = useState(userStats.stamina+50);
-    const [friendHealStat, setFriendHealStat] = useState(friendStats.stamina+50);
+    const [healStat, setHealStat] = useState((userStats.stamina+50) > 100 ? 100 : (userStats.stamina+50));
+    const [friendHealStat, setFriendHealStat] = useState((friendStats.stamina+50) > 100 ? 100 : (friendStats.stamina+50));
+
     const [healCount, setHealCount] = useState(0);
     const [friendHealCount, setFriendHealCount] = useState(0);
     const [isHealButtonDisabled, setIsHealButtonDisabled] = useState(false);
@@ -105,6 +106,10 @@ export default function BattlePage({navigation, route}) {
         }
     }, [autoBattle, isBotMakingMove]);
 
+    useEffect(() => {
+        setIsHealButtonDisabled(healStat === 100);
+      }, [healStat]);
+
     const startCharging = () => {
         setIsCharging(true);
         const id = setInterval(() => {
@@ -155,39 +160,38 @@ export default function BattlePage({navigation, route}) {
     //Usermoves
     const attackClick = () => {
         if (ultiUsed === 0) {
-            // Regular attack
-            const newFriendHealstat = friendHealStat - attackStat;
-            setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
-            console.log(`Damage dealt by user: ${attackStat}`);
-            setInfoText(`You dealt ${attackStat} damage!`);
-            setIsBotMakingMove(true); // Disable buttons after the user's move
-            setAutoBattle(true);
-       
-        } else {
-            // Attack with ultimate
-            const newFriendHealstat = friendHealStat - ultiUsed;
-            setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
-            console.log(`Ultimate Damage dealt by user: ${ultiUsed}`);
-            setUltiUsed(0);
-            setInfoText(`You dealt ${friendUltiLimit} damage using ultimate!`);
-            setIsBotMakingMove(true); // Disable buttons after the user's move
-            setAutoBattle(true);
-            
-            
-        }
-
-        if (healStat <= 0 || friendHealStat <= 0) {
-            if (healStat <= 0 && friendHealStat <= 0) {
-              setWinner("It's a tie!");
-            } else if (healStat <= 0) {
-              setWinner("You lost!");
-            } else {
-              setWinner("You won!");
-            }
+          // Regular attack
+          const newFriendHealstat = friendHealStat - attackStat;
+          setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
+          console.log(`Damage dealt by user: ${attackStat}`);
+          setInfoText(`You dealt ${attackStat} damage!`);
+      
+          if (newFriendHealstat <= 0) {
+            setWinner("You won!");
             setRunGameOverModal(true);
+          } else {
+            setIsBotMakingMove(true); // Disable buttons after the user's move
+            setAutoBattle(true);
           }
+        } else {
+          // Attack with ultimate
+          const newFriendHealstat = friendHealStat - ultiUsed;
+          setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
+          console.log(`Ultimate Damage dealt by user: ${ultiUsed}`);
+          setUltiUsed(0);
+          setInfoText(`You dealt ${ultiUsed} damage using ultimate!`);
+      
+          if (newFriendHealstat <= 0) {
+            setWinner("You won!");
+            setRunGameOverModal(true);
+          } else {
+            setIsBotMakingMove(true); // Disable buttons after the user's move
+            setAutoBattle(true);
+          }
+        }
+      };
 
-        };
+
 
     const healClick = () => {
         if (healCount < 2) {
@@ -218,28 +222,28 @@ export default function BattlePage({navigation, route}) {
           setIsBotMakingMove(false); // Enable buttons after the user's move
           setAutoBattle(false);
           setInfoText(`The enemy dealt ${friendUltiLimit} damage using ultimate!`);
+      
+          if (newUserHealstat <= 0) {
+            setWinner("You lost!");
+            setRunGameOverModal(true);
+          }
         } else {
           // Regular attack
           const newUserHealstat = healStat - friendAttackStat;
           setHealStat(newUserHealstat >= 0 ? newUserHealstat : 0);
           console.log(`Damage dealt by bot: ${friendAttackStat}`);
           setInfoText(`The enemy dealt ${friendAttackStat} damage!`);
-          setIsBotMakingMove(false); // Enable buttons after the user's move
-          setAutoBattle(false);
-        }
-
-        if (healStat <= 0 || friendHealStat <= 0) {
-            if (healStat <= 0 && friendHealStat <= 0) {
-              setWinner("It's a tie!");
-            } else if (healStat <= 0) {
-              setWinner("You lost!");
-            } else {
-              setWinner("You won!");
-            }
+      
+          if (newUserHealstat <= 0) {
+            setWinner("You lost!");
             setRunGameOverModal(true);
+          } else {
+            setIsBotMakingMove(false); // Enable buttons after the user's move
+            setAutoBattle(false);
           }
+        }
       };
-
+      
     const friendHealClick = () => {
         if (friendHealCount < 3) {
           const newfriendHealstat = friendHealStat + 10;
