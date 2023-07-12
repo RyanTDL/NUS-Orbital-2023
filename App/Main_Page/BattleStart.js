@@ -190,11 +190,11 @@ export default function BattlePage({navigation, route}) {
     const healClick = () => {
         console.log(healCount);
         if (healCount < 3) {
-            const newHealstat = healStat + 10;
+            const newHealstat = healStat + 20;
             setHealStat(newHealstat <= 100 ? newHealstat : 100);
-            console.log(`User's gained 10 health!`);
+            console.log(`User's gained 20 health!`);
             console.log(`User's current ${healStat}`);
-            setInfoText(`You healed 10 health!`);
+            setInfoText(`You healed 20 health!`);
             setIsBotMakingMove(true); // Disable buttons after the user's move
             setAutoBattle(true);
             setHealCount(healCount + 1);
@@ -238,10 +238,10 @@ export default function BattlePage({navigation, route}) {
       
     const friendHealClick = () => {
         if (friendHealCount < 3) {
-          const newfriendHealstat = friendHealStat + 10;
+          const newfriendHealstat = friendHealStat + 20;
           setFriendHealStat(newfriendHealstat <= 100 ? newfriendHealstat : 100);
-          setInfoText(`The enemy healed 10 health!`);
-          console.log('Bot healed 10 health!');
+          setInfoText(`The enemy healed 20 health!`);
+          console.log('Bot healed 20 health!');
           console.log(`Bot's current health ${friendHealStat}`);
           setIsBotMakingMove(false); // Enable buttons after the user's move
           setAutoBattle(false);
@@ -251,56 +251,106 @@ export default function BattlePage({navigation, route}) {
       
 
 
-    //Auto Battle
+    // //Auto Battle
+    // const startAutoBattle = () => {
+    //     setAutoBattle(true);
+    //     performBotMove();
+    //   };
+    
+    //   const performBotMove = () => {
+    //     // Bot logic to choose a move
+    //     const moves = ["attack", "ultimate", "heal"];
+    //     const randomMoveIndex = Math.floor(Math.random() * moves.length);
+    //     let randomMove = moves[randomMoveIndex];
+      
+    //     // Check if the ultimate has already been charged
+    //     if (randomMove === "ultimate" && friendUltiUsed) {
+    //       friendAttackClick(); // Perform a regular attack instead
+    //       return;
+    //     }
+      
+    //     // Check if the friend has already used the heal move three times
+    //     if (randomMove === "heal" && friendHealCount >= 3) {
+    //       // Choose a different move if the heal move limit is reached
+    //       const availableMoves = moves.filter((move) => move !== "heal");
+    //       const newRandomMoveIndex = Math.floor(Math.random() * availableMoves.length);
+    //       randomMove = availableMoves[newRandomMoveIndex];
+    //     }
+      
+    //     // Perform the chosen move after a delay
+    //     setTimeout(() => {
+    //       switch (randomMove) {
+    //         case "attack":
+    //           friendAttackClick();
+    //           break;
+    //         case "ultimate":
+    //             console.log('Bot charged its ultimate!');
+    //             setInfoText("The enemy charged his ultimate!");
+    //             setIsBotMakingMove(false); // Enable buttons after the user's move
+    //             setFriendUltiUsed(true);
+    //             setFriendUltiLeft((prev) => prev + friendUltiLimit);
+    //             break;
+    //         case "heal":
+    //             friendHealClick();
+    //             break;
+    //         default:
+    //             break;
+    //       }
+    //     }, 2000); // Delay of 2000 milliseconds 
+    //   };
+
+        // Auto Battle
     const startAutoBattle = () => {
         setAutoBattle(true);
         performBotMove();
-      };
+    };
     
-      const performBotMove = () => {
+    const performBotMove = () => {
         // Bot logic to choose a move
         const moves = ["attack", "ultimate", "heal"];
         const randomMoveIndex = Math.floor(Math.random() * moves.length);
         let randomMove = moves[randomMoveIndex];
-      
+    
         // Check if the ultimate has already been charged
-        if (randomMove === "ultimate" && friendUltiUsed) {
-          friendAttackClick(); // Perform a regular attack instead
-          return;
-        }
-      
-        // Check if the friend has already used the heal move three times
-        if (randomMove === "heal" && friendHealCount >= 3) {
-          // Choose a different move if the heal move limit is reached
-          const availableMoves = moves.filter((move) => move !== "heal");
-          const newRandomMoveIndex = Math.floor(Math.random() * availableMoves.length);
-          randomMove = availableMoves[newRandomMoveIndex];
-        }
-      
-        // Perform the chosen move after a delay
         setTimeout(() => {
-          switch (randomMove) {
-            case "attack":
-              friendAttackClick();
-              break;
-            case "ultimate":
+        if (randomMove === "ultimate" && friendUltiUsed) {
+            friendAttackClick(); // Perform a regular attack instead
+            return;
+        }
+    
+        // Check if the friend has already used the heal move three times
+        setTimeout(() => {
+            if (randomMove === "heal" && friendHealCount >= 3) {
+            // Choose a different move if the heal move limit is reached
+            const availableMoves = moves.filter((move) => move !== "heal");
+            const newRandomMoveIndex = Math.floor(Math.random() * availableMoves.length);
+            randomMove = availableMoves[newRandomMoveIndex];
+            }
+    
+            // Perform the chosen move after a delay
+            setTimeout(() => {
+            switch (randomMove) {
+                case "attack":
+                friendAttackClick();
+                break;
+                case "ultimate":
                 console.log('Bot charged its ultimate!');
                 setInfoText("The enemy charged his ultimate!");
                 setIsBotMakingMove(false); // Enable buttons after the user's move
+                setFriendUltiUsed(true);
                 setFriendUltiLeft((prev) => prev + friendUltiLimit);
-                setTimeout(() => {
-                    setFriendUltiUsed(true);
-                }, 2000); // Delay of 2000 milliseconds 
                 break;
-            case "heal":
+                case "heal":
                 friendHealClick();
                 break;
-            default:
+                default:
                 break;
-          }
-        }, 2000); // Delay of 2000 milliseconds 
-      };
-
+            }
+            }, 1000); // Delay of 2000 milliseconds for the final move
+        }, 500); // Delay of 2000 milliseconds for the heal move check
+        }, 700); // Delay of 2000 milliseconds for the ultimate move check
+    };
+  
 
         
     
@@ -366,7 +416,7 @@ export default function BattlePage({navigation, route}) {
                                             style={[
                                             styles.statusbarinside,
                                             {
-                                                backgroundColor: index < 3 - healCount ? '#61A631' : 'transparent',
+                                                backgroundColor: index < 3 - healCount ? '#61A631' : 'grey',
                                                 height: 20,
                                             
                                             },
@@ -439,7 +489,7 @@ export default function BattlePage({navigation, route}) {
                                             style={[
                                             styles.statusbarinside,
                                             {
-                                                backgroundColor: index < 3 - friendHealCount ? '#61A631' : 'transparent',
+                                                backgroundColor: index < 3 - friendHealCount ? '#61A631' : 'grey',
                                                 height: 20,
                                             },
                                             ]}
@@ -718,6 +768,7 @@ const styles = StyleSheet.create({
         height:20, 
         marginEnd: 8,
         overflow: 'hidden',
+
     },
 
     statusbarinside: {
