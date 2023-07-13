@@ -1,5 +1,5 @@
-import {React, useState, useEffect} from "react";
-import {Dimensions, Alert, StyleSheet, ImageBackground, Text, View, SafeAreaView, Modal, Image, Pressable, TouchableOpacity} from 'react-native';
+import {React, useState, useEffect, useRef} from "react";
+import {Dimensions, Alert, StyleSheet, ImageBackground, Text, View, Animated,  SafeAreaView, Modal, Image, Pressable, TouchableOpacity} from 'react-native';
 import { StatusBar, Platform } from 'react-native';
 import { useFonts } from 'expo-font';
 import { MaterialIcons } from '@expo/vector-icons'; 
@@ -27,11 +27,20 @@ export default function BattlePage({navigation, route}) {
         intellect: route.params.friendStats[5]
     };
 
+
     //player icons, keep getting call stack error :(
     const userIcon = require('../../assets/player_avatars/always_late.png');
     const friendIcon = require('../../assets/player_avatars/star_athlete.png');  
+
+    // console.log(userStats.icon);
+    // console.log('GOD HELP');
     // const userIcon = require(userStats.icon);
     // const friendIcon = require(friendStats.icon);
+
+    // console.log(userIcon);
+
+    // const [userIcon, setUserIcon] = useState(null);
+    // const [friendIcon, setFriendIcon] = useState(null);
 
     const [infoText, setInfoText]= useState('Choose your next move!');
 
@@ -68,6 +77,10 @@ export default function BattlePage({navigation, route}) {
     //Auto battle
     const [autoBattle, setAutoBattle] = useState(false);
     const [isBotMakingMove, setIsBotMakingMove] = useState(false); // Track if bot is making a move
+
+    //animation logic
+    const userIconAnim = useRef(new Animated.Value(0)).current;
+    const friendIconAnim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         if (autoBattle) {
@@ -167,6 +180,10 @@ export default function BattlePage({navigation, route}) {
             setIsBotMakingMove(true); // Disable buttons after the user's move
             setAutoBattle(true);
           }
+
+        // Trigger user icon animation
+        animateUserIcon();
+
         } else {
           // Attack with ultimate
           const newFriendHealstat = friendHealStat - (ultiUsed*2);
@@ -182,6 +199,9 @@ export default function BattlePage({navigation, route}) {
             setIsBotMakingMove(true); // Disable buttons after the user's move
             setAutoBattle(true);
           }
+
+        // Trigger user icon animation
+        animateUserIcon();
         }
       };
 
@@ -219,6 +239,10 @@ export default function BattlePage({navigation, route}) {
             setWinner("You lost!");
             setRunGameOverModal(true);
           }
+
+        // Trigger friend icon animation
+        animateFriendIcon();
+
         } else {
           // Regular attack
           const newUserHealstat = healStat - friendAttackStat;
@@ -233,6 +257,9 @@ export default function BattlePage({navigation, route}) {
             setAutoBattle(false);
             setIsBotMakingMove(false); // Enable buttons after the user's move
           }
+
+        // Trigger friend icon animation
+        animateFriendIcon();
         }
       };
       
@@ -249,55 +276,6 @@ export default function BattlePage({navigation, route}) {
         }
     };
       
-
-
-    // //Auto Battle
-    // const startAutoBattle = () => {
-    //     setAutoBattle(true);
-    //     performBotMove();
-    //   };
-    
-    //   const performBotMove = () => {
-    //     // Bot logic to choose a move
-    //     const moves = ["attack", "ultimate", "heal"];
-    //     const randomMoveIndex = Math.floor(Math.random() * moves.length);
-    //     let randomMove = moves[randomMoveIndex];
-      
-    //     // Check if the ultimate has already been charged
-    //     if (randomMove === "ultimate" && friendUltiUsed) {
-    //       friendAttackClick(); // Perform a regular attack instead
-    //       return;
-    //     }
-      
-    //     // Check if the friend has already used the heal move three times
-    //     if (randomMove === "heal" && friendHealCount >= 3) {
-    //       // Choose a different move if the heal move limit is reached
-    //       const availableMoves = moves.filter((move) => move !== "heal");
-    //       const newRandomMoveIndex = Math.floor(Math.random() * availableMoves.length);
-    //       randomMove = availableMoves[newRandomMoveIndex];
-    //     }
-      
-    //     // Perform the chosen move after a delay
-    //     setTimeout(() => {
-    //       switch (randomMove) {
-    //         case "attack":
-    //           friendAttackClick();
-    //           break;
-    //         case "ultimate":
-    //             console.log('Bot charged its ultimate!');
-    //             setInfoText("The enemy charged his ultimate!");
-    //             setIsBotMakingMove(false); // Enable buttons after the user's move
-    //             setFriendUltiUsed(true);
-    //             setFriendUltiLeft((prev) => prev + friendUltiLimit);
-    //             break;
-    //         case "heal":
-    //             friendHealClick();
-    //             break;
-    //         default:
-    //             break;
-    //       }
-    //     }, 2000); // Delay of 2000 milliseconds 
-    //   };
 
         // Auto Battle
     const startAutoBattle = () => {
@@ -350,6 +328,39 @@ export default function BattlePage({navigation, route}) {
         }, 500); // Delay of 2000 milliseconds for the heal move check
         }, 700); // Delay of 2000 milliseconds for the ultimate move check
     };
+
+
+    //animation logic
+    const animateUserIcon = () => {
+        Animated.sequence([
+          Animated.timing(userIconAnim, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(userIconAnim, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      };
+      
+      const animateFriendIcon = () => {
+        Animated.sequence([
+          Animated.timing(friendIconAnim, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(friendIconAnim, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      };
+      
   
 
         
@@ -511,15 +522,57 @@ export default function BattlePage({navigation, route}) {
                 style={styles.battlebackgroundimage}
                 source={require('../../assets/battlesystem/battlebackground.jpg')}>
                     <TouchableOpacity onPress={() => setRunInstructionsVisible(true)} >
-                    <MaterialIcons
-                        name="help-outline"
-                        size={35}
-                        style={styles.instructionsIcon}
-                    />  
+                        <MaterialIcons
+                            name="help-outline"
+                            size={35}
+                            style={styles.instructionsIcon}
+                        />  
                     </TouchableOpacity>
+                    <View style= {{flex: 1, flexDirection: 'row', alignItems: 'flex-end', marginBottom: 30}}>
+                        <View style= {{flex: 1, alignItems: 'center'}}>
+                                <Animated.Image
+                                    style={[
+                                        styles.iconImage,
+                                        {
+                                        transform: [
+                                            {
+                                            scale: userIconAnim.interpolate({
+                                                inputRange: [0, 1],
+                                                outputRange: [1, 1.2],
+                                            }),
+                                            },
+                                        ],
+                                        },
+                                    ]}
+                                    source={userIcon}
+                                />
+                        </View>
+
+                        <View style= {{flex: 1, alignItems: 'center'}}>
+                            <Animated.Image
+                                style={[
+                                    styles.iconImage,
+                                    {
+                                    transform: [
+                                        {
+                                        scale: friendIconAnim.interpolate({
+                                            inputRange: [0, 1],
+                                            outputRange: [1, 1.2],
+                                        }),
+                                        },
+                                    ],
+                                    },
+                                ]}
+                                source={friendIcon}
+                            />
+                            
+                        </View>
+                    </View>
 
                 </ImageBackground> 
             </View>
+
+
 
             <View style={styles.infobox}>
                 <Text style={styles.infoBoxText}> 
@@ -789,8 +842,6 @@ const styles = StyleSheet.create({
 
     animationwindow: {
         flex: 1,
-        backgroundColor: 'black',
-        marginBottom: 0,  
     },
 
     battlebackgroundimage: {
@@ -799,10 +850,12 @@ const styles = StyleSheet.create({
         borderWidth: 4,
         borderColor: 'black',
         borderRadius: 7,
+  
     },
 
     instructionsIcon: {
-        textAlign: 'right',
+        textAlign: 'right'
+        
     },
 
     infobox: {
