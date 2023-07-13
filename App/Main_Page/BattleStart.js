@@ -4,7 +4,6 @@ import { StatusBar, Platform } from 'react-native';
 import { useFonts } from 'expo-font';
 import { MaterialIcons } from '@expo/vector-icons'; 
 
-
 export default function BattlePage({navigation, route}) {
 
     let userStats = {
@@ -27,105 +26,45 @@ export default function BattlePage({navigation, route}) {
         intellect: route.params.friendStats[5]
     };
 
-
-    //player icons, keep getting call stack error :(
+    //player icons cannot sync, keep getting stupid call stack error :(
     const userIcon = require('../../assets/player_avatars/always_late.png');
     const friendIcon = require('../../assets/player_avatars/star_athlete.png');  
-
     // console.log(userStats.icon);
     // console.log('GOD HELP');
     // const userIcon = require(userStats.icon);
     // const friendIcon = require(friendStats.icon);
-
     // console.log(userIcon);
-
     // const [userIcon, setUserIcon] = useState(null);
     // const [friendIcon, setFriendIcon] = useState(null);
 
     const [infoText, setInfoText]= useState('Choose your next move!');
-
     const [runInstructionsVisible, setRunInstructionsVisible]= useState(false);
     const [runModalVisible, setRunModalVisible]= useState(false);
     const [runGameOverModal, setRunGameOverModal]= useState(false);
     const [winner, setWinner] = useState();
-
+    
+    //Heal Button
     const [healStat, setHealStat] = useState((userStats.stamina+50) > 100 ? 100 : (userStats.stamina+50));
     const [friendHealStat, setFriendHealStat] = useState((friendStats.stamina+50) > 100 ? 100 : (friendStats.stamina+50));
-
     const [healCount, setHealCount] = useState(0);
     const [friendHealCount, setFriendHealCount] = useState(0);
     const [isHealButtonDisabled, setIsHealButtonDisabled] = useState(false);
 
+    //Attack button
     const [attackStat, setAttackStat] = useState(userStats.strength);
     const [friendAttackStat, setFriendAttackStat] = useState(friendStats.strength);
 
     //Ulti Button with charging feature
     const [ultiLimit, setUltiLimit] = useState(userStats.intellect+10);
     const [friendUltiLimit, setFriendUltiLimit] = useState(friendStats.intellect+10);
-
     const [ultiUsed, setUltiUsed] = useState(0);
     const [friendUltiUsed, setFriendUltiUsed] = useState(false);
-
     const [ultiLeft, setUltiLeft] = useState(0);
     const [friendUltiLeft, setFriendUltiLeft] = useState(0);
-
     const [isCharging, setIsCharging] = useState(false);
     const [intervalId, setIntervalId] = useState(null);
     const [isUltiButtonDisabled, setIsUltiButtonDisabled] = useState(false);
     const [ultiButtonLabel, setUltiButtonLabel] = useState('ULTIMATE');
-
-    //Auto battle
-    const [autoBattle, setAutoBattle] = useState(false);
-    const [isBotMakingMove, setIsBotMakingMove] = useState(false); // Track if bot is making a move
-
-    //animation logic
-    const userIconAnim = useRef(new Animated.Value(0)).current;
-    const friendIconAnim = useRef(new Animated.Value(0)).current;
-
-    const [isSlashing, setIsSlashing] = useState(false);
-    const performSlashingAnimation = () => {
-        const slashDuration = 1000; // Adjust duration as needed
-      
-        setIsSlashing(true);
-        setTimeout(() => setIsSlashing(false), slashDuration);
-      };
-    const slashImage = require('../../assets/battlesystem/slash.png');
-
-    
-    useEffect(() => {
-        if (autoBattle) {
-          // Automatically perform bot move after the user's move
-          performBotMove();
-          setAutoBattle(false);
-        }
-      }, [autoBattle]); // Triggers the bot move
-
-    useEffect(() => {
-        if (ultiUsed === 0) {
-          setIsUltiButtonDisabled(false); // Enable the ultimate button
-          setUltiButtonLabel('ULTIMATE'); // Reset the label
-        } else if (ultiUsed >= ultiLimit) {
-          setIsUltiButtonDisabled(true); // Disable the ultimate button when the limit is reached
-          setInfoText(`WARNING!\nMax ULIIMATE is charged!`);
-        }
-      }, [ultiUsed, ultiLimit]);
-
-    useEffect(() => {
-        if (ultiLeft >= 100) {
-            setIsUltiButtonDisabled(true); // Disable the ultimate button when ultiLeft reaches 100
-          }
-          
-        else if (autoBattle && !isBotMakingMove) {
-            setIsBotMakingMove(true); // Disable buttons when it's the bot's turn
-            performBotMove();
-            setAutoBattle(false);
-        }
-    }, [autoBattle, isBotMakingMove]);
-
-    useEffect(() => {
-        setIsHealButtonDisabled(healStat === 100);
-      }, [healStat]);
-
     const startCharging = () => {
         setIsCharging(true);
         const id = setInterval(() => {
@@ -152,8 +91,7 @@ export default function BattlePage({navigation, route}) {
           }
         }, 100); // Adjust the interval duration as needed
         setIntervalId(id);
-    };
-      
+    };   
     const stopCharging = () => {
         setIsCharging(false);
         if (intervalId) {
@@ -166,6 +104,87 @@ export default function BattlePage({navigation, route}) {
         setAutoBattle(true);
     };
     
+    //Auto battle
+    const [autoBattle, setAutoBattle] = useState(false);
+    const [isBotMakingMove, setIsBotMakingMove] = useState(false); // Track if bot is making a move
+
+    //Animation logic
+    const userIconAnim = useRef(new Animated.Value(0)).current;
+    const friendIconAnim = useRef(new Animated.Value(0)).current;
+
+    const [isSlashing, setIsSlashing] = useState(false);
+    const performSlashingAnimation = () => {
+        const slashDuration = 2000; // Adjust duration as needed
+        setIsSlashing(true);
+        setTimeout(() => setIsSlashing(false), slashDuration);
+      };
+    const slashImage = require('../../assets/battlesystem/slash.png');
+   
+    //Animation Duration
+    const animateUserIcon = () => {
+        Animated.sequence([
+            Animated.timing(userIconAnim, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+            }),
+            Animated.timing(userIconAnim, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+            }),
+        ]).start();
+        };
+        
+        const animateFriendIcon = () => {
+        Animated.sequence([
+            Animated.timing(friendIconAnim, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+            }),
+            Animated.timing(friendIconAnim, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+            }),
+        ]).start();
+        };
+          
+    useEffect(() => {
+        if (autoBattle) {
+          // Automatically perform bot move after the user's move
+          performBotMove();
+          setAutoBattle(false);
+        }
+      }, [autoBattle]); // Triggers the bot move when auto battle is true
+
+    useEffect(() => {
+        if (ultiUsed === 0) {
+          setIsUltiButtonDisabled(false); // Enable the ultimate button
+          setUltiButtonLabel('ULTIMATE'); // Reset the label
+        } else if (ultiUsed >= ultiLimit) {
+          setIsUltiButtonDisabled(true); // Disable the ultimate button when the limit is reached
+          setInfoText(`WARNING!\nMax ULIIMATE is charged!`);
+        }
+      }, [ultiUsed, ultiLimit]); //Ulti button logic
+
+    useEffect(() => {
+        if (ultiLeft >= 100) {
+            setIsUltiButtonDisabled(true); // Disable the ultimate button when ultiLeft reaches 100
+          }
+          
+        else if (autoBattle && !isBotMakingMove) {
+            setIsBotMakingMove(true); // Disable buttons when it's the bot's turn
+            performBotMove();
+            setAutoBattle(false);
+        }
+    }, [autoBattle, isBotMakingMove]); // Ulti empty + bot turn disable buttons
+
+    useEffect(() => {
+        setIsHealButtonDisabled(healStat === 100);
+      }, [healStat]); // Heal button disable when max health
+
     //Load Font 
     const [loaded] = useFonts({
         'PressStart2P-Regular': require('../../assets/fonts/PressStart2P-Regular.ttf'),      
@@ -294,7 +313,7 @@ export default function BattlePage({navigation, route}) {
     };
       
 
-        // Auto Battle
+    // Auto Battle
     const startAutoBattle = () => {
         setAutoBattle(true);
         performBotMove();
@@ -345,43 +364,7 @@ export default function BattlePage({navigation, route}) {
         }, 500); // Delay of 2000 milliseconds for the heal move check
         }, 700); // Delay of 2000 milliseconds for the ultimate move check
     };
-
-
-    //animation logic
-    const animateUserIcon = () => {
-        Animated.sequence([
-          Animated.timing(userIconAnim, {
-            toValue: 1,
-            duration: 600,
-            useNativeDriver: true,
-          }),
-          Animated.timing(userIconAnim, {
-            toValue: 0,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-        ]).start();
-      };
-      
-      const animateFriendIcon = () => {
-        Animated.sequence([
-          Animated.timing(friendIconAnim, {
-            toValue: 1,
-            duration: 600,
-            useNativeDriver: true,
-          }),
-          Animated.timing(friendIconAnim, {
-            toValue: 0,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-        ]).start();
-      };
-      
-  
-
-        
-    
+            
     return(
         <SafeAreaView style={styles.container}>
             <View style={styles.playersInfoContainer}>
@@ -555,7 +538,7 @@ export default function BattlePage({navigation, route}) {
                                         {
                                         scale: userIconAnim.interpolate({
                                             inputRange: [0, 1],
-                                            outputRange: [1, 1.2], // size of icon
+                                            outputRange: [1, 1.3], // size of icon
                                         }),
                                         },
 
@@ -604,13 +587,13 @@ export default function BattlePage({navigation, route}) {
                                         {
                                         scale: friendIconAnim.interpolate({
                                             inputRange: [0, 1],
-                                            outputRange: [1, 1.2],
+                                            outputRange: [1, 1.3], // size of icon
                                         }),
                                         },
                                         {
                                         translateY: friendIconAnim.interpolate({
                                             inputRange: [0, 1],
-                                            outputRange: [0, -20], // Adjust the value to control the movement distance
+                                            outputRange: [0, -20], // icon vertical movement
                                         }),
                                         },
                                     ],
@@ -625,13 +608,13 @@ export default function BattlePage({navigation, route}) {
                                         {
                                         opacity: userIconAnim.interpolate({
                                             inputRange: [0, 1],
-                                            outputRange: [0, 1],
+                                            outputRange: [0, 1], // transparency of slash
                                         }),
                                         transform: [
                                             {
                                             scale: userIconAnim.interpolate({
                                                 inputRange: [0, 1],
-                                                outputRange: [1, 1.5],
+                                                outputRange: [1, 1.5], // size of slash
                                             }),
                                             },
                                         ],
