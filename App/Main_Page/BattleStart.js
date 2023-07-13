@@ -121,6 +121,21 @@ export default function BattlePage({navigation, route}) {
         setTimeout(() => setIsSlashing(false), slashDuration);
       };
     const slashImage = require('../../assets/battlesystem/slash.png');
+
+    const [isHealing, setIsHealing] = useState(false);
+    const [isFriendHealing, setIsFriendHealing] = useState(false);
+    const performHealingAnimation = (playerHealing) => {
+        const healDuration = 1000; // Adjust duration as needed
+      
+        if (playerHealing) {
+          setIsFriendHealing(true);
+          setTimeout(() => setIsFriendHealing(false), healDuration);
+        } else {
+          setIsHealing(true);
+          setTimeout(() => setIsHealing(false), healDuration);
+        }
+      };
+    const healEffectGif = require('../../assets/battlesystem/healEffect.gif');
    
     //Animation Duration
     const animateUserIcon = () => {
@@ -252,6 +267,8 @@ export default function BattlePage({navigation, route}) {
             setIsBotMakingMove(true); // Disable buttons after the user's move
             setAutoBattle(true);
             setHealCount(healCount + 1);
+            // Trigger heal annimation
+            performHealingAnimation(false);
         } 
 
     };
@@ -307,16 +324,18 @@ export default function BattlePage({navigation, route}) {
       
     const friendHealClick = () => {
         if (friendHealCount < 3) {
-          const newfriendHealstat = friendHealStat + 20;
-          setFriendHealStat(newfriendHealstat <= 100 ? newfriendHealstat : 100);
-          setInfoText(`The enemy healed 20 health!`);
-          console.log('Bot healed 20 health!');
-          console.log(`Bot's current health ${friendHealStat}`);
-          setTimeout(()=> {
-            setIsBotMakingMove(false);
-          }, 2000);
-          setAutoBattle(false);
-          setFriendHealCount(friendHealCount + 1);
+            const newfriendHealstat = friendHealStat + 20;
+            setFriendHealStat(newfriendHealstat <= 100 ? newfriendHealstat : 100);
+            setInfoText(`The enemy healed 20 health!`);
+            console.log('Bot healed 20 health!');
+            console.log(`Bot's current health ${friendHealStat}`);
+            setTimeout(()=> {
+                setIsBotMakingMove(false);
+            }, 2000);
+            setAutoBattle(false);
+            setFriendHealCount(friendHealCount + 1);
+            // Trigger heal annimation
+            performHealingAnimation(true);
         }
     };
       
@@ -530,7 +549,7 @@ export default function BattlePage({navigation, route}) {
             <View style={styles.animationwindow}>
                 <ImageBackground
                 style={styles.battlebackgroundimage}
-                source={require('../../assets/battlesystem/battlebackground2.jpg')}>
+                source={require('../../assets/battlesystem/battlebackground3.webp')}>
                     <TouchableOpacity onPress={() => setRunInstructionsVisible(true)} >
                         <MaterialIcons
                             name="help-outline"
@@ -539,7 +558,7 @@ export default function BattlePage({navigation, route}) {
                         />  
                     </TouchableOpacity>
                     <View style= {{flex: 1, flexDirection: 'row', alignItems: 'flex-end'}}>
-                        <View style= {{flex: 1, alignItems: 'center', marginBottom: 35, marginLeft: 15}}>
+                        <View style= {{flex: 1, alignItems: 'center', marginBottom: 40, marginLeft: 35}}>
                             <Animated.Image
                                 style={[
                                     styles.iconImage,
@@ -586,9 +605,15 @@ export default function BattlePage({navigation, route}) {
                                     <Image source={slashImage} style={styles.slashImage} />
                                 </Animated.View>
                             )}
+                            {isHealing && (
+                                <Image
+                                    source={healEffectGif}
+                                    style={styles.healEffect}
+                                />
+                            )}
                         </View>
 
-                        <View style= {{flex: 1, alignItems: 'center', marginBottom: 100, marginRight: 20}}>
+                        <View style= {{flex: 1, alignItems: 'center', marginBottom: 100, marginRight: 25}}>
                             <Animated.Image
                                 style={[
                                     styles.iconImage,
@@ -633,6 +658,12 @@ export default function BattlePage({navigation, route}) {
                                     >
                                     <Image source={slashImage} style={styles.slashImage} />
                                 </Animated.View>
+                            )}
+                            {isFriendHealing && (
+                                <Image
+                                    source={healEffectGif}
+                                    style={styles.healEffect}
+                                />
                             )}
                         </View>
                     </View>
@@ -908,6 +939,15 @@ const styles = StyleSheet.create({
         paddingRight: 0,
     },
 
+    battlebackgroundimage: {
+        flex: 1,
+        resizeMode: 'cover',
+        borderWidth: 4,
+        borderColor: 'black',
+        borderRadius: 7,
+  
+    },
+
     animationwindow: {
         flex: 1,
     },
@@ -932,13 +972,11 @@ const styles = StyleSheet.create({
         height: 100,
     },
 
-    battlebackgroundimage: {
-        flex: 1,
-        resizeMode: 'cover',
-        borderWidth: 4,
-        borderColor: 'black',
-        borderRadius: 7,
-  
+    healEffect: {
+        position: 'absolute',
+        width: 200, 
+        height: 200,
+        top: -80
     },
 
     instructionsIcon: {
