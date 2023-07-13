@@ -127,7 +127,7 @@ export default function BattlePage({navigation, route}) {
         Animated.sequence([
             Animated.timing(userIconAnim, {
             toValue: 1,
-            duration: 600,
+            duration: 400,
             useNativeDriver: true,
             }),
             Animated.timing(userIconAnim, {
@@ -142,7 +142,7 @@ export default function BattlePage({navigation, route}) {
         Animated.sequence([
             Animated.timing(friendIconAnim, {
             toValue: 1,
-            duration: 600,
+            duration: 400,
             useNativeDriver: true,
             }),
             Animated.timing(friendIconAnim, {
@@ -530,16 +530,16 @@ export default function BattlePage({navigation, route}) {
             <View style={styles.animationwindow}>
                 <ImageBackground
                 style={styles.battlebackgroundimage}
-                source={require('../../assets/battlesystem/battlebackground.jpg')}>
+                source={require('../../assets/battlesystem/battlebackground2.jpg')}>
                     <TouchableOpacity onPress={() => setRunInstructionsVisible(true)} >
                         <MaterialIcons
                             name="help-outline"
-                            size={35}
+                            size={30}
                             style={styles.instructionsIcon}
                         />  
                     </TouchableOpacity>
-                    <View style= {{flex: 1, flexDirection: 'row', alignItems: 'flex-end', marginBottom: 30}}>
-                        <View style= {{flex: 1, alignItems: 'center'}}>
+                    <View style= {{flex: 1, flexDirection: 'row', alignItems: 'flex-end'}}>
+                        <View style= {{flex: 1, alignItems: 'center', marginBottom: 35, marginLeft: 15}}>
                             <Animated.Image
                                 style={[
                                     styles.iconImage,
@@ -588,7 +588,7 @@ export default function BattlePage({navigation, route}) {
                             )}
                         </View>
 
-                        <View style= {{flex: 1, alignItems: 'center'}}>
+                        <View style= {{flex: 1, alignItems: 'center', marginBottom: 100, marginRight: 20}}>
                             <Animated.Image
                                 style={[
                                     styles.iconImage,
@@ -912,6 +912,11 @@ const styles = StyleSheet.create({
         flex: 1,
     },
 
+    iconImage: {
+        width: 70,
+        height: 70,
+    },
+
     slashOverlay: {
         position: 'absolute',
         top: 0,
@@ -937,7 +942,8 @@ const styles = StyleSheet.create({
     },
 
     instructionsIcon: {
-        textAlign: 'right'
+        textAlign: 'right',
+        color: 'white'
         
     },
 
