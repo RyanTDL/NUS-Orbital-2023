@@ -82,6 +82,16 @@ export default function BattlePage({navigation, route}) {
     const userIconAnim = useRef(new Animated.Value(0)).current;
     const friendIconAnim = useRef(new Animated.Value(0)).current;
 
+    const [isSlashing, setIsSlashing] = useState(false);
+    const performSlashingAnimation = () => {
+        const slashDuration = 1000; // Adjust duration as needed
+      
+        setIsSlashing(true);
+        setTimeout(() => setIsSlashing(false), slashDuration);
+      };
+    const slashImage = require('../../assets/battlesystem/slash.png');
+
+    
     useEffect(() => {
         if (autoBattle) {
           // Automatically perform bot move after the user's move
@@ -183,6 +193,8 @@ export default function BattlePage({navigation, route}) {
 
         // Trigger user icon animation
         animateUserIcon();
+        // Trigger slash animation
+        performSlashingAnimation();
 
         } else {
           // Attack with ultimate
@@ -202,9 +214,10 @@ export default function BattlePage({navigation, route}) {
 
         // Trigger user icon animation
         animateUserIcon();
+        // Trigger slash animation
+        performSlashingAnimation();
         }
       };
-
 
 
     const healClick = () => {
@@ -242,6 +255,8 @@ export default function BattlePage({navigation, route}) {
 
         // Trigger friend icon animation
         animateFriendIcon();
+        // Trigger slash animation
+        performSlashingAnimation();
 
         } else {
           // Regular attack
@@ -260,6 +275,8 @@ export default function BattlePage({navigation, route}) {
 
         // Trigger friend icon animation
         animateFriendIcon();
+        // Trigger slash animation
+        performSlashingAnimation();
         }
       };
       
@@ -335,12 +352,12 @@ export default function BattlePage({navigation, route}) {
         Animated.sequence([
           Animated.timing(userIconAnim, {
             toValue: 1,
-            duration: 500,
+            duration: 600,
             useNativeDriver: true,
           }),
           Animated.timing(userIconAnim, {
             toValue: 0,
-            duration: 500,
+            duration: 200,
             useNativeDriver: true,
           }),
         ]).start();
@@ -350,12 +367,12 @@ export default function BattlePage({navigation, route}) {
         Animated.sequence([
           Animated.timing(friendIconAnim, {
             toValue: 1,
-            duration: 500,
+            duration: 600,
             useNativeDriver: true,
           }),
           Animated.timing(friendIconAnim, {
             toValue: 0,
-            duration: 500,
+            duration: 200,
             useNativeDriver: true,
           }),
         ]).start();
@@ -530,22 +547,52 @@ export default function BattlePage({navigation, route}) {
                     </TouchableOpacity>
                     <View style= {{flex: 1, flexDirection: 'row', alignItems: 'flex-end', marginBottom: 30}}>
                         <View style= {{flex: 1, alignItems: 'center'}}>
-                                <Animated.Image
-                                    style={[
-                                        styles.iconImage,
+                            <Animated.Image
+                                style={[
+                                    styles.iconImage,
+                                    {
+                                    transform: [
                                         {
+                                        scale: userIconAnim.interpolate({
+                                            inputRange: [0, 1],
+                                            outputRange: [1, 1.2], // size of icon
+                                        }),
+                                        },
+
+                                        {
+                                        translateY: userIconAnim.interpolate({
+                                            inputRange: [0, 1],
+                                            outputRange: [0, -20], // icon vertical movement
+                                        }),
+                                        },
+                                    ],
+                                    },
+                                ]}
+                                source={userIcon}
+                            />
+                            {isSlashing && (
+                                <Animated.View
+                                    style={[
+                                        styles.slashOverlay,
+                                        {
+                                        opacity: friendIconAnim.interpolate({
+                                            inputRange: [0, 1],
+                                            outputRange: [0, 1], // transparency of slash
+                                        }),
                                         transform: [
                                             {
-                                            scale: userIconAnim.interpolate({
+                                            scale: friendIconAnim.interpolate({
                                                 inputRange: [0, 1],
-                                                outputRange: [1, 1.2],
+                                                outputRange: [1, 1.5], // size of slash
                                             }),
                                             },
                                         ],
                                         },
                                     ]}
-                                    source={userIcon}
-                                />
+                                    >
+                                    <Image source={slashImage} style={styles.slashImage} />
+                                </Animated.View>
+                            )}
                         </View>
 
                         <View style= {{flex: 1, alignItems: 'center'}}>
@@ -560,12 +607,40 @@ export default function BattlePage({navigation, route}) {
                                             outputRange: [1, 1.2],
                                         }),
                                         },
+                                        {
+                                        translateY: friendIconAnim.interpolate({
+                                            inputRange: [0, 1],
+                                            outputRange: [0, -20], // Adjust the value to control the movement distance
+                                        }),
+                                        },
                                     ],
                                     },
                                 ]}
                                 source={friendIcon}
                             />
-                            
+                            {isSlashing && (
+                                <Animated.View
+                                    style={[
+                                        styles.slashOverlay,
+                                        {
+                                        opacity: userIconAnim.interpolate({
+                                            inputRange: [0, 1],
+                                            outputRange: [0, 1],
+                                        }),
+                                        transform: [
+                                            {
+                                            scale: userIconAnim.interpolate({
+                                                inputRange: [0, 1],
+                                                outputRange: [1, 1.5],
+                                            }),
+                                            },
+                                        ],
+                                        },
+                                    ]}
+                                    >
+                                    <Image source={slashImage} style={styles.slashImage} />
+                                </Animated.View>
+                            )}
                         </View>
                     </View>
 
@@ -842,6 +917,21 @@ const styles = StyleSheet.create({
 
     animationwindow: {
         flex: 1,
+    },
+
+    slashOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    slashImage: {
+        width: 100,
+        height: 100,
     },
 
     battlebackgroundimage: {
