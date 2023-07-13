@@ -85,7 +85,9 @@ export default function BattlePage({navigation, route}) {
       
           if (ultiUsed >= ultiLimit) {
             setIsUltiButtonDisabled(true); // Disable the ultimate button
-            setIsBotMakingMove(true); // Disable buttons when it's the bot's turn
+            setTimeout(()=> {
+                setIsBotMakingMove(false);
+              }, 2000);
             clearInterval(intervalId); // Stop the charging interval
             setIntervalId(null);
           }
@@ -167,7 +169,7 @@ export default function BattlePage({navigation, route}) {
           setIsUltiButtonDisabled(true); // Disable the ultimate button when the limit is reached
           setInfoText(`WARNING!\nMax ULIIMATE is charged!`);
         }
-      }, [ultiUsed, ultiLimit]); //Ulti button logic
+      }, [ultiUsed, ultiLimit]); // Disable Ulit (Max Charge)
 
     useEffect(() => {
         if (ultiLeft >= 100) {
@@ -179,11 +181,11 @@ export default function BattlePage({navigation, route}) {
             performBotMove();
             setAutoBattle(false);
         }
-    }, [autoBattle, isBotMakingMove]); // Ulti empty + bot turn disable buttons
+    }, [autoBattle, isBotMakingMove]); // Disable buttons (Ulti empty + Bot turn)
 
     useEffect(() => {
         setIsHealButtonDisabled(healStat === 100);
-      }, [healStat]); // Heal button disable when max health
+      }, [healStat]); // Diable Heal (Max health)
 
     //Load Font 
     const [loaded] = useFonts({
@@ -263,7 +265,9 @@ export default function BattlePage({navigation, route}) {
           setHealStat(newUserHealstat >= 0 ? newUserHealstat : 0);
           console.log(`Ultimate damage dealt by bot: ${(friendUltiLimit*2)}`);
           setFriendUltiUsed(false);
-          setIsBotMakingMove(false); // Enable buttons after the user's move
+          setTimeout(()=> {
+            setIsBotMakingMove(false);
+          }, 2000);
           setAutoBattle(false);
           setInfoText(`The enemy dealt ${(friendUltiLimit*2)} damage using ultimate!`);
       
@@ -289,7 +293,9 @@ export default function BattlePage({navigation, route}) {
             setRunGameOverModal(true);
           } else {
             setAutoBattle(false);
-            setIsBotMakingMove(false); // Enable buttons after the user's move
+            setTimeout(()=> {
+                setIsBotMakingMove(false);
+              }, 2000);
           }
 
         // Trigger friend icon animation
@@ -306,7 +312,9 @@ export default function BattlePage({navigation, route}) {
           setInfoText(`The enemy healed 20 health!`);
           console.log('Bot healed 20 health!');
           console.log(`Bot's current health ${friendHealStat}`);
-          setIsBotMakingMove(false); // Enable buttons after the user's move
+          setTimeout(()=> {
+            setIsBotMakingMove(false);
+          }, 2000);
           setAutoBattle(false);
           setFriendHealCount(friendHealCount + 1);
         }
@@ -350,7 +358,9 @@ export default function BattlePage({navigation, route}) {
                 case "ultimate":
                 console.log('Bot charged its ultimate!');
                 setInfoText("The enemy charged his ultimate!");
-                setIsBotMakingMove(false); // Enable buttons after the user's move
+                setTimeout(()=> {
+                    setIsBotMakingMove(false);
+                  }, 2000);
                 setFriendUltiUsed(true);
                 setFriendUltiLeft((prev) => prev + friendUltiLimit);
                 break;
