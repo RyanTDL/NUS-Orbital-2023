@@ -65,47 +65,106 @@ export default function BattlePage({navigation, route}) {
     const [intervalId, setIntervalId] = useState(null);
     const [isUltiButtonDisabled, setIsUltiButtonDisabled] = useState(false);
     const [ultiButtonLabel, setUltiButtonLabel] = useState('ULTIMATE');
+
+    const [isUltiModalVisible, setIsUltiModalVisible] = useState(false);
+    const [ultiTapCount, setUltiTapCount] = useState(0);
+    const [ultiModalTimer, setUltiModalTimer] = useState(5);
+    const [positiveScore, setPositiveScore] = useState(0);
+    const [negativeScore, setNegativeScore] = useState(0);
+    const [correctTaps, setCorrectTaps] = useState(0);
+    const [wrongTaps, setWrongTaps] = useState(0);
+    const positiveObjectImage = require('../../assets/battlesystem/ultimatePotion.png');
+    const negativeObjectImage = require('../../assets/battlesystem/ultimatePoison.png');
+    const [refreshIntervalId, setRefreshIntervalId] = useState(null);
+
     const startCharging = () => {
         setIsCharging(true);
+        setIsUltiModalVisible(true);
+        setUltiTapCount(0);
+        setUltiModalTimer(10);
+
         const id = setInterval(() => {
-          setUltiLeft((prevUltiLeft) => {
-            if (!isUltiButtonDisabled && prevUltiLeft < 100) {
-              const newUltiLeft = prevUltiLeft + 1;
-              return newUltiLeft <= 100 ? newUltiLeft : 100; // Limit ultileft to 100
+            setUltiModalTimer((prevTimer) => {
+            if (prevTimer > 0) {
+                return prevTimer - 1;
+            } else {
+                clearInterval(id);
+                setIntervalId(null);
+                setIsUltiButtonDisabled(true);
+                setIsUltiModalVisible(false);
+                console.log('CHARGING STOPPED!');
+                
+                setIsBotMakingMove(true);
+                setAutoBattle(true);
             }
-            return prevUltiLeft;
-          });
-      
-          setUltiUsed((prevUltiUsed) => {
-            if (prevUltiUsed < ultiLimit) {
-              return prevUltiUsed + 1;
-            }
-            return prevUltiUsed;
-          });
-      
-          if (ultiUsed >= ultiLimit) {
-            setIsUltiButtonDisabled(true); // Disable the ultimate button
-            setTimeout(()=> {
-                setIsBotMakingMove(false);
-              }, 2000);
-            clearInterval(intervalId); // Stop the charging interval
-            setIntervalId(null);
-          }
-        }, 100); // Adjust the interval duration as needed
+            });
+        }, 1000);
+
         setIntervalId(id);
-    };   
-    const stopCharging = () => {
-        setIsCharging(false);
-        if (intervalId) {
-          clearInterval(intervalId);
-          setIntervalId(null);
-        }
-        setIsUltiButtonDisabled(true); // Disable the ultimate button on onPressOut
-        setInfoText(`${ultiUsed*2} ATK is charged for next turn!`);
-        setIsBotMakingMove(true); // Disable buttons after the user's move
-        setAutoBattle(true);
     };
+
+    const generateObjects = () => {
+        const objects = [];
+        const numObjects = Math.floor(Math.random() * 8) + 3; // Random number between 3 and 10
+      
+        // Generate objects
+        for (let i = 0; i < numObjects; i++) {
+          const objectType = i === 0 ? "positiveObject" : "negativeObject";
+          const position = {
+            x: Math.random(),
+            y: Math.random(),
+          };
+          objects.push({ objectType, position });
+        }
+      
+        return objects;
+      };
+
+    const [currentObjects, setCurrentObjects] = useState(generateObjects());
+  
+    const handleObjectTap = (objectType) => {
+        if (objectType === "positiveObject") {
+          setPositiveScore((score) => score + 1);
+          setCorrectTaps((count) => count + 1);
+          setUltiUsed((used) => used + 1);
+          setUltiLeft((left) => left + ultiUsed + 1);
+          setInfoText(`${(ultiUsed+1)} Potions found!`); // Display info text when charging starts
+        } else if (objectType === "negativeObject") {
+          setNegativeScore((score) => score - 1);
+          setWrongTaps((count) => count + 1);
+          setHealStat((stat) => (stat > 1 ? stat - 1 : 1));
+        }
+      
+        setCurrentObjects(generateObjects());
+      };
+
+    useEffect(() => {
+        const refreshObjectPositions = () => {
+            setCurrentObjects(generateObjects());
+        };
+
+        const intervalId = setInterval(refreshObjectPositions, 1000);
+
+        setRefreshIntervalId(intervalId);
+
+        return () => {
+            clearInterval(refreshIntervalId);
+        };
+    }, []); // Refresh the objects every 1 seconds
+
+    useEffect(() => {
+    return () => {
+        clearInterval(refreshIntervalId);
+    };
+    }, [isUltiModalVisible]); // Clear the interval when the modal is closed
     
+    useEffect(() => {
+        if (!isUltiModalVisible) {
+          setIsCharging(false);
+        }
+      }, [isUltiModalVisible]);
+
+
     //Auto battle
     const [autoBattle, setAutoBattle] = useState(false);
     const [isBotMakingMove, setIsBotMakingMove] = useState(false); // Track if bot is making a move
@@ -698,34 +757,29 @@ export default function BattlePage({navigation, route}) {
                         )}
                     </Pressable>
 
-                    <Pressable 
-                        style={({pressed}) => [
-                            styles.ultimateButton,
-                            pressed && {opacity: 0.7},
-                            (isUltiButtonDisabled && !isBotMakingMove) && {opacity: 0.5, backgroundColor: 'gray'}, // Apply styling to disable the isUltiButtonDisabled button
-                            isBotMakingMove && {opacity: 0.3, backgroundColor: 'gray'}, // Apply styling to disable the isBotMakingMove button
-                        ]}
-                        disabled={isUltiButtonDisabled || isBotMakingMove} // Disable the button
-                        onPressIn={() => {
-                            if (ultiUsed>=ultiLimit) {
-                                console.log('CHARGED!');
-                                stopCharging();
-                            }
-                            console.log('CHARGING!');
-                            startCharging();
-                        }}
-                        onPressOut={() => {
-                            console.log('CHARGED!');
-                            stopCharging();
-                        }}
-                        >
-                        {({ pressed }) => (
-                        <Text style={[styles.text, {fontSize: 18}]}>
-                            {pressed ? 'CHARGING!' : ultiLeft === 100 ? 'EMPTY!' : isUltiButtonDisabled ? `CHARGED!` : 'ULTIMATE'}
+                    <Pressable
+                    style={({ pressed }) => [
+                        styles.ultimateButton,
+                        pressed && { opacity: 0.7 },
+                        (isUltiButtonDisabled && !isBotMakingMove) && { opacity: 0.5, backgroundColor: 'gray' },
+                        isBotMakingMove && { opacity: 0.3, backgroundColor: 'gray' },
+                        isCharging && { opacity: 0.3, backgroundColor: 'gray' },
+                    ]}
+                    disabled={isUltiButtonDisabled || isBotMakingMove}
+                    onPressIn={() => {
+                        if (isUltiButtonDisabled || isBotMakingMove) {
+                          return;
+                        }
+                        startCharging();
+                        setInfoText(`Find the potions to charge up!`); // Display info text when charging starts
+                      }}
+                    
+                    >
+                        <Text style={[styles.text, { fontSize: 18 }]}>
+                            {isUltiButtonDisabled ? `${ultiUsed*2} ATK CHARGED!` : isCharging ? 'CHARGING!' : ultiLeft === 100 ? 'EMPTY!' : 'ULTIMATE'}
                         </Text>
-                        )}
-                        
                     </Pressable>
+
                 </View>
 
                 <View style={styles.movesContainer}>
@@ -747,9 +801,9 @@ export default function BattlePage({navigation, route}) {
                             {pressed ? 'HEALING!' : healCount <3  ? 'HEAL' : 'EMPTY!'}
                         </Text>
                         )}
-                        </Pressable>            
+                    </Pressable>            
                         
-                        <Pressable 
+                    <Pressable 
                             style={({pressed}) => [
                                 styles.runButton,
                                 pressed && {opacity: 0.7}, 
@@ -760,110 +814,153 @@ export default function BattlePage({navigation, route}) {
                         }}> 
                             <Text style={styles.text}> RUN </Text>
 
-                        </Pressable>
-                        <Modal
-                            animationType="slide"
-                            transparent={true}
-                            visible={runInstructionsVisible}
-                            >
-                            <View style={styles.modalContainer}>
-                                <View style={[styles.modalContent, {height: 530, width: 350}]}>
-                                    <Text style={[styles.abandonText, {verticalAlign: 'top', textDecorationLine: 'underline', flex: 0.5, marginTop: 10}]}>How to Play?</Text>
-                                    <Text style={styles.howToPlayText}>
-                                        1. First player to lose all health loses! {'\n'}
-                                        2. ATTACK deals damage equivilant to Strength  {'\n'}
-                                        3. ULTIMATE charges up the attack for the next turn {'\n'}
-                                        4. Maximum charge depends on Intellect and POWER BAR Level {'\n'}
-                                        5. HEAL heals 10 health {'\n'}
-                                        6. Each Player has 3 HEALS! {'\n'}
-                                    </Text>
-
-                                    <Pressable
-                                        style={({pressed}) => [
-                                            styles.modalButton,
-                                            {flex: 0.4},
-                                            pressed && {opacity: 0.7}, 
-                                        ]}  
-                                        onPress={() => {
-                                            setRunInstructionsVisible(!runInstructionsVisible);
-                            
-                                        }}
-                                    >
-                                        <Text style={styles.returnBattleButton}>RETURN TO BATTLE!</Text>
-                                    </Pressable>
-
-                                </View>
-                            </View>
-                        </Modal> 
-                        <Modal
-                            animationType="slide"
-                            transparent={true}
-                            visible={runModalVisible}
-                            >
-                            <View style={styles.modalContainer}>
-                                <View style={styles.modalContent}>
-                                    <Text style={styles.abandonText}>Abandon Battle?</Text>
-
-                                    <View style={styles.modalContentChild}>
-                                        <Pressable
-                                            style={({pressed}) => [
-                                                styles.modalButton,
-                                                pressed && {opacity: 0.7}, 
-                                            ]}  
-                                            onPress={() => {
-                                                setRunModalVisible(!runModalVisible);
-                                                navigation.navigate('Friends List');
-                                            }}
-
-                                        >
-                                            <Text style={styles.yesNoText}>YES</Text>
-                                        </Pressable>
-                                        <Pressable
-                                            style={({pressed}) => [
-                                                styles.modalButton,
-                                                pressed && {opacity: 0.7}, 
-                                            ]} 
-                                            onPress={() => setRunModalVisible(!runModalVisible)}
-
-                                        >
-                                            <Text style={styles.yesNoText}>NO</Text>
-                                        </Pressable>
-                                    </View>
-
-                                </View>
-                            </View>
-                        </Modal>    
-                        <Modal
-                            animationType="slide"
-                            transparent={true}
-                            visible={runGameOverModal}
-                            >
-                            <View style={styles.modalContainer}>
-                                <View style={styles.modalContent}>
-                                    <Text style={styles.abandonText}>{winner}</Text>
-
-                                    <View style={styles.modalContentChild}>
-                                        <Pressable
-                                            style={({pressed}) => [
-                                                styles.modalButton,
-                                                pressed && {opacity: 0.7}, 
-                                            ]}  
-                                            onPress={() => {
-                                                setRunGameOverModal(!runGameOverModal);
-                                                navigation.navigate('Friends List');
-                                            }}
-
-                                        >
-                                            <Text style={styles.gameOverText}>RETURN HOME!</Text>
-                                        </Pressable>
-                                    </View>
-
-
-                                </View>
-                            </View>
-                        </Modal>           
+                    </Pressable>
+       
                 </View>
             </View>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={runInstructionsVisible}
+                >
+                <View style={styles.modalContainer}>
+                    <View style={[styles.modalContent, {height: 530, width: 350}]}>
+                        <Text style={[styles.abandonText, {verticalAlign: 'top', textDecorationLine: 'underline', flex: 0.5, marginTop: 10}]}>How to Play?</Text>
+                        <Text style={styles.howToPlayText}>
+                            1. First player to lose all health loses! {'\n'}
+                            2. ATTACK deals damage equivilant to Strength  {'\n'}
+                            3. ULTIMATE charges up the attack for the next turn {'\n'}
+                            4. Maximum charge depends on Intellect and POWER BAR Level {'\n'}
+                            5. HEAL heals 10 health {'\n'}
+                            6. Each Player has 3 HEALS! {'\n'}
+                        </Text>
+
+                        <Pressable
+                            style={({pressed}) => [
+                                styles.modalButton,
+                                {flex: 0.4},
+                                pressed && {opacity: 0.7}, 
+                            ]}  
+                            onPress={() => {
+                                setRunInstructionsVisible(!runInstructionsVisible);
+                
+                            }}
+                        >
+                            <Text style={styles.returnBattleButton}>RETURN TO BATTLE!</Text>
+                        </Pressable>
+
+                    </View>
+                </View>
+            </Modal> 
+
+            <Modal visible={isUltiModalVisible} transparent={true} animationType="fade" onRequestClose={() => {}}>
+                <View style={styles.ultiModalContainer}>
+                    <View style={styles.ultiCounter}>
+                        <View style={styles.counterBox}>
+                            <Text style={styles.tapCounter}>{`Timer: ${ultiModalTimer}`}</Text>
+                        </View>
+                        <View style={styles.counterBox}>
+                            <Text style={styles.tapCounter}>{`Found: ${correctTaps + wrongTaps}`}</Text>
+                        </View>
+                        <View style={styles.counterBox}>
+                            <Text style={styles.tapCounter}>{`Potions: ${correctTaps}`}</Text>
+                        </View>
+                        <View style={styles.counterBox}>
+                            <Text style={styles.tapCounter}>{`Poisons: ${wrongTaps}`}</Text>
+                        </View>
+                    </View>
+                    <View style={styles.ultiGame}>
+                        {currentObjects.map((object, index) => (
+                            <TouchableOpacity
+                                key={index}
+                                style={[
+                                styles.modalTapArea,
+                                {
+                                    left: `${object.position.x * 100}%`,
+                                    top: `${object.position.y * 100}%`,
+                                },
+                                ]}
+                                onPress={() => handleObjectTap(object.objectType)}
+                            >
+                                {object.objectType === "positiveObject" && (
+                                <Image source={positiveObjectImage} style={styles.objectImage} />
+                                )}
+                                {object.objectType === "negativeObject" && (
+                                <Image source={negativeObjectImage} style={styles.objectImage} />
+                                )}
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </View>
+            </Modal>
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={runModalVisible}
+                >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.abandonText}>Abandon Battle?</Text>
+
+                        <View style={styles.modalContentChild}>
+                            <Pressable
+                                style={({pressed}) => [
+                                    styles.modalButton,
+                                    pressed && {opacity: 0.7}, 
+                                ]}  
+                                onPress={() => {
+                                    setRunModalVisible(!runModalVisible);
+                                    navigation.navigate('Friends List');
+                                }}
+
+                            >
+                                <Text style={styles.yesNoText}>YES</Text>
+                            </Pressable>
+                            <Pressable
+                                style={({pressed}) => [
+                                    styles.modalButton,
+                                    pressed && {opacity: 0.7}, 
+                                ]} 
+                                onPress={() => setRunModalVisible(!runModalVisible)}
+
+                            >
+                                <Text style={styles.yesNoText}>NO</Text>
+                            </Pressable>
+                        </View>
+
+                    </View>
+                </View>
+            </Modal>    
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={runGameOverModal}
+                >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.abandonText}>{winner}</Text>
+
+                        <View style={styles.modalContentChild}>
+                            <Pressable
+                                style={({pressed}) => [
+                                    styles.modalButton,
+                                    pressed && {opacity: 0.7}, 
+                                ]}  
+                                onPress={() => {
+                                    setRunGameOverModal(!runGameOverModal);
+                                    navigation.navigate('Friends List');
+                                }}
+
+                            >
+                                <Text style={styles.gameOverText}>RETURN HOME!</Text>
+                            </Pressable>
+                        </View>
+
+
+                    </View>
+                </View>
+            </Modal>    
         </SafeAreaView>
     )
 }
@@ -1083,7 +1180,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#00000080', // Semi-transparent background
       },
-      modalContent: {
+    modalContent: {
         flexDirection: 'column',
         backgroundColor: 'white',
         height: 200,
@@ -1091,15 +1188,15 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         borderWidth: 10,
         borderColor: '#76C4E8'
-      },
+    },
 
-      modalContentChild: {
+    modalContentChild: {
         flex: 1.2,
         flexDirection: 'row',
         padding: 15,
-      },
+    },
 
-      modalButton: {
+    modalButton: {
         flex: 1,
         backgroundColor: '#0098BA',
         borderColor: '#76C4E8',
@@ -1107,32 +1204,80 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         padding: 10,
         margin: 5,
-      },
+    },
 
-      abandonText: {
+    abandonText: {
         flex: 1,
         fontFamily: "PressStart2P-Regular",
         fontWeight: '700',
         fontSize: 30,
         textAlign: 'center',
         verticalAlign: 'middle',
-      },
+    },
 
-      yesNoText: {
+    yesNoText: {
         color: 'white',
         fontWeight: '800',
         fontSize: 30,
         textAlign: 'center',
+    },
+
+    ultiModalContainer: {
+        flex: 0.7,
+        backgroundColor: 'transparent',
+        borderRadius: 10,
+        marginTop: 160,
+        flexDirection: 'column'
       },
 
-      gameOverText: {
+    tapCounter: {
+        fontSize: 12,
+        color: "black",
+        fontWeight: "bold",
+        textAlign: 'center'
+    },
+
+    counterBox: {
+        borderWidth: 2,
+        borderColor: "black",
+        backgroundColor: '#D5B71C',
+        borderRadius: 5,
+        margin: 6,
+        width: 75,
+        height: 20
+    },
+
+    ultiCounter: {
+        flex: 0.08,
+        flexDirection: "row",        
+    },
+
+    ultiGame: {
+        flex: 0.5,
+        // backgroundColor: 'green',
+    },
+
+      objectImage: {
+        width: 40,
+        height: 40,
+      },
+      modalTapArea: {
+        width: 100,
+        height: 100,
+        borderRadius: 5,
+        justifyContent: "center",
+        alignItems: "center",
+        margin: 5,
+      },
+
+    gameOverText: {
         color: 'white',
         fontWeight: '700',
         fontSize: 28,
         textAlign: 'center',
-      },
+    },
 
-      howToPlayText: {
+    howToPlayText: {
         flex: 4,
         color: 'black',
         fontWeight: '600',
@@ -1140,13 +1285,13 @@ const styles = StyleSheet.create({
         margin: 20,
         lineHeight: 30,
 
-      },
+    },
     
-      returnBattleButton: {
+    returnBattleButton: {
         color: 'white',
         fontWeight: '600',
         fontSize: 25,
         textAlign: 'center'
-      },
+    },
 
 })
