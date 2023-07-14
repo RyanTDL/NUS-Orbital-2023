@@ -105,11 +105,11 @@ export default function BattlePage({navigation, route}) {
 
     const generateObjects = () => {
         const objects = [];
-        const numObjects = Math.floor(Math.random() * 8) + 3; // Random number between 3 and 10
+        const numObjects = Math.floor(Math.random() * 8) + 5; // Random number between 5 and 10
       
         // Generate objects
         for (let i = 0; i < numObjects; i++) {
-          const objectType = i === 0 ? "positiveObject" : "negativeObject";
+          const objectType = i === 2 ? "positiveObject" : "negativeObject";
           const position = {
             x: Math.random(),
             y: Math.random(),
@@ -128,7 +128,7 @@ export default function BattlePage({navigation, route}) {
           setCorrectTaps((count) => count + 1);
           setUltiUsed((used) => used + 1);
           setUltiLeft((left) => left + ultiUsed + 1);
-          setInfoText(`${(ultiUsed+1)} Potions found!`); // Display info text when charging starts
+          setInfoText(`${ultiUsed + 1} Potions found!`); // Display info text when charging starts
         } else if (objectType === "negativeObject") {
           setNegativeScore((score) => score - 1);
           setWrongTaps((count) => count + 1);
@@ -137,7 +137,8 @@ export default function BattlePage({navigation, route}) {
       
         setCurrentObjects(generateObjects());
       };
-
+    
+      
     useEffect(() => {
         const refreshObjectPositions = () => {
             setCurrentObjects(generateObjects());
@@ -163,7 +164,6 @@ export default function BattlePage({navigation, route}) {
           setIsCharging(false);
         }
       }, [isUltiModalVisible]);
-
 
     //Auto battle
     const [autoBattle, setAutoBattle] = useState(false);
@@ -609,13 +609,32 @@ export default function BattlePage({navigation, route}) {
                 <ImageBackground
                 style={styles.battlebackgroundimage}
                 source={require('../../assets/battlesystem/battlebackground3.webp')}>
-                    <TouchableOpacity onPress={() => setRunInstructionsVisible(true)} >
-                        <MaterialIcons
-                            name="help-outline"
-                            size={30}
-                            style={styles.instructionsIcon}
-                        />  
-                    </TouchableOpacity>
+                    <View styles={{flex: 1, flexDirection: 'row'}}>
+                        {isUltiModalVisible && (
+                            <View style={{flex: 1, flexDirection: 'row'}}>
+                                <View style={styles.counterBox}>
+                                <Text style={styles.tapCounter}>{`Timer: ${ultiModalTimer}`}</Text>
+                                </View>
+                                <View style={styles.counterBox}>
+                                <Text style={styles.tapCounter}>{`Found: ${correctTaps + wrongTaps}`}</Text>
+                                </View>
+                                <View style={styles.counterBox}>
+                                <Text style={styles.tapCounter}>{`Potions: ${correctTaps}`}</Text>
+                                </View>
+                                <View style={styles.counterBox}>
+                                <Text style={styles.tapCounter}>{`Poisons: ${wrongTaps}`}</Text>
+                                </View>
+                            </View>
+                        )}
+                        <TouchableOpacity onPress={() => setRunInstructionsVisible(true)} >
+                            <MaterialIcons
+                                name="help-outline"
+                                size={30}
+                                style={styles.instructionsIcon}
+                            />  
+                        </TouchableOpacity>
+                    </View>
+
                     <View style= {{flex: 1, flexDirection: 'row', alignItems: 'flex-end'}}>
                         <View style= {{flex: 1, alignItems: 'center', marginBottom: 40, marginLeft: 35}}>
                             <Animated.Image
@@ -855,20 +874,6 @@ export default function BattlePage({navigation, route}) {
 
             <Modal visible={isUltiModalVisible} transparent={true} animationType="fade" onRequestClose={() => {}}>
                 <View style={styles.ultiModalContainer}>
-                    <View style={styles.ultiCounter}>
-                        <View style={styles.counterBox}>
-                            <Text style={styles.tapCounter}>{`Timer: ${ultiModalTimer}`}</Text>
-                        </View>
-                        <View style={styles.counterBox}>
-                            <Text style={styles.tapCounter}>{`Found: ${correctTaps + wrongTaps}`}</Text>
-                        </View>
-                        <View style={styles.counterBox}>
-                            <Text style={styles.tapCounter}>{`Potions: ${correctTaps}`}</Text>
-                        </View>
-                        <View style={styles.counterBox}>
-                            <Text style={styles.tapCounter}>{`Poisons: ${wrongTaps}`}</Text>
-                        </View>
-                    </View>
                     <View style={styles.ultiGame}>
                         {currentObjects.map((object, index) => (
                             <TouchableOpacity
@@ -1082,6 +1087,23 @@ const styles = StyleSheet.create({
         
     },
 
+    tapCounter: {
+        fontSize: 12,
+        color: "black",
+        fontWeight: "bold",
+        textAlign: 'center'
+    },
+
+    counterBox: {
+        borderWidth: 2,
+        borderColor: "black",
+        backgroundColor: '#D5B71C',
+        borderRadius: 5,
+        margin: 7,
+        width: 75,
+        height: 23
+    },
+
     infobox: {
         flex: 0.4,
         backgroundColor: 'rgba(151, 151, 151, 0.87)',
@@ -1229,23 +1251,6 @@ const styles = StyleSheet.create({
         marginTop: 160,
         flexDirection: 'column'
       },
-
-    tapCounter: {
-        fontSize: 12,
-        color: "black",
-        fontWeight: "bold",
-        textAlign: 'center'
-    },
-
-    counterBox: {
-        borderWidth: 2,
-        borderColor: "black",
-        backgroundColor: '#D5B71C',
-        borderRadius: 5,
-        margin: 6,
-        width: 75,
-        height: 20
-    },
 
     ultiCounter: {
         flex: 0.08,
