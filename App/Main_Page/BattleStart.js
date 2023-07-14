@@ -143,7 +143,7 @@ export default function BattlePage({navigation, route}) {
             setCurrentObjects(generateObjects());
         };
 
-        const intervalId = setInterval(refreshObjectPositions, 1000);
+        const intervalId = setInterval(refreshObjectPositions, 3000);
 
         setRefreshIntervalId(intervalId);
 
