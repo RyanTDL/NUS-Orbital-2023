@@ -626,6 +626,7 @@ export default function BattlePage({navigation, route}) {
                                 </View>
                             </View>
                         )}
+                        
                         <TouchableOpacity onPress={() => setRunInstructionsVisible(true)} >
                             <MaterialIcons
                                 name="help-outline"
