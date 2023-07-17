@@ -3,6 +3,8 @@ import {Dimensions, Alert, StyleSheet, ImageBackground, Text, View, Animated,  S
 import { StatusBar, Platform } from 'react-native';
 import { useFonts } from 'expo-font';
 import { MaterialIcons } from '@expo/vector-icons'; 
+import FastImage from 'react-native-fast-image';
+
 
 export default function BattlePage({navigation, route}) {
 
@@ -55,8 +57,8 @@ export default function BattlePage({navigation, route}) {
     const [friendAttackStat, setFriendAttackStat] = useState(friendStats.strength);
 
     //Ulti Button with charging feature
-    const [ultiLimit, setUltiLimit] = useState(userStats.intellect+10);
-    const [friendUltiLimit, setFriendUltiLimit] = useState(friendStats.intellect+10);
+    const [ultiLimit, setUltiLimit] = useState(userStats.intellect);
+    const [friendUltiLimit, setFriendUltiLimit] = useState(friendStats.intellect);
     const [ultiUsed, setUltiUsed] = useState(0);
     const [friendUltiUsed, setFriendUltiUsed] = useState(false);
     const [ultiLeft, setUltiLeft] = useState(0);
@@ -65,6 +67,8 @@ export default function BattlePage({navigation, route}) {
     const [intervalId, setIntervalId] = useState(null);
     const [isUltiButtonDisabled, setIsUltiButtonDisabled] = useState(false);
     const [ultiButtonLabel, setUltiButtonLabel] = useState('ULTIMATE');
+    const [ultiEngaged, setUltiEngaged] = useState(false);
+    const [friendUltiEngaged, setFriendUltiEngaged] = useState(false);
 
     const [isUltiModalVisible, setIsUltiModalVisible] = useState(false);
     const [ultiTapCount, setUltiTapCount] = useState(0);
@@ -82,6 +86,7 @@ export default function BattlePage({navigation, route}) {
         setIsUltiModalVisible(true);
         setUltiTapCount(0);
         setUltiModalTimer(10);
+        setUltiEngaged(true);
 
         const id = setInterval(() => {
             setUltiModalTimer((prevTimer) => {
@@ -126,8 +131,8 @@ export default function BattlePage({navigation, route}) {
         if (objectType === "positiveObject") {
           setPositiveScore((score) => score + 1);
           setCorrectTaps((count) => count + 1);
-          setUltiUsed((used) => used + 1);
-          setUltiLeft((left) => left + ultiUsed + 1);
+          setUltiUsed((used) => used + 1); //Used to do damage using ulti each turn
+          setUltiLeft((left) => left + ultiUsed + 1); //Used to update power bar
           setInfoText(`${ultiUsed + 1} Potions found!`); // Display info text when charging starts
         } else if (objectType === "negativeObject") {
           setNegativeScore((score) => score - 1);
@@ -137,8 +142,7 @@ export default function BattlePage({navigation, route}) {
       
         setCurrentObjects(generateObjects());
       };
-    
-      
+     
     useEffect(() => {
         const refreshObjectPositions = () => {
             setCurrentObjects(generateObjects());
@@ -165,13 +169,11 @@ export default function BattlePage({navigation, route}) {
         }
       }, [isUltiModalVisible]);
 
-    //Auto battle
-    const [autoBattle, setAutoBattle] = useState(false);
-    const [isBotMakingMove, setIsBotMakingMove] = useState(false); // Track if bot is making a move
-
     //Animation logic
-    const userIconAnim = useRef(new Animated.Value(0)).current;
-    const friendIconAnim = useRef(new Animated.Value(0)).current;
+    const slashImage = require('../../assets/battlesystem/slash.gif');
+    const healEffectGif = require('../../assets/battlesystem/healEffect.gif');
+    const chargingFlameGif = require('../../assets/battlesystem/chargingFlame.gif');
+    const ultimateGif = require('../../assets/battlesystem/ultimate.gif');
 
     const [isSlashing, setIsSlashing] = useState(false);
     const performSlashingAnimation = () => {
@@ -179,13 +181,26 @@ export default function BattlePage({navigation, route}) {
         setIsSlashing(true);
         setTimeout(() => setIsSlashing(false), slashDuration);
       };
-    const slashImage = require('../../assets/battlesystem/slash.png');
+
+    const [isUltimate, setIsUltimate] = useState(false);
+    const [isFriendUltimate, setIsFriendUltimate] = useState(false);
+    const performUltimateAnimation = (playerUsingUltimate) => {
+        const ultimateDuration = 1000; // Adjust duration as needed
+        if (playerUsingUltimate) {
+            setIsFriendUltimate(true);
+            setTimeout(() => setIsFriendUltimate(false), ultimateDuration);
+        } else {
+            setIsUltimate(true);
+            setTimeout(() => setIsUltimate(false), ultimateDuration);
+        }
+      };
+
+
 
     const [isHealing, setIsHealing] = useState(false);
     const [isFriendHealing, setIsFriendHealing] = useState(false);
     const performHealingAnimation = (playerHealing) => {
         const healDuration = 1000; // Adjust duration as needed
-      
         if (playerHealing) {
           setIsFriendHealing(true);
           setTimeout(() => setIsFriendHealing(false), healDuration);
@@ -194,9 +209,12 @@ export default function BattlePage({navigation, route}) {
           setTimeout(() => setIsHealing(false), healDuration);
         }
       };
-    const healEffectGif = require('../../assets/battlesystem/healEffect.gif');
+
    
     //Animation Duration
+    const userIconAnim = useRef(new Animated.Value(0)).current;
+    const friendIconAnim = useRef(new Animated.Value(0)).current;
+
     const animateUserIcon = () => {
         Animated.sequence([
             Animated.timing(userIconAnim, {
@@ -206,13 +224,13 @@ export default function BattlePage({navigation, route}) {
             }),
             Animated.timing(userIconAnim, {
             toValue: 0,
-            duration: 200,
+            duration: 150,
             useNativeDriver: true,
             }),
         ]).start();
-        };
+    };
         
-        const animateFriendIcon = () => {
+    const animateFriendIcon = () => {
         Animated.sequence([
             Animated.timing(friendIconAnim, {
             toValue: 1,
@@ -221,12 +239,16 @@ export default function BattlePage({navigation, route}) {
             }),
             Animated.timing(friendIconAnim, {
             toValue: 0,
-            duration: 200,
+            duration: 150,
             useNativeDriver: true,
             }),
         ]).start();
-        };
-          
+    };
+
+    //Auto battle
+    const [autoBattle, setAutoBattle] = useState(false);
+    const [isBotMakingMove, setIsBotMakingMove] = useState(false); // Track if bot is making a move
+    
     useEffect(() => {
         if (autoBattle) {
           // Automatically perform bot move after the user's move
@@ -236,14 +258,14 @@ export default function BattlePage({navigation, route}) {
       }, [autoBattle]); // Triggers the bot move when auto battle is true
 
     useEffect(() => {
-        if (ultiUsed === 0) {
+        if (!ultiEngaged) {
           setIsUltiButtonDisabled(false); // Enable the ultimate button
           setUltiButtonLabel('ULTIMATE'); // Reset the label
         } else if (ultiUsed >= ultiLimit) {
           setIsUltiButtonDisabled(true); // Disable the ultimate button when the limit is reached
           setInfoText(`WARNING!\nMax ULIIMATE is charged!`);
         }
-      }, [ultiUsed, ultiLimit]); // Disable Ulit (Max Charge)
+      }, [ultiEngaged, ultiLimit]); // Disable Ulit (Max Charge)
 
     useEffect(() => {
         if (ultiLeft >= 100) {
@@ -271,7 +293,7 @@ export default function BattlePage({navigation, route}) {
 
     //Usermoves
     const attackClick = () => {
-        if (ultiUsed === 0) {
+        if (!ultiEngaged) {
           // Regular attack
           const newFriendHealstat = friendHealStat - attackStat;
           setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
@@ -298,6 +320,7 @@ export default function BattlePage({navigation, route}) {
           console.log(`Ultimate Damage dealt by user: ${(ultiUsed*2)}`);
           setUltiUsed(0);
           setInfoText(`You dealt ${(ultiUsed*2)} damage using ultimate!`);
+          setUltiEngaged(false);
       
           if (newFriendHealstat <= 0) {
             setWinner("You won!");
@@ -309,8 +332,8 @@ export default function BattlePage({navigation, route}) {
 
         // Trigger user icon animation
         animateUserIcon();
-        // Trigger slash animation
-        performSlashingAnimation();
+        // Trigger ultimate animation
+        performUltimateAnimation(false);
         }
       };
 
@@ -341,6 +364,7 @@ export default function BattlePage({navigation, route}) {
           setHealStat(newUserHealstat >= 0 ? newUserHealstat : 0);
           console.log(`Ultimate damage dealt by bot: ${(friendUltiLimit*2)}`);
           setFriendUltiUsed(false);
+          setFriendUltiEngaged(false);
           setTimeout(()=> {
             setIsBotMakingMove(false);
           }, 2000);
@@ -354,8 +378,8 @@ export default function BattlePage({navigation, route}) {
 
         // Trigger friend icon animation
         animateFriendIcon();
-        // Trigger slash animation
-        performSlashingAnimation();
+        // Trigger ultimate animation
+        performUltimateAnimation(true);
 
         } else {
           // Regular attack
@@ -431,22 +455,23 @@ export default function BattlePage({navigation, route}) {
             setTimeout(() => {
             switch (randomMove) {
                 case "attack":
-                friendAttackClick();
-                break;
+                    friendAttackClick();
+                    break;
                 case "ultimate":
-                console.log('Bot charged its ultimate!');
-                setInfoText("The enemy charged his ultimate!");
-                setTimeout(()=> {
-                    setIsBotMakingMove(false);
-                  }, 2000);
-                setFriendUltiUsed(true);
-                setFriendUltiLeft((prev) => prev + friendUltiLimit);
-                break;
+                    console.log('Bot charged its ultimate!');
+                    setInfoText("The enemy charged his ultimate!");
+                    setTimeout(()=> {
+                        setIsBotMakingMove(false);
+                    }, 2000);
+                    setFriendUltiUsed(true);
+                    setFriendUltiEngaged(true);
+                    setFriendUltiLeft((prev) => prev + friendUltiLimit);
+                    break;
                 case "heal":
-                friendHealClick();
-                break;
+                    friendHealClick();
+                    break;
                 default:
-                break;
+                    break;
             }
             }, 1000); // Delay of 2000 milliseconds for the final move
         }, 500); // Delay of 2000 milliseconds for the heal move check
@@ -479,7 +504,7 @@ export default function BattlePage({navigation, route}) {
                                 </View>
                                 
                                 <View style={styles.statusbar}>
-                                    <View style ={[styles.statusbarinside,{ backgroundColor:'#fc080d', width: `${healStat}%`}]}>
+                                    <View style ={[styles.statusbarFill,{ backgroundColor:'#fc080d', width: `${healStat}%`}]}>
                                     </View>
                                 </View>
                                 <Text style ={[styles.statusbarinfo,{color: 'red'}]}> {healStat} </Text>
@@ -494,7 +519,7 @@ export default function BattlePage({navigation, route}) {
                                 </View>
 
                                 <View style={styles.statusbar}>
-                                    <View style ={[styles.statusbarinside,{backgroundColor:'#D5B71C', width: (100 - ultiLeft) + '%'}]}>
+                                    <View style ={[styles.statusbarFill,{backgroundColor:'#D5B71C', width: (100 - ultiLeft) + '%'}]}>
                                     </View>
                                 </View>
                                 <Text style ={[styles.statusbarinfo,{color: 'yellow'}]}> {(100 - ultiLeft) + '%'} </Text>
@@ -513,7 +538,7 @@ export default function BattlePage({navigation, route}) {
                                         <View
                                             key={index}
                                             style={[
-                                            styles.statusbarinside,
+                                            styles.statusbarFill,
                                             {
                                                 backgroundColor: index < 3 - healCount ? '#61A631' : 'grey',
                                                 height: 20,
@@ -552,7 +577,7 @@ export default function BattlePage({navigation, route}) {
                                 </View>
                                 
                                 <View style={styles.statusbar}>
-                                    <View style ={[styles.statusbarinside,{ backgroundColor:'#fc080d', width: `${friendHealStat}%` }]}>
+                                    <View style ={[styles.statusbarFill,{ backgroundColor:'#fc080d', width: `${friendHealStat}%` }]}>
                                     </View>
                                 </View>
                                 <Text style ={[styles.statusbarinfo,{color: 'red'}]}> {friendHealStat} </Text>
@@ -567,7 +592,7 @@ export default function BattlePage({navigation, route}) {
                                 </View>
 
                                 <View style={styles.statusbar}>
-                                    <View style ={[styles.statusbarinside,{backgroundColor:'#D5B71C', width: (100 - friendUltiLeft) + '%'}]}>
+                                    <View style ={[styles.statusbarFill,{backgroundColor:'#D5B71C', width: (100 - friendUltiLeft) + '%'}]}>
                                     </View>
                                 </View>
                                 <Text style ={[styles.statusbarinfo,{color: 'yellow'}]}> {(100 - friendUltiLeft) + '%'} </Text>
@@ -586,7 +611,7 @@ export default function BattlePage({navigation, route}) {
                                         <View
                                             key={index}
                                             style={[
-                                            styles.statusbarinside,
+                                            styles.statusbarFill,
                                             {
                                                 backgroundColor: index < 3 - friendHealCount ? '#61A631' : 'grey',
                                                 height: 20,
@@ -690,6 +715,19 @@ export default function BattlePage({navigation, route}) {
                                     style={styles.healEffect}
                                 />
                             )}
+                            {ultiEngaged && (
+                                <Image
+                                    source={chargingFlameGif}
+                                    style={styles.chargingEffect}
+                                />
+                            )}
+                            {isFriendUltimate && (
+                                <Image
+                                    source={ultimateGif}
+                                    style={styles.ultimateEffect}
+                                />
+                            )}
+
                         </View>
 
                         <View style= {{flex: 1, alignItems: 'center', marginBottom: 100, marginRight: 25}}>
@@ -742,6 +780,20 @@ export default function BattlePage({navigation, route}) {
                                 <Image
                                     source={healEffectGif}
                                     style={styles.healEffect}
+                                />
+                            )}
+
+                            {friendUltiEngaged && (
+                                <Image
+                                    source={chargingFlameGif}
+                                    style={styles.chargingEffect}
+                                />
+                            )}
+
+                            {isUltimate && (
+                                <Image
+                                    source={ultimateGif}
+                                    style={styles.ultimateEffect}
                                 />
                             )}
                         </View>
@@ -994,7 +1046,7 @@ const styles = StyleSheet.create({
         flex: 1,
         borderRadius: 10,
         overflow: 'hidden',
-
+        
     },
 
     playerIcon: {
@@ -1017,6 +1069,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
 
+    playerStatsIcon: {
+        flex: 0.2,
+    },
 
     statusbar: {
         flex: 1,
@@ -1026,7 +1081,7 @@ const styles = StyleSheet.create({
 
     },
 
-    statusbarinside: {
+    statusbarFill: {
         flex: 1,
         height:25, 
         borderWidth:1.5, 
@@ -1037,7 +1092,7 @@ const styles = StyleSheet.create({
 
     statusbarinfo: {
         flex: 0.3, 
-        fontSize: 10,
+        fontSize: 12,
         fontWeight: '900',
         paddingRight: 0,
     },
@@ -1048,7 +1103,6 @@ const styles = StyleSheet.create({
         borderWidth: 4,
         borderColor: 'black',
         borderRadius: 7,
-  
     },
 
     animationwindow: {
@@ -1073,6 +1127,7 @@ const styles = StyleSheet.create({
     slashImage: {
         width: 100,
         height: 100,
+        resizeMode: 'contain'
     },
 
     healEffect: {
@@ -1080,6 +1135,19 @@ const styles = StyleSheet.create({
         width: 200, 
         height: 200,
         top: -80
+    },
+
+    chargingEffect: {
+        position: 'absolute',
+        bottom: -10,
+        opacity: 0.5,  
+        tintColor: '#f0b851'  
+    },
+
+    ultimateEffect: {
+        position: 'absolute',
+        bottom: -10,
+        opacity: 0.8,  
     },
 
     instructionsIcon: {
@@ -1263,18 +1331,19 @@ const styles = StyleSheet.create({
         // backgroundColor: 'green',
     },
 
-      objectImage: {
+    objectImage: {
         width: 40,
         height: 40,
-      },
-      modalTapArea: {
+    },
+
+    modalTapArea: {
         width: 100,
         height: 100,
         borderRadius: 5,
         justifyContent: "center",
         alignItems: "center",
         margin: 5,
-      },
+    },
 
     gameOverText: {
         color: 'white',
