@@ -56,6 +56,9 @@ export default function BattlePage({navigation, route}) {
     const [attackStat, setAttackStat] = useState(userStats.strength);
     const [friendAttackStat, setFriendAttackStat] = useState(friendStats.strength);
 
+    const [agilityStat, setAgilityStat] = useState(userStats.agility+50);
+    const [friendAgilityStat, setFriendAgilityStat] = useState(friendStats.agility+50);
+
     //Ulti Button with charging feature
     const [ultiLimit, setUltiLimit] = useState(userStats.intellect);
     const [friendUltiLimit, setFriendUltiLimit] = useState(friendStats.intellect);
@@ -85,7 +88,7 @@ export default function BattlePage({navigation, route}) {
         setIsCharging(true);
         setIsUltiModalVisible(true);
         setUltiTapCount(0);
-        setUltiModalTimer(1000);
+        setUltiModalTimer(10);
         setUltiEngaged(true);
 
         const id = setInterval(() => {
@@ -298,50 +301,65 @@ export default function BattlePage({navigation, route}) {
     }
 
     //Usermoves
+
     const attackClick = () => {
-        if (!ultiEngaged) {
+        const dodgeChance = friendAgilityStat / 100;
+        const isDodged = Math.random() < dodgeChance;
+      
+        if (!ultiEngaged && !isDodged) {
           // Regular attack
-          const newFriendHealstat = friendHealStat - attackStat;
-          setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
-          console.log(`Damage dealt by user: ${attackStat}`);
-          setInfoText(`You dealt ${attackStat} damage!`);
+          const damageDealt = attackStat;
+          const newFriendHealstat = friendHealStat - damageDealt;
+      
+          setFriendHealStat(Math.max(0, newFriendHealstat));
+          console.log(`Damage dealt by user: ${damageDealt}`);
+          setInfoText(`You dealt ${damageDealt} damage!`);
       
           if (newFriendHealstat <= 0) {
             setWinner("You won!");
             setRunGameOverModal(true);
           } else {
-            setIsBotMakingMove(true); // Disable buttons after the user's move
+            setIsBotMakingMove(true);
             setAutoBattle(true);
           }
-
-        // Trigger user icon animation
-        animateUserIcon();
-        // Trigger slash animation
-        performSlashingAnimation();
-
-        } else {
+      
+          animateUserIcon();
+          performSlashingAnimation();
+        } else if (ultiEngaged && !isDodged) {
           // Attack with ultimate
-          const newFriendHealstat = friendHealStat - (ultiUsed*2);
-          setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
-          console.log(`Ultimate Damage dealt by user: ${(ultiUsed*2)}`);
+          const damageDealt = ultiUsed * 2;
+          const newFriendHealstat = friendHealStat - damageDealt;
+      
+          setFriendHealStat(Math.max(0, newFriendHealstat));
+          console.log(`Ultimate Damage dealt by user: ${damageDealt}`);
           setUltiUsed(0);
-          setInfoText(`You dealt ${(ultiUsed*2)} damage using ultimate!`);
+          setInfoText(`You dealt ${damageDealt} damage using ultimate!`);
           setUltiEngaged(false);
       
           if (newFriendHealstat <= 0) {
             setWinner("You won!");
             setRunGameOverModal(true);
           } else {
-            setIsBotMakingMove(true); // Disable buttons after the user's move
+            setIsBotMakingMove(true);
             setAutoBattle(true);
           }
-
-        // Trigger user icon animation
-        animateUserIcon();
-        // Trigger ultimate animation
-        performUltimateAnimation(false);
+      
+          animateUserIcon();
+          performUltimateAnimation(false);
+        } else {
+          // Attack was dodged
+          if (ultiEngaged) {
+            setInfoText('Enemy dodged the ultimate attack!');
+            setIsBotMakingMove(true);
+            setAutoBattle(true);
+          } else {
+            setInfoText('Enemy dodged the attack!');
+            setIsBotMakingMove(true);
+            setAutoBattle(true);
+          }
         }
-      };
+    };
+      
 
 
     const healClick = () => {
@@ -364,50 +382,65 @@ export default function BattlePage({navigation, route}) {
 
     //Botmoves
     const friendAttackClick = () => {
-        if (friendUltiUsed) {
+        const dodgeChance = agilityStat / 100;
+        const isDodged = Math.random() < dodgeChance;
+      
+        if (friendUltiUsed && !isDodged) {
           // Attack with ultimate
-          const newUserHealstat = healStat - (friendUltiLimit*2);
+          const damageDealt = friendUltiLimit * 2;
+          const newUserHealstat = healStat - damageDealt;
           setHealStat(newUserHealstat >= 0 ? newUserHealstat : 0);
-          console.log(`Ultimate damage dealt by bot: ${(friendUltiLimit*2)}`);
+          console.log(`Ultimate damage dealt by bot: ${damageDealt}`);
           setFriendUltiUsed(false);
           setFriendUltiEngaged(false);
-          setTimeout(()=> {
+          setTimeout(() => {
             setIsBotMakingMove(false);
           }, 2000);
           setAutoBattle(false);
-          setInfoText(`The enemy dealt ${(friendUltiLimit*2)} damage using ultimate!`);
+          setInfoText(`The enemy dealt ${damageDealt} damage using ultimate!`);
       
           if (newUserHealstat <= 0) {
             setWinner("You lost!");
             setRunGameOverModal(true);
           }
-
-        // Trigger friend icon animation
-        animateFriendIcon();
-        // Trigger ultimate animation
-        performUltimateAnimation(true);
-
-        } else {
+      
+          // Trigger friend icon animation
+          animateFriendIcon();
+          // Trigger ultimate animation
+          performUltimateAnimation(true);
+        } else if (!isDodged) {
           // Regular attack
-          const newUserHealstat = healStat - friendAttackStat;
+          const damageDealt = friendAttackStat;
+          const newUserHealstat = healStat - damageDealt;
           setHealStat(newUserHealstat >= 0 ? newUserHealstat : 0);
-          console.log(`Damage dealt by bot: ${friendAttackStat}`);
-          setInfoText(`The enemy dealt ${friendAttackStat} damage!`);
+          console.log(`Damage dealt by bot: ${damageDealt}`);
+          setInfoText(`The enemy dealt ${damageDealt} damage!`);
       
           if (newUserHealstat <= 0) {
             setWinner("You lost!");
             setRunGameOverModal(true);
           } else {
             setAutoBattle(false);
-            setTimeout(()=> {
-                setIsBotMakingMove(false);
-              }, 2000);
+            setTimeout(() => {
+              setIsBotMakingMove(false);
+            }, 2000);
           }
-
-        // Trigger friend icon animation
-        animateFriendIcon();
-        // Trigger slash animation
-        performSlashingAnimation();
+      
+          // Trigger friend icon animation
+          animateFriendIcon();
+          // Trigger slash animation
+          performSlashingAnimation();
+        } else {
+          // Attack was dodged
+          if (friendUltiUsed) {
+            setInfoText('You dodged the ultimate attack!');
+            setIsBotMakingMove(false);
+            setAutoBattle(false);
+          } else {
+            setInfoText('You dodged the enemy attack!');
+            setIsBotMakingMove(false);
+            setAutoBattle(false);
+          }
         }
       };
       
@@ -994,8 +1027,8 @@ export default function BattlePage({navigation, route}) {
                                     <TouchableOpacity onPress={() => setRunModalVisible(!runModalVisible)} >
                                         <MaterialIcons
                                             name="directions-run"
-                                            size={20}
-                                            style={[styles.counterBox, {height: 35, width: 28, textAlign: 'center', verticalAlign: 'middle'}]}
+                                            size={30}
+                                            style={styles.minigameRun}
                                         />  
                                     </TouchableOpacity>
                                 </View>
@@ -1020,6 +1053,7 @@ export default function BattlePage({navigation, route}) {
                                     <Image source={negativeObjectImage} style={styles.objectImage} />
                                 )}
                                 </TouchableOpacity>
+                                
                             ))}
                             <View style={styles.box} />
 
@@ -1398,9 +1432,22 @@ const styles = StyleSheet.create({
         borderColor: "black",
         backgroundColor: '#D5B71C',
         borderRadius: 5,
-        margin: 7,
+        margin: 6,
         width: 75,
         height: 23,
+    },
+
+    minigameRun: {
+        borderWidth: 3,
+        borderRadius: 5,
+        borderColor: '#0098BA',
+        backgroundColor: '#76C4E8',
+        margin: 4,
+        width: 35,
+        height: 40,
+        textAlign: 'center', 
+        verticalAlign: 'middle',
+        color: 'black'
     },
 
     tapCounter: {
