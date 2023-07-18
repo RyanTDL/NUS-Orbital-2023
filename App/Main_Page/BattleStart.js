@@ -108,18 +108,43 @@ export default function BattlePage({navigation, route}) {
         setIntervalId(id);
     };
 
+    // const generateObjects = () => {
+    //     const objects = [];
+    //     const numObjects = Math.floor(Math.random() * 8) + 5; // Random number between 5 and 10
+      
+    //     // Generate objects
+    //     for (let i = 0; i < numObjects; i++) {
+    //       const objectType = i === 2 ? "positiveObject" : "negativeObject";
+    //       const position = {
+    //         x: Math.random(),
+    //         y: Math.random(),
+    //       };
+    //       objects.push({ objectType, position });
+    //     }
+      
+    //     return objects;
+    //   };
     const generateObjects = () => {
         const objects = [];
-        const numObjects = Math.floor(Math.random() * 8) + 5; // Random number between 5 and 10
+        const numObjects = Math.floor(Math.random() * 6) + 10; // Random number between 10 and 15
+        const positiveObjectsCount = 2; // Number of positive objects to generate
       
-        // Generate objects
-        for (let i = 0; i < numObjects; i++) {
-          const objectType = i === 2 ? "positiveObject" : "negativeObject";
+        // Generate positive objects
+        for (let i = 0; i < positiveObjectsCount; i++) {
           const position = {
             x: Math.random(),
             y: Math.random(),
           };
-          objects.push({ objectType, position });
+          objects.push({ objectType: "positiveObject", position });
+        }
+      
+        // Generate negative objects
+        for (let i = positiveObjectsCount; i < numObjects; i++) {
+          const position = {
+            x: Math.random(),
+            y: Math.random(),
+          };
+          objects.push({ objectType: "negativeObject", position });
         }
       
         return objects;
