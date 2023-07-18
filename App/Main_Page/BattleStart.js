@@ -77,15 +77,15 @@ export default function BattlePage({navigation, route}) {
     const [negativeScore, setNegativeScore] = useState(0);
     const [correctTaps, setCorrectTaps] = useState(0);
     const [wrongTaps, setWrongTaps] = useState(0);
-    const positiveObjectImage = require('../../assets/battlesystem/ultimatePotion.png');
-    const negativeObjectImage = require('../../assets/battlesystem/ultimatePoison.png');
+    const positiveObjectImage = require('../../assets/battlesystem/mini_game/ultimatePotion.png');
+    const negativeObjectImage = require('../../assets/battlesystem/mini_game/ultimatePoison.png');
     const [refreshIntervalId, setRefreshIntervalId] = useState(null);
 
     const startCharging = () => {
         setIsCharging(true);
         setIsUltiModalVisible(true);
         setUltiTapCount(0);
-        setUltiModalTimer(10);
+        setUltiModalTimer(1000);
         setUltiEngaged(true);
 
         const id = setInterval(() => {
@@ -108,47 +108,23 @@ export default function BattlePage({navigation, route}) {
         setIntervalId(id);
     };
 
-    // const generateObjects = () => {
-    //     const objects = [];
-    //     const numObjects = Math.floor(Math.random() * 8) + 5; // Random number between 5 and 10
-      
-    //     // Generate objects
-    //     for (let i = 0; i < numObjects; i++) {
-    //       const objectType = i === 2 ? "positiveObject" : "negativeObject";
-    //       const position = {
-    //         x: Math.random(),
-    //         y: Math.random(),
-    //       };
-    //       objects.push({ objectType, position });
-    //     }
-      
-    //     return objects;
-    //   };
     const generateObjects = () => {
         const objects = [];
-        const numObjects = Math.floor(Math.random() * 6) + 10; // Random number between 10 and 15
-        const positiveObjectsCount = 2; // Number of positive objects to generate
+        const numObjects = Math.floor(Math.random() * 8) + 5; // Random number between 5 and 10
       
-        // Generate positive objects
-        for (let i = 0; i < positiveObjectsCount; i++) {
+        // Generate objects
+        for (let i = 0; i < numObjects; i++) {
+          const objectType = i === 2 ? "positiveObject" : "negativeObject";
           const position = {
             x: Math.random(),
             y: Math.random(),
           };
-          objects.push({ objectType: "positiveObject", position });
-        }
-      
-        // Generate negative objects
-        for (let i = positiveObjectsCount; i < numObjects; i++) {
-          const position = {
-            x: Math.random(),
-            y: Math.random(),
-          };
-          objects.push({ objectType: "negativeObject", position });
+          objects.push({ objectType, position });
         }
       
         return objects;
       };
+
 
     const [currentObjects, setCurrentObjects] = useState(generateObjects());
   
@@ -200,10 +176,10 @@ export default function BattlePage({navigation, route}) {
       }, [isUltiModalVisible]);
 
     //Animation logic
-    const slashGif = require('../../assets/battlesystem/slash.gif');
-    const healEffectGif = require('../../assets/battlesystem/healEffect.gif');
-    const chargingFlameGif = require('../../assets/battlesystem/chargingFlame.gif');
-    const ultimateGif = require('../../assets/battlesystem/ultimate.gif');
+    const slashGif = require('../../assets/battlesystem/move_effects/slash.gif');
+    const healEffectGif = require('../../assets/battlesystem/move_effects/healEffect.gif');
+    const chargingFlameGif = require('../../assets/battlesystem/move_effects/chargingFlame.gif');
+    const ultimateGif = require('../../assets/battlesystem/move_effects/ultimate.gif');
 
     const [isSlashing, setIsSlashing] = useState(false);
     const performSlashingAnimation = () => {
@@ -514,7 +490,7 @@ export default function BattlePage({navigation, route}) {
 
                 <View style={styles.playerInfo}> 
                     <ImageBackground style={styles.infoBackground}
-                        source={require('../../assets/battlesystem/playerInfoBackground.jpg')}
+                        source={require('../../assets/battlesystem/backgrounds/playerInfoBackground.jpg')}
                         > 
 
                         <View style={styles.playerIcon}>
@@ -529,7 +505,7 @@ export default function BattlePage({navigation, route}) {
                                 <View style={styles.playerStatsIcon}>
                                     <Image
                                         style={{flex: 1, width: 30, resizeMode: 'contain',}}
-                                        source={require('../../assets/battlesystem/heart.png')}
+                                        source={require('../../assets/battlesystem/stat_icons/heart.png')}
                                         />
                                 </View>
                                 
@@ -544,7 +520,7 @@ export default function BattlePage({navigation, route}) {
                                 <View style={styles.playerStatsIcon}>
                                     <Image
                                         style={{flex: 1, width: 30, resizeMode: 'contain',}}
-                                        source={require('../../assets/battlesystem/power.png')}
+                                        source={require('../../assets/battlesystem/stat_icons/power.png')}
                                         />
                                 </View>
 
@@ -559,7 +535,7 @@ export default function BattlePage({navigation, route}) {
                                 <View style={styles.playerStatsIcon}>
                                     <Image
                                         style={{flex: 1, width: 30, resizeMode: 'contain',}}
-                                        source={require('../../assets/battlesystem/heal.png')}
+                                        source={require('../../assets/battlesystem/stat_icons/heal.png')}
                                         />
                                 </View>
                                 
@@ -587,7 +563,7 @@ export default function BattlePage({navigation, route}) {
 
                 <View style={styles.playerInfo}> 
                     <ImageBackground style={styles.infoBackground}
-                        source={require('../../assets/battlesystem/playerInfoBackground.jpg')}
+                        source={require('../../assets/battlesystem/backgrounds/playerInfoBackground.jpg')}
                         > 
 
                         <View style={styles.playerIcon}>
@@ -602,7 +578,7 @@ export default function BattlePage({navigation, route}) {
                                 <View style={styles.playerStatsIcon}>
                                     <Image
                                         style={{flex: 1, width: 30, resizeMode: 'contain',}}
-                                        source={require('../../assets/battlesystem/heart.png')}
+                                        source={require('../../assets/battlesystem/stat_icons/heart.png')}
                                         />
                                 </View>
                                 
@@ -617,7 +593,7 @@ export default function BattlePage({navigation, route}) {
                                 <View style={styles.playerStatsIcon}>
                                     <Image
                                         style={{flex: 1, width: 30, resizeMode: 'contain',}}
-                                        source={require('../../assets/battlesystem/power.png')}
+                                        source={require('../../assets/battlesystem/stat_icons/power.png')}
                                         />
                                 </View>
 
@@ -632,7 +608,7 @@ export default function BattlePage({navigation, route}) {
                                 <View style={styles.playerStatsIcon}>
                                     <Image
                                         style={{flex: 1, width: 30, resizeMode: 'contain',}}
-                                        source={require('../../assets/battlesystem/heal.png')}
+                                        source={require('../../assets/battlesystem/stat_icons/heal.png')}
                                         />
                                 </View>
                                 
@@ -663,7 +639,7 @@ export default function BattlePage({navigation, route}) {
             <View style={styles.animationwindow}>
                 <ImageBackground
                 style={styles.battlebackgroundimage}
-                source={require('../../assets/battlesystem/battlebackground3.webp')}>
+                source={require('../../assets/battlesystem/backgrounds/battlebackground3.webp')}>
                     <View styles={{flex: 1, flexDirection: 'row'}}>                        
                         <TouchableOpacity onPress={() => setRunInstructionsVisible(true)} >
                             <MaterialIcons
@@ -941,7 +917,7 @@ export default function BattlePage({navigation, route}) {
             <Modal visible={isUltiModalVisible} animationType="fade" onRequestClose={() => {}}>
                 <View style={styles.ultiModalContainer}>
                     <ImageBackground style={styles.infoBackground}
-                        source={require('../../assets/battlesystem/playerInfoBackground.jpg')}
+                        source={require('../../assets/battlesystem/backgrounds/playerInfoBackground.jpg')}
                         > 
                         
                         <View style={{flex: 1, flexDirection: 'column'}}>
@@ -960,7 +936,7 @@ export default function BattlePage({navigation, route}) {
                                         <View style={styles.playerStatsIcon}>
                                             <Image
                                                 style={{flex: 1, width: 30, resizeMode: 'contain'}}
-                                                source={require('../../assets/battlesystem/heart.png')}
+                                                source={require('../../assets/battlesystem/stat_icons/heart.png')}
                                                 />
                                         </View>
                                         
@@ -975,7 +951,7 @@ export default function BattlePage({navigation, route}) {
                                         <View style={styles.playerStatsIcon}>
                                             <Image
                                                 style={{flex: 1, width: 30, resizeMode: 'contain',}}
-                                                source={require('../../assets/battlesystem/power.png')}
+                                                source={require('../../assets/battlesystem/stat_icons/power.png')}
                                                 />
                                         </View>
 
@@ -999,7 +975,7 @@ export default function BattlePage({navigation, route}) {
 
                     <ImageBackground
                         style={styles.ultiGame}
-                        source={require('../../assets/battlesystem/battlebackground1.jpg')}
+                        source={require('../../assets/battlesystem/backgrounds/battlebackground1.jpg')}
                         >
                             <View style={{flex: 1, flexDirection: 'row'}}>
                                 <View style={styles.counterBox}>
@@ -1045,6 +1021,7 @@ export default function BattlePage({navigation, route}) {
                                 )}
                                 </TouchableOpacity>
                             ))}
+                            <View style={styles.box} />
 
                     </ImageBackground>
                 </View>
@@ -1405,7 +1382,7 @@ const styles = StyleSheet.create({
     ultiModalContainer: {
         flex: 1,
         flexDirection: 'column',
-        backgroundColor: 'black'
+        backgroundColor: 'black',
       },
     
     ultiStatusbar: {
@@ -1468,5 +1445,6 @@ const styles = StyleSheet.create({
         fontSize: 28,
         textAlign: 'center',
     },
+
 
 })
