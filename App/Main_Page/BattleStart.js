@@ -55,9 +55,10 @@ export default function BattlePage({navigation, route}) {
     //Attack button
     const [attackStat, setAttackStat] = useState(userStats.strength);
     const [friendAttackStat, setFriendAttackStat] = useState(friendStats.strength);
-
-    const [agilityStat, setAgilityStat] = useState(userStats.agility+50);
-    const [friendAgilityStat, setFriendAgilityStat] = useState(friendStats.agility+50);
+    
+    //Dodge Stats
+    const [agilityStat, setAgilityStat] = useState(userStats.agility+20);
+    const [friendAgilityStat, setFriendAgilityStat] = useState(friendStats.agility+20);
 
     //Ulti Button with charging feature
     const [ultiLimit, setUltiLimit] = useState(userStats.intellect);
@@ -183,6 +184,7 @@ export default function BattlePage({navigation, route}) {
     const healEffectGif = require('../../assets/battlesystem/move_effects/healEffect.gif');
     const chargingFlameGif = require('../../assets/battlesystem/move_effects/chargingFlame.gif');
     const ultimateGif = require('../../assets/battlesystem/move_effects/ultimate.gif');
+    const dodgingEffectGif = require('../../assets/battlesystem/move_effects/dodgeEffect.gif');
 
     const [isSlashing, setIsSlashing] = useState(false);
     const performSlashingAnimation = () => {
@@ -204,18 +206,29 @@ export default function BattlePage({navigation, route}) {
         }
       };
 
-
-
     const [isHealing, setIsHealing] = useState(false);
     const [isFriendHealing, setIsFriendHealing] = useState(false);
     const performHealingAnimation = (playerHealing) => {
         const healDuration = 1000; // Adjust duration as needed
         if (playerHealing) {
-          setIsFriendHealing(true);
-          setTimeout(() => setIsFriendHealing(false), healDuration);
+            setIsFriendHealing(true);
+            setTimeout(() => setIsFriendHealing(false), healDuration);
         } else {
-          setIsHealing(true);
-          setTimeout(() => setIsHealing(false), healDuration);
+            setIsHealing(true);
+            setTimeout(() => setIsHealing(false), healDuration);
+        }
+      };
+
+    const [isDodging, setIsDodging] = useState(false);
+    const [isFriendDodging, setIsFriendDodging] = useState(false);
+    const performDodgeAnimation = (playerDodging) => {
+        const dodgeDuration = 1000; // Adjust duration as needed
+        if (playerDodging) {
+            setIsFriendDodging(true);
+            setTimeout(() => setIsFriendDodging(false), dodgeDuration);
+        } else {
+            setIsDodging(true);
+            setTimeout(() => setIsDodging(false), dodgeDuration);
         }
       };
 
@@ -357,6 +370,8 @@ export default function BattlePage({navigation, route}) {
             setIsBotMakingMove(true);
             setAutoBattle(true);
           }
+        // Trigger dodge animation
+        performDodgeAnimation(false);
         }
     };
       
@@ -441,6 +456,8 @@ export default function BattlePage({navigation, route}) {
             setIsBotMakingMove(false);
             setAutoBattle(false);
           }
+            // Trigger dodge animation
+            performDodgeAnimation(true);
         }
       };
       
@@ -750,6 +767,13 @@ export default function BattlePage({navigation, route}) {
                                 />
                             )}
 
+                            {isFriendDodging && (
+                                <Image
+                                    source={dodgingEffectGif}
+                                    style={styles.dodgingEffect}
+                                />
+                            )}
+
                         </View>
 
                         <View style= {{flex: 1, alignItems: 'center', marginBottom: 100, marginRight: 25}}>
@@ -818,6 +842,14 @@ export default function BattlePage({navigation, route}) {
                                     style={styles.ultimateEffect}
                                 />
                             )}
+
+                            {isDodging && (
+                                <Image
+                                    source={dodgingEffectGif}
+                                    style={styles.dodgingEffect}
+                                />
+                            )}
+
                         </View>
                     </View>
 
@@ -1261,6 +1293,14 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: -10,
         opacity: 0.8,  
+    },
+
+    dodgingEffect: {
+        position: 'absolute',
+        opacity: 0.8,  
+        width: 200, 
+        height: 200,
+        bottom: 0
     },
 
     infobox: {
