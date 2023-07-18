@@ -132,8 +132,14 @@ export default function BattlePage({navigation, route}) {
           setPositiveScore((score) => score + 1);
           setCorrectTaps((count) => count + 1);
           setUltiUsed((used) => used + 1); //Used to do damage using ulti each turn
-          setUltiLeft((left) => left + ultiUsed + 1); //Used to update power bar
-          setInfoText(`${ultiUsed + 1} Potions found!`); // Display info text when charging starts
+          setUltiLeft((left) => left + 1); //Used to update power bar
+          if (ultiUsed+1===1){
+            setInfoText(`${ultiUsed + 1} Potion found!`); // Display info text when charging starts
+            
+          }else{
+            setInfoText(`${ultiUsed + 1} Potions found!`); // Display info text when charging starts
+          }
+
         } else if (objectType === "negativeObject") {
           setNegativeScore((score) => score - 1);
           setWrongTaps((count) => count + 1);
@@ -148,29 +154,28 @@ export default function BattlePage({navigation, route}) {
             setCurrentObjects(generateObjects());
         };
 
-        const intervalId = setInterval(refreshObjectPositions, 3000);
+        const intervalId = setInterval(refreshObjectPositions, 2000);
 
         setRefreshIntervalId(intervalId);
 
         return () => {
             clearInterval(refreshIntervalId);
         };
-    }, []); // Refresh the objects every 1 seconds
+    }, []); // Refresh the objects every 2 seconds
 
-    useEffect(() => {
-    return () => {
-        clearInterval(refreshIntervalId);
-    };
-    }, [isUltiModalVisible]); // Clear the interval when the modal is closed
     
     useEffect(() => {
         if (!isUltiModalVisible) {
-          setIsCharging(false);
+            if (ultiUsed === 0 && ultiEngaged) {
+                setUltiUsed(1);
+                setInfoText(`Here's a consolation potion for you!`)
+            }
+            setIsCharging(false);
         }
       }, [isUltiModalVisible]);
 
     //Animation logic
-    const slashImage = require('../../assets/battlesystem/slash.gif');
+    const slashGif = require('../../assets/battlesystem/slash.gif');
     const healEffectGif = require('../../assets/battlesystem/healEffect.gif');
     const chargingFlameGif = require('../../assets/battlesystem/chargingFlame.gif');
     const ultimateGif = require('../../assets/battlesystem/ultimate.gif');
@@ -281,7 +286,7 @@ export default function BattlePage({navigation, route}) {
 
     useEffect(() => {
         setIsHealButtonDisabled(healStat === 100);
-      }, [healStat]); // Diable Heal (Max health)
+      }, [healStat]); // Disable Heal (Max health)
 
     //Load Font 
     const [loaded] = useFonts({
@@ -634,24 +639,7 @@ export default function BattlePage({navigation, route}) {
                 <ImageBackground
                 style={styles.battlebackgroundimage}
                 source={require('../../assets/battlesystem/battlebackground3.webp')}>
-                    <View styles={{flex: 1, flexDirection: 'row'}}>
-                        {isUltiModalVisible && (
-                            <View style={{flex: 1, flexDirection: 'row'}}>
-                                <View style={styles.counterBox}>
-                                <Text style={styles.tapCounter}>{`Timer: ${ultiModalTimer}`}</Text>
-                                </View>
-                                <View style={styles.counterBox}>
-                                <Text style={styles.tapCounter}>{`Found: ${correctTaps + wrongTaps}`}</Text>
-                                </View>
-                                <View style={styles.counterBox}>
-                                <Text style={styles.tapCounter}>{`Potions: ${correctTaps}`}</Text>
-                                </View>
-                                <View style={styles.counterBox}>
-                                <Text style={styles.tapCounter}>{`Poisons: ${wrongTaps}`}</Text>
-                                </View>
-                            </View>
-                        )}
-                        
+                    <View styles={{flex: 1, flexDirection: 'row'}}>                        
                         <TouchableOpacity onPress={() => setRunInstructionsVisible(true)} >
                             <MaterialIcons
                                 name="help-outline"
@@ -706,7 +694,7 @@ export default function BattlePage({navigation, route}) {
                                         },
                                     ]}
                                     >
-                                    <Image source={slashImage} style={styles.slashImage} />
+                                    <Image source={slashGif} style={styles.slashGif} />
                                 </Animated.View>
                             )}
                             {isHealing && (
@@ -773,7 +761,7 @@ export default function BattlePage({navigation, route}) {
                                         },
                                     ]}
                                     >
-                                    <Image source={slashImage} style={styles.slashImage} />
+                                    <Image source={slashGif} style={styles.slashGif} />
                                 </Animated.View>
                             )}
                             {isFriendHealing && (
@@ -925,32 +913,118 @@ export default function BattlePage({navigation, route}) {
                 </View>
             </Modal> 
 
-            <Modal visible={isUltiModalVisible} transparent={true} animationType="fade" onRequestClose={() => {}}>
+            <Modal visible={isUltiModalVisible} animationType="fade" onRequestClose={() => {}}>
                 <View style={styles.ultiModalContainer}>
-                    <View style={styles.ultiGame}>
-                        {currentObjects.map((object, index) => (
-                            <TouchableOpacity
+                    <ImageBackground style={styles.infoBackground}
+                        source={require('../../assets/battlesystem/playerInfoBackground.jpg')}
+                        > 
+                        
+                        <View style={{flex: 1, flexDirection: 'column'}}>
+                            <View style={[styles.infobox,{flex: 0.7, backgroundColor: 'transparent'}]}>
+                                <Text style={styles.infoBoxText}> 
+                                    {infoText}
+                                </Text>
+                            </View>
+
+                            <View  style={[styles.infobox,{flex: 0.5, backgroundColor: 'transparent', flexDirection: 'row', alignItems: 'center'}]}>
+                                <View style={{flex: 0.2,alignItems: 'center'}}>
+                                    <Image source={userIcon}/>
+                                </View>
+                                <View style={{flex: 1, flexDirection: 'column'}}>
+                                    <View style={styles.playerStats}>
+                                        <View style={styles.playerStatsIcon}>
+                                            <Image
+                                                style={{flex: 1, width: 30, resizeMode: 'contain'}}
+                                                source={require('../../assets/battlesystem/heart.png')}
+                                                />
+                                        </View>
+                                        
+                                        <View style={styles.ultiStatusbar}>
+                                            <View style ={[styles.statusbarFill,{ backgroundColor:'#fc080d', width: `${healStat}%`}]}>
+                                            </View>
+                                        </View>
+                                        <Text style ={[styles.statusbarinfo,{color: 'red', alignSelf: 'center'}]}> {healStat} </Text>
+                                    </View>
+
+                                    <View style={styles.playerStats}> 
+                                        <View style={styles.playerStatsIcon}>
+                                            <Image
+                                                style={{flex: 1, width: 30, resizeMode: 'contain',}}
+                                                source={require('../../assets/battlesystem/power.png')}
+                                                />
+                                        </View>
+
+                                        <View style={styles.ultiStatusbar}>
+                                            <View style ={[styles.statusbarFill,{backgroundColor:'#D5B71C', width: (100 - ultiLeft) + '%'}]}>
+                                            </View>
+                                        </View>
+                                        <Text style ={[styles.statusbarinfo,{color: 'yellow', alignSelf: 'center'}]}> {(100 - ultiLeft) + '%'} </Text>
+                                    </View>
+
+                                </View>
+                            </View>
+                        </View>
+                        {ultiEngaged && (
+                                <Image
+                                    source={chargingFlameGif}
+                                    style={[styles.chargingEffect, {left: -60, bottom: 0}]}
+                                />
+                        )}
+                    </ImageBackground>     
+
+                    <ImageBackground
+                        style={styles.ultiGame}
+                        source={require('../../assets/battlesystem/battlebackground1.jpg')}
+                        >
+                            <View style={{flex: 1, flexDirection: 'row'}}>
+                                <View style={styles.counterBox}>
+                                    <Text style={styles.tapCounter}>{`Timer: ${ultiModalTimer}`}</Text>
+                                </View>
+                                <View style={styles.counterBox}>
+                                    <Text style={styles.tapCounter}>{`Found: ${correctTaps + wrongTaps}`}</Text>
+                                </View>
+                                <View style={styles.counterBox}>
+                                    <Text style={styles.tapCounter}>{`Potions: ${correctTaps}`}</Text>
+                                </View>
+                                <View style={styles.counterBox}>
+                                    <Text style={styles.tapCounter}>{`Poisons: ${wrongTaps}`}</Text>
+                                </View>
+                                <View>                        
+                                    <TouchableOpacity onPress={() => setRunModalVisible(!runModalVisible)} >
+                                        <MaterialIcons
+                                            name="directions-run"
+                                            size={20}
+                                            style={[styles.counterBox, {height: 35, width: 28, textAlign: 'center', verticalAlign: 'middle'}]}
+                                        />  
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+
+                            {currentObjects.map((object, index) => (
+                                <TouchableOpacity
                                 key={index}
                                 style={[
-                                styles.modalTapArea,
-                                {
+                                    styles.modalTapArea,
+                                    {
                                     left: `${object.position.x * 100}%`,
                                     top: `${object.position.y * 100}%`,
-                                },
+                                    },
                                 ]}
                                 onPress={() => handleObjectTap(object.objectType)}
-                            >
-                                {object.objectType === "positiveObject" && (
-                                <Image source={positiveObjectImage} style={styles.objectImage} />
+                                >
+                                {object.objectType === 'positiveObject' && (
+                                    <Image source={positiveObjectImage} style={styles.objectImage} />
                                 )}
-                                {object.objectType === "negativeObject" && (
-                                <Image source={negativeObjectImage} style={styles.objectImage} />
+                                {object.objectType === 'negativeObject' && (
+                                    <Image source={negativeObjectImage} style={styles.objectImage} />
                                 )}
-                            </TouchableOpacity>
-                        ))}
-                    </View>
+                                </TouchableOpacity>
+                            ))}
+
+                    </ImageBackground>
                 </View>
             </Modal>
+
 
             <Modal
                 animationType="slide"
@@ -1046,7 +1120,6 @@ const styles = StyleSheet.create({
         flex: 1,
         borderRadius: 10,
         overflow: 'hidden',
-        
     },
 
     playerIcon: {
@@ -1078,7 +1151,6 @@ const styles = StyleSheet.create({
         height:20, 
         marginEnd: 8,
         overflow: 'hidden',
-
     },
 
     statusbarFill: {
@@ -1087,7 +1159,6 @@ const styles = StyleSheet.create({
         borderWidth:1.5, 
         borderRadius: 6, 
         borderColor:'black', 
-
     },
 
     statusbarinfo: {
@@ -1095,6 +1166,10 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: '900',
         paddingRight: 0,
+    },
+    
+    animationwindow: {
+        flex: 1,
     },
 
     battlebackgroundimage: {
@@ -1105,13 +1180,21 @@ const styles = StyleSheet.create({
         borderRadius: 7,
     },
 
-    animationwindow: {
-        flex: 1,
+    instructionsIcon: {
+        textAlign: 'right',
+        color: 'white'
+        
     },
 
     iconImage: {
         width: 70,
         height: 70,
+    },
+
+    slashGif: {
+        width: 100,
+        height: 100,
+        resizeMode: 'contain'
     },
 
     slashOverlay: {
@@ -1122,12 +1205,6 @@ const styles = StyleSheet.create({
         bottom: 0,
         justifyContent: 'center',
         alignItems: 'center',
-    },
-
-    slashImage: {
-        width: 100,
-        height: 100,
-        resizeMode: 'contain'
     },
 
     healEffect: {
@@ -1148,29 +1225,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: -10,
         opacity: 0.8,  
-    },
-
-    instructionsIcon: {
-        textAlign: 'right',
-        color: 'white'
-        
-    },
-
-    tapCounter: {
-        fontSize: 12,
-        color: "black",
-        fontWeight: "bold",
-        textAlign: 'center'
-    },
-
-    counterBox: {
-        borderWidth: 2,
-        borderColor: "black",
-        backgroundColor: '#D5B71C',
-        borderRadius: 5,
-        margin: 7,
-        width: 75,
-        height: 23
     },
 
     infobox: {
@@ -1208,6 +1262,17 @@ const styles = StyleSheet.create({
     movesContainer: {
         flex: 1,
         flexDirection: "row",
+    },
+
+    text:{
+        fontFamily: "PressStart2P-Regular",
+        fontWeight: '400',
+        fontSize: 20,
+        lineHeight: 30,
+        color: '#FFFFFF',
+        textShadowColor: '#000000',
+        textShadowOffset: { width: 2.2, height: 3.5 },
+        textShadowRadius: 4,
     },
 
     attackButton:{
@@ -1252,17 +1317,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#76C4E8',
         borderColor: '#0098BA' 
-    },
-
-    text:{
-        fontFamily: "PressStart2P-Regular",
-        fontWeight: '400',
-        fontSize: 20,
-        lineHeight: 30,
-        color: '#FFFFFF',
-        textShadowColor: '#000000',
-        textShadowOffset: { width: 2.2, height: 3.5 },
-        textShadowRadius: 4,
     },
 
     modalContainer: {
@@ -1313,45 +1367,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 
-    ultiModalContainer: {
-        flex: 0.7,
-        backgroundColor: 'transparent',
-        borderRadius: 10,
-        marginTop: 160,
-        flexDirection: 'column'
-      },
-
-    ultiCounter: {
-        flex: 0.08,
-        flexDirection: "row",        
-    },
-
-    ultiGame: {
-        flex: 0.5,
-        // backgroundColor: 'green',
-    },
-
-    objectImage: {
-        width: 40,
-        height: 40,
-    },
-
-    modalTapArea: {
-        width: 100,
-        height: 100,
-        borderRadius: 5,
-        justifyContent: "center",
-        alignItems: "center",
-        margin: 5,
-    },
-
-    gameOverText: {
-        color: 'white',
-        fontWeight: '700',
-        fontSize: 28,
-        textAlign: 'center',
-    },
-
     howToPlayText: {
         flex: 4,
         color: 'black',
@@ -1361,12 +1376,72 @@ const styles = StyleSheet.create({
         lineHeight: 30,
 
     },
+
+    ultiModalContainer: {
+        flex: 1,
+        flexDirection: 'column',
+        backgroundColor: 'black'
+      },
     
+    ultiStatusbar: {
+        flex: 1,
+        height:20, 
+        marginEnd: 8,
+        overflow: 'hidden',
+        alignSelf: 'center'
+    },
+
+    counterBox: {
+        borderWidth: 2,
+        borderColor: "black",
+        backgroundColor: '#D5B71C',
+        borderRadius: 5,
+        margin: 7,
+        width: 75,
+        height: 23,
+    },
+
+    tapCounter: {
+        fontSize: 12,
+        color: "black",
+        fontWeight: "bold",
+        textAlign: 'center'
+    },
+
+    ultiCounter: {
+        flex: 0.08,
+        flexDirection: "row",        
+    },
+
+    ultiGame: {
+        flex: 3,
+    },
+
+    objectImage: {
+        width: 40,
+        height: 40,
+    },
+    modalTapArea: {
+        width: 100,
+        height: 100,
+        borderRadius: 5,
+        justifyContent: "center",
+        alignItems: "center",
+        margin: 5,
+    },
+
     returnBattleButton: {
         color: 'white',
         fontWeight: '600',
         fontSize: 25,
         textAlign: 'center'
+    },
+
+    gameOverText: {
+        color: 'white',
+        fontWeight: '700',
+        fontSize: 28,
+        textAlign: 'center',
     },
 
 })
