@@ -175,11 +175,11 @@ export default function BattlePage({navigation, route}) {
           }
         } else {
           // Attack with ultimate
-          const newFriendHealstat = friendHealStat - ultiUsed;
+          const newFriendHealstat = friendHealStat - (ultiUsed*2);
           setFriendHealStat(newFriendHealstat >= 0 ? newFriendHealstat : 0);
-          console.log(`Ultimate Damage dealt by user: ${ultiUsed}`);
+          console.log(`Ultimate Damage dealt by user: ${(ultiUsed*2)}`);
           setUltiUsed(0);
-          setInfoText(`You dealt ${ultiUsed} damage using ultimate!`);
+          setInfoText(`You dealt ${(ultiUsed*2)} damage using ultimate!`);
       
           if (newFriendHealstat <= 0) {
             setWinner("You won!");
@@ -215,13 +215,13 @@ export default function BattlePage({navigation, route}) {
     const friendAttackClick = () => {
         if (friendUltiUsed) {
           // Attack with ultimate
-          const newUserHealstat = healStat - friendUltiLimit;
+          const newUserHealstat = healStat - (friendUltiLimit*2);
           setHealStat(newUserHealstat >= 0 ? newUserHealstat : 0);
-          console.log(`Ultimate damage dealt by bot: ${friendUltiLimit}`);
+          console.log(`Ultimate damage dealt by bot: ${(friendUltiLimit*2)}`);
           setFriendUltiUsed(false);
           setIsBotMakingMove(false); // Enable buttons after the user's move
           setAutoBattle(false);
-          setInfoText(`The enemy dealt ${friendUltiLimit} damage using ultimate!`);
+          setInfoText(`The enemy dealt ${(friendUltiLimit*2)} damage using ultimate!`);
       
           if (newUserHealstat <= 0) {
             setWinner("You lost!");
@@ -520,7 +520,7 @@ export default function BattlePage({navigation, route}) {
                             visible={runInstructionsVisible}
                             >
                             <View style={styles.modalContainer}>
-                                <View style={[styles.modalContent, {height: 500, width: 350}]}>
+                                <View style={[styles.modalContent, {height: 530, width: 350}]}>
                                     <Text style={[styles.abandonText, {verticalAlign: 'top', textDecorationLine: 'underline', flex: 0.5, marginTop: 10}]}>How to Play?</Text>
                                     <Text style={styles.howToPlayText}>
                                         1. First player to lose all health loses! {'\n'}
