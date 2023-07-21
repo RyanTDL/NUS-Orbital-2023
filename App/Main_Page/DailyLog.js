@@ -63,6 +63,10 @@ export default function DailyLog({navigation}) {
             alert("Please ensure all inputs are within 24 hours")
             return
         }
+        else if ((daily_exercise+daily_sleep+daily_study)>24){
+            alert("Please ensure all inputs are within 24 hours")
+            return
+        }
 
         //Push the new values into the database
         try {
