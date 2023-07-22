@@ -1,5 +1,5 @@
 import {React, useState, useEffect, useRef} from "react";
-import {Dimensions, Alert, StyleSheet, ImageBackground, Text, View, Animated,  SafeAreaView, Modal, Image, Pressable, TouchableOpacity} from 'react-native';
+import {Dimensions, ScrollView, StyleSheet, ImageBackground, Text, View, Animated,  SafeAreaView, Modal, Image, Pressable, TouchableOpacity} from 'react-native';
 import { StatusBar, Platform } from 'react-native';
 import { useFonts } from 'expo-font';
 import { MaterialIcons } from '@expo/vector-icons'; 
@@ -55,10 +55,10 @@ export default function BattlePage({navigation, route}) {
     //Attack button
     const [attackStat, setAttackStat] = useState(userStats.strength);
     const [friendAttackStat, setFriendAttackStat] = useState(friendStats.strength);
-    
+
     //Dodge Stats
-    const [agilityStat, setAgilityStat] = useState(userStats.agility+20);
-    const [friendAgilityStat, setFriendAgilityStat] = useState(friendStats.agility+20);
+    const [agilityStat, setAgilityStat] = useState(userStats.agility+10);
+    const [friendAgilityStat, setFriendAgilityStat] = useState(friendStats.agility+10);
 
     //Ulti Button with charging feature
     const [ultiLimit, setUltiLimit] = useState(userStats.intellect);
@@ -89,7 +89,7 @@ export default function BattlePage({navigation, route}) {
         setIsCharging(true);
         setIsUltiModalVisible(true);
         setUltiTapCount(0);
-        setUltiModalTimer(10);
+        setUltiModalTimer(15);
         setUltiEngaged(true);
 
         const id = setInterval(() => {
@@ -112,47 +112,71 @@ export default function BattlePage({navigation, route}) {
         setIntervalId(id);
     };
 
+
     const generateObjects = () => {
         const objects = [];
-        const numObjects = Math.floor(Math.random() * 8) + 5; // Random number between 5 and 10
+        const totalObjects = 15; // Set the total number of objects here
+        const maxPositiveObjects = 2; // Set the maximum number of positive objects here
+        let numPositiveObjects = 0;
       
         // Generate objects
-        for (let i = 0; i < numObjects; i++) {
-          const objectType = i === 2 ? "positiveObject" : "negativeObject";
-          const position = {
-            x: Math.random(),
-            y: Math.random(),
-          };
-          objects.push({ objectType, position });
+        for (let i = 0; i < maxPositiveObjects || (totalObjects - i) > (maxPositiveObjects - numPositiveObjects); i++) {
+            let objectType;
+    
+            if (numPositiveObjects < maxPositiveObjects) {
+                // If we can generate more positive objects, randomly choose between them
+                objectType = Math.random() < 0.5 ? "positiveObject" : "negativeObject";
+            } else {
+                // If we reached the maximum number of positive objects, set the type to negative
+                objectType = "negativeObject";
+            }
+      
+            const position = {
+                x: Math.random(),
+                y: Math.random(),
+            };
+      
+            if (objectType === "positiveObject") {
+                numPositiveObjects++;
+            } 
+            objects.push({ objectType, position });
         }
       
         return objects;
-      };
+    };
 
 
     const [currentObjects, setCurrentObjects] = useState(generateObjects());
   
     const handleObjectTap = (objectType) => {
         if (objectType === "positiveObject") {
-          setPositiveScore((score) => score + 1);
-          setCorrectTaps((count) => count + 1);
-          setUltiUsed((used) => used + 1); //Used to do damage using ulti each turn
-          setUltiLeft((left) => left + 1); //Used to update power bar
-          if (ultiUsed+1===1){
-            setInfoText(`${ultiUsed + 1} Potion found!`); // Display info text when charging starts
+            setPositiveScore((score) => score + 1);
+            setCorrectTaps((count) => count + 1);
+            setUltiUsed((used) => used + 1); // Used to do damage using ulti each turn
+            setUltiLeft((left) => left + 1); // Used to update power bar
             
-          }else{
-            setInfoText(`${ultiUsed + 1} Potions found!`); // Display info text when charging starts
-          }
-
+            if (ultiUsed + 1 === 1) {
+                setInfoText(`${ultiUsed + 1} Potion found!`); // Display info text when charging starts
+            } else {
+                setInfoText(`${ultiUsed + 1} Potions found!`); // Display info text when charging starts
+            }
+    
+            // Check if the ultimate limit of positive objects is reached
+            if (ultiUsed + 1 === ultiLimit) {
+                setIsUltiModalVisible(false); // Set ultiModalVisible to false when ultimate limit is reached
+                setInfoText(`Max ${ultiUsed+1} Potions is found!`);
+                setUltiEngaged(true);
+                setAutoBattle(true);
+            }
+    
         } else if (objectType === "negativeObject") {
-          setNegativeScore((score) => score - 1);
-          setWrongTaps((count) => count + 1);
-          setHealStat((stat) => (stat > 1 ? stat - 1 : 1));
+            setNegativeScore((score) => score - 1);
+            setWrongTaps((count) => count + 1);
+            setHealStat((stat) => (stat > 1 ? stat - 5 : 1));
         }
       
         setCurrentObjects(generateObjects());
-      };
+    };
      
     useEffect(() => {
         const refreshObjectPositions = () => {
@@ -222,7 +246,7 @@ export default function BattlePage({navigation, route}) {
     const [isDodging, setIsDodging] = useState(false);
     const [isFriendDodging, setIsFriendDodging] = useState(false);
     const performDodgeAnimation = (playerDodging) => {
-        const dodgeDuration = 1000; // Adjust duration as needed
+        const dodgeDuration = 500; // Adjust duration as needed
         if (playerDodging) {
             setIsFriendDodging(true);
             setTimeout(() => setIsFriendDodging(false), dodgeDuration);
@@ -285,7 +309,7 @@ export default function BattlePage({navigation, route}) {
           setUltiButtonLabel('ULTIMATE'); // Reset the label
         } else if (ultiUsed >= ultiLimit) {
           setIsUltiButtonDisabled(true); // Disable the ultimate button when the limit is reached
-          setInfoText(`WARNING!\nMax ULIIMATE is charged!`);
+          setInfoText(`Max ULIIMATE is charged!`);
         }
       }, [ultiEngaged, ultiLimit]); // Disable Ulit (Max Charge)
 
@@ -363,8 +387,10 @@ export default function BattlePage({navigation, route}) {
           // Attack was dodged
           if (ultiEngaged) {
             setInfoText('Enemy dodged the ultimate attack!');
+            setUltiUsed(0);
             setIsBotMakingMove(true);
             setAutoBattle(true);
+            setUltiEngaged(false);
           } else {
             setInfoText('Enemy dodged the attack!');
             setIsBotMakingMove(true);
@@ -951,20 +977,24 @@ export default function BattlePage({navigation, route}) {
                 >
                 <View style={styles.modalContainer}>
                     <View style={[styles.modalContent, {height: 530, width: 350}]}>
-                        <Text style={[styles.abandonText, {verticalAlign: 'top', textDecorationLine: 'underline', flex: 0.5, marginTop: 10}]}>How to Play?</Text>
-                        <Text style={styles.howToPlayText}>
-                            1. First player to lose all health loses! {'\n'}
-                            2. ATTACK deals damage equivilant to Strength  {'\n'}
-                            3. ULTIMATE charges up the attack for the next turn {'\n'}
-                            4. Maximum charge depends on Intellect and POWER BAR Level {'\n'}
-                            5. HEAL heals 10 health {'\n'}
-                            6. Each Player has 3 HEALS! {'\n'}
-                        </Text>
+                        <Text style={[styles.abandonText, {verticalAlign: 'top', textDecorationLine: 'underline', flex: 0.1, marginTop: 10}]}>How to Play?</Text>
+                        <ScrollView style={styles.instructionsContainer} >
+                            <Text style={styles.howToPlayText}>
+                                1. First player to lose all health loses! {'\n'}
+                                2. ATTACK deals damage equivalent to Strength  {'\n'}
+                                3. ULTIMATE charges up the attack for the next turn {'\n'}
+                                4. Charge depends on the number of potions found {'\n'}
+                                5. Maximum charge depends on the Intellect and the Power Bar level {'\n'}
+                                6. Agility will affect the probability of dodging an attack or ultimate {'\n'}
+                                7. HEAL heals 10 health {'\n'}
+                                8. Each Player has 3 HEALS! {'\n'}
+                            </Text>
+                        </ScrollView>  
 
                         <Pressable
                             style={({pressed}) => [
                                 styles.modalButton,
-                                {flex: 0.4},
+                                {flex: 0.1},
                                 pressed && {opacity: 0.7}, 
                             ]}  
                             onPress={() => {
@@ -1297,7 +1327,7 @@ const styles = StyleSheet.create({
 
     dodgingEffect: {
         position: 'absolute',
-        opacity: 0.8,  
+        opacity: 0.9,  
         width: 200, 
         height: 200,
         bottom: 0
@@ -1451,6 +1481,9 @@ const styles = StyleSheet.create({
         margin: 20,
         lineHeight: 30,
 
+    },
+    instructionsContainer: {
+        flex: 1,
     },
 
     ultiModalContainer: {
