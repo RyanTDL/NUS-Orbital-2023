@@ -50,8 +50,8 @@ export default function BattlePage({navigation, route}) {
     const [winner, setWinner] = useState();
     
     //Heal Button
-    const [healStat, setHealStat] = useState((userStats.stamina+50) > 100 ? 100 : (userStats.stamina+50));
-    const [friendHealStat, setFriendHealStat] = useState((friendStats.stamina+50) > 100 ? 100 : (friendStats.stamina+50));
+    const [healStat, setHealStat] = useState((userStats.stamina+50) > 100 ? 100 : (userStats.stamina+20));
+    const [friendHealStat, setFriendHealStat] = useState((friendStats.stamina+50) > 100 ? 100 : (friendStats.stamina+20));
     const [healCount, setHealCount] = useState(0);
     const [friendHealCount, setFriendHealCount] = useState(0);
     const [isHealButtonDisabled, setIsHealButtonDisabled] = useState(false);
@@ -116,7 +116,7 @@ export default function BattlePage({navigation, route}) {
         setIntervalId(id);
     };
 
-
+    
     const generateObjects = () => {
         const objects = [];
         const totalObjects = 15; // Set the total number of objects here
@@ -168,9 +168,13 @@ export default function BattlePage({navigation, route}) {
             // Check if the ultimate limit of positive objects is reached
             if (ultiUsed + 1 === ultiLimit) {
                 setIsUltiModalVisible(false); // Set ultiModalVisible to false when ultimate limit is reached
-                setInfoText(`Max ${ultiUsed+1} Potions is found!`);
                 setUltiEngaged(true);
+                setIsUltiButtonDisabled(true);
+                setInfoText(`Max ${ultiUsed+1} Potions is found!`);
                 setAutoBattle(true);
+                setIsBotMakingMove(true);
+                clearInterval(intervalId);
+
             }
     
         } else if (objectType === "negativeObject") {
@@ -481,6 +485,8 @@ export default function BattlePage({navigation, route}) {
             setInfoText('You dodged the ultimate attack!');
             setIsBotMakingMove(false);
             setAutoBattle(false);
+            setFriendUltiUsed(false);
+            setFriendUltiEngaged(false);
           } else {
             setInfoText('You dodged the enemy attack!');
             setIsBotMakingMove(false);
@@ -987,11 +993,12 @@ export default function BattlePage({navigation, route}) {
                                 1. First player to lose all health loses! {'\n'}
                                 2. ATTACK deals damage equivalent to Strength  {'\n'}
                                 3. ULTIMATE charges up the attack for the next turn {'\n'}
-                                4. Charge depends on the number of potions found {'\n'}
-                                5. Maximum charge depends on the Intellect and the Power Bar level {'\n'}
-                                6. Agility will affect the probability of dodging an attack or ultimate {'\n'}
-                                7. HEAL heals 10 health {'\n'}
-                                8. Each Player has 3 HEALS! {'\n'}
+                                4. Charge depends on the number of yellow potions found {'\n'}
+                                5. Every purple poison will result in 5 damage!
+                                6. Maximum charge depends on the Intellect and the Power Bar level {'\n'}
+                                7. Agility will affect the probability of dodging an attack or ultimate {'\n'}
+                                8. HEAL heals 10 health {'\n'}
+                                9. Each Player has 3 HEALS! {'\n'}
                             </Text>
                         </ScrollView>  
 
