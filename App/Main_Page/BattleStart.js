@@ -38,8 +38,8 @@ export default function BattlePage({navigation, route}) {
     // console.log(userIcon);
     // const [userIcon, setUserIcon] = useState(null);
     // const [friendIcon, setFriendIcon] = useState(null);
-    const userMainIcon = require('../../assets/player_avatars/always_late.png');
-    const friendMainIcon = require('../../assets/player_avatars/star_athlete.png');  
+    // const userMainIcon = require('../../assets/player_avatars/always_late.png');
+    // const friendMainIcon = require('../../assets/player_avatars/star_athlete.png');  
     const userIcon = require('../../assets/player_bots/bot1.png');
     const friendIcon = require('../../assets/player_bots/bot2.png');  
 
@@ -580,7 +580,7 @@ export default function BattlePage({navigation, route}) {
                         > 
 
                         <View style={styles.playerIcon}>
-                            <Image source={userMainIcon}/>
+                            <Image style={styles.playerBotIcon} source={userIcon}/>
                             <Text style={styles.playerName}>
                             {userStats.name}
                             </Text>
@@ -653,7 +653,7 @@ export default function BattlePage({navigation, route}) {
                         > 
 
                         <View style={styles.playerIcon}>
-                            <Image source={friendMainIcon}/>
+                            <Image style={styles.playerBotIcon} source={friendIcon}/>
                             <Text style={styles.playerName}>
                             {friendStats.name}
                             </Text>
@@ -994,7 +994,7 @@ export default function BattlePage({navigation, route}) {
                                 2. ATTACK deals damage equivalent to Strength  {'\n'}
                                 3. ULTIMATE charges up the attack for the next turn {'\n'}
                                 4. Charge depends on the number of yellow potions found {'\n'}
-                                5. Every purple poison will result in 5 damage!
+                                5. Every purple poison will result in 5 damage! {'\n'}
                                 6. Maximum charge depends on the Intellect and the Power Bar level {'\n'}
                                 7. Agility will affect the probability of dodging an attack or ultimate {'\n'}
                                 8. HEAL heals 10 health {'\n'}
@@ -1035,7 +1035,7 @@ export default function BattlePage({navigation, route}) {
 
                             <View  style={[styles.infobox,{flex: 0.5, backgroundColor: 'transparent', flexDirection: 'row', alignItems: 'center'}]}>
                                 <View style={{flex: 0.2,alignItems: 'center'}}>
-                                    <Image source={userMainIcon}/>
+                                    <Image style={styles.playerBotIcon} source={userIcon}/>
                                 </View>
                                 <View style={{flex: 1, flexDirection: 'column'}}>
                                     <View style={styles.playerStats}>
@@ -1236,6 +1236,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingTop: 10,
     },
+
+    playerBotIcon: {
+        resizeMode: 'contain',
+        width: 60,
+        height: 60
+    },
+
 
     playerName: {
         flex: 1,
