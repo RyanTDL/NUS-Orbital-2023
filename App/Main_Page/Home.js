@@ -100,8 +100,8 @@ export default function HomeScreen({navigation}) {
                 </View>
 
                 <View style={[styles.childContainer, {flex:3, marginBottom:10}]}>
-                    <View style={{width:240, height:240, borderWidth:2, borderRadius: 120, borderColor:'white', backgroundColor: 'white'}}></View>
-                    <Text style={{color:'white', fontSize:25, fontWeight:'500'}}>{name}</Text>
+                    <Image source={require("../../assets/player_bots/bot1.png")} style={{width:200, height:200, margin:10}}/>
+                    <Text style={{color:'white', fontSize:25, fontWeight:'500'}}>Player: {name}</Text>
                 </View>
 
                 <View style={[styles.childContainer, {flex:4}]}>

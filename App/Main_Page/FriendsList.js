@@ -8,7 +8,6 @@ import {collection, getDoc, FieldValue, setDoc, query, where, doc, increment, ge
 import { useAuthState } from "react-firebase-hooks/auth";
 import {auth} from "../../firebase";
 import { useNavigation } from '@react-navigation/native';
-import { async } from "@firebase/util";
 
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen
 
