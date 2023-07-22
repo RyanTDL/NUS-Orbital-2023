@@ -999,6 +999,7 @@ export default function BattlePage({navigation, route}) {
                                 7. Agility will affect the probability of dodging an attack or ultimate {'\n'}
                                 8. HEAL heals 10 health {'\n'}
                                 9. Each Player has 3 HEALS! {'\n'}
+                                10. The maximum health for each player is 100!
                             </Text>
                         </ScrollView>  
 
