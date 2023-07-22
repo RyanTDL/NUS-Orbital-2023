@@ -29,8 +29,8 @@ export default function BattlePage({navigation, route}) {
     };
 
     //player icons cannot sync, keep getting stupid call stack error :(
-    const userIcon = require('../../assets/player_avatars/always_late.png');
-    const friendIcon = require('../../assets/player_avatars/star_athlete.png');  
+    // const userIcon = require('../../assets/player_avatars/always_late.png');
+    // const friendIcon = require('../../assets/player_avatars/star_athlete.png');  
     // console.log(userStats.icon);
     // console.log('GOD HELP');
     // const userIcon = require(userStats.icon);
@@ -38,6 +38,10 @@ export default function BattlePage({navigation, route}) {
     // console.log(userIcon);
     // const [userIcon, setUserIcon] = useState(null);
     // const [friendIcon, setFriendIcon] = useState(null);
+    const userMainIcon = require('../../assets/player_avatars/always_late.png');
+    const friendMainIcon = require('../../assets/player_avatars/star_athlete.png');  
+    const userIcon = require('../../assets/player_bots/bot1.png');
+    const friendIcon = require('../../assets/player_bots/bot2.png');  
 
     const [infoText, setInfoText]= useState('Choose your next move!');
     const [runInstructionsVisible, setRunInstructionsVisible]= useState(false);
@@ -570,7 +574,7 @@ export default function BattlePage({navigation, route}) {
                         > 
 
                         <View style={styles.playerIcon}>
-                            <Image source={userIcon}/>
+                            <Image source={userMainIcon}/>
                             <Text style={styles.playerName}>
                             {userStats.name}
                             </Text>
@@ -643,7 +647,7 @@ export default function BattlePage({navigation, route}) {
                         > 
 
                         <View style={styles.playerIcon}>
-                            <Image source={friendIcon}/>
+                            <Image source={friendMainIcon}/>
                             <Text style={styles.playerName}>
                             {friendStats.name}
                             </Text>
@@ -1024,7 +1028,7 @@ export default function BattlePage({navigation, route}) {
 
                             <View  style={[styles.infobox,{flex: 0.5, backgroundColor: 'transparent', flexDirection: 'row', alignItems: 'center'}]}>
                                 <View style={{flex: 0.2,alignItems: 'center'}}>
-                                    <Image source={userIcon}/>
+                                    <Image source={userMainIcon}/>
                                 </View>
                                 <View style={{flex: 1, flexDirection: 'column'}}>
                                     <View style={styles.playerStats}>
