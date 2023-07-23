@@ -9,6 +9,9 @@
     "web": "expo start --web",
     "test": "jest"
   },
+  "jest": {
+    "preset": "react-native"
+  },
   "dependencies": {
     "@react-native-community/checkbox": "^0.5.15",
     "@react-navigation/native": "^6.1.6",
