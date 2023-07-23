@@ -1,0 +1,231 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Testing Signing In Pages AppButton renders correctly 1`] = `
+<View
+  accessibilityState={
+    {
+      "busy": undefined,
+      "checked": undefined,
+      "disabled": undefined,
+      "expanded": undefined,
+      "selected": undefined,
+    }
+  }
+  accessibilityValue={
+    {
+      "max": undefined,
+      "min": undefined,
+      "now": undefined,
+      "text": undefined,
+    }
+  }
+  accessible={true}
+  collapsable={false}
+  focusable={false}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    {
+      "opacity": 1,
+    }
+  }
+>
+  <Text />
+</View>
+`;
+
+exports[`Testing Signing In Pages Welcome Page renders correctly 1`] = `
+<RCTSafeAreaView
+  style={
+    {
+      "alignItems": "center",
+      "backgroundColor": "black",
+      "flex": 1,
+      "height": 1334,
+      "justifyContent": "center",
+      "width": 750,
+    }
+  }
+>
+  <Image
+    source={
+      {
+        "testUri": "../../../assets/app_icon.png",
+      }
+    }
+    style={
+      [
+        {
+          "alignItems": "center",
+          "justifyContent": "center",
+        },
+        {
+          "flex": 3,
+        },
+      ]
+    }
+  />
+  <View
+    style={
+      [
+        {
+          "alignItems": "center",
+          "justifyContent": "center",
+        },
+        {
+          "flex": 1,
+        },
+      ]
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#FFFFFF",
+          "fontSize": 45,
+          "fontWeight": 700,
+        }
+      }
+    >
+      LifeQuest
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#FFFFFF",
+          "fontSize": 18,
+          "fontWeight": 400,
+          "paddingTop": 5,
+        }
+      }
+    >
+      Level up your life, one step at a time
+    </Text>
+  </View>
+  <View
+    style={
+      [
+        {
+          "alignItems": "center",
+          "justifyContent": "center",
+        },
+        {
+          "flex": 1,
+        },
+      ]
+    }
+  >
+    <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "backgroundColor": "#009688",
+          "borderRadius": 24,
+          "margin": 8,
+          "opacity": 1,
+          "paddingVertical": 16,
+          "width": 328,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "alignSelf": "center",
+            "color": "#fff",
+            "fontSize": 18,
+            "fontWeight": "bold",
+            "textTransform": "uppercase",
+          }
+        }
+      >
+        Log In
+      </Text>
+    </View>
+    <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "backgroundColor": "#009688",
+          "borderRadius": 24,
+          "margin": 8,
+          "opacity": 1,
+          "paddingVertical": 16,
+          "width": 328,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "alignSelf": "center",
+            "color": "#fff",
+            "fontSize": 18,
+            "fontWeight": "bold",
+            "textTransform": "uppercase",
+          }
+        }
+      >
+        Sign Up
+      </Text>
+    </View>
+  </View>
+</RCTSafeAreaView>
+`;

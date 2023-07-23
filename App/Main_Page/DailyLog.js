@@ -1,11 +1,10 @@
-import React, {useState, useEffect, useCallback, StrictMode} from "react";
+import React, {useState, useEffect} from "react";
 import {Dimensions, ImageBackground, StyleSheet, Text, TextInput, View, SafeAreaView} from 'react-native';
 import NavTab from "./NavTab";
 import AppButton from "../Signing_In/Button";
-import {db, getDatabaseData} from "../../firebase";
+import {db, getDatabaseData, auth} from "../../firebase";
 import {collection, getDoc, setDoc, doc, increment} from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
-import {auth} from "../../firebase";
 
 
 const {width, height}= Dimensions.get('window'); //retrieves dimensions of the screen

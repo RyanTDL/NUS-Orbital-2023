@@ -3,8 +3,6 @@ import renderer from 'react-test-renderer';
 import { render, fireEvent } from '@testing-library/react-native';
 import Welcome from '../App/Signing_In/Welcome';
 import AppButton from '../App/Signing_In/Button';
-import SignUp from '../App/Signing_In/SignUp';
-
 
 describe('Testing Signing In Pages', () => {
 
