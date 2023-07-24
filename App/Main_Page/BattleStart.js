@@ -3,7 +3,6 @@ import {Dimensions, ScrollView, StyleSheet, ImageBackground, Text, View, Animate
 import { StatusBar, Platform } from 'react-native';
 import { useFonts } from 'expo-font';
 import { MaterialIcons } from '@expo/vector-icons'; 
-import FastImage from 'react-native-fast-image';
 
 
 export default function BattlePage({navigation, route}) {
@@ -28,18 +27,7 @@ export default function BattlePage({navigation, route}) {
         intellect: route.params.friendStats[5]
     };
 
-    //player icons cannot sync, keep getting stupid call stack error :(
-    // const userIcon = require('../../assets/player_avatars/always_late.png');
-    // const friendIcon = require('../../assets/player_avatars/star_athlete.png');  
-    // console.log(userStats.icon);
-    // console.log('GOD HELP');
-    // const userIcon = require(userStats.icon);
-    // const friendIcon = require(friendStats.icon);
-    // console.log(userIcon);
-    // const [userIcon, setUserIcon] = useState(null);
-    // const [friendIcon, setFriendIcon] = useState(null);
-    // const userMainIcon = require('../../assets/player_avatars/always_late.png');
-    // const friendMainIcon = require('../../assets/player_avatars/star_athlete.png');  
+    //player icons hard coded for now
     const userIcon = require('../../assets/player_bots/bot1.png');
     const friendIcon = require('../../assets/player_bots/bot2.png');  
 
