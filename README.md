@@ -9,6 +9,8 @@
   - [4.1 Main Components](#main-components)
   - [4.2 Features](#features)
     - [4.2.1. Milestone 1](#milestone1-features)
+    - [4.2.2. Milestone 2](#milestone2-features)
+    - [4.2.3. Milestone 3](#milestone3-features)
 - [5. Architecture](#architecture)
   - [5.1. Design Diagrams](#design-diagrams)
   - [5.2. Processes](#processes)
@@ -101,9 +103,10 @@ Over mobile app's frontend is made up of these main componenets:
 </div>
 
 - Daily Log
+<img src="images_README/DailyLog.jpg" style="max-width:20px; width:20%;">
+
 - Character Progress
 <div style="display: flex;">
-<img src="images_README/DailyLog.jpg" style="max-width:20px; width:20%;">
 <img src="images_README/CharacterProgress.jpg" style="max-width:20px; width:20%;">
 </div>
 
@@ -115,8 +118,15 @@ Over mobile app's frontend is made up of these main componenets:
 </div>
 
 - Friends List
-  <img src="images_README/FriendsList.jpg" style="max-width:20px; width:20%;">
+<img src="images_README/FriendsList.jpg" style="max-width:20px; width:20%;">
 
+- Battle Page
+<div style="display: flex;">
+<img src="images_README/Game/game.jpg" style="max-width:20px; width:20%;">
+<img src="images_README/Game/minigame_1.jpg" style="max-width:20px; width:20%;">
+</div>
+
+  
 ### <a name="features"></a>4.2 Features
 
 An **iOS mobile app** that supports 3 main features. The user will be able to input and store data on their duration of sleep, number of steps taken, duration of exercise and the time spent studying in order to upgrade their respective stats.
@@ -124,29 +134,47 @@ An **iOS mobile app** that supports 3 main features. The user will be able to in
 **Outlined below is how the battle system will be implemented, as well as how the avatar’s character stats come into play:**
 
 - Strength: Determines how much damage is done during each attack
-- Agility: Determines the order of attack. The character with a higher agility stat will attack first
-- Stamina: Determines the maximum starting health of the character
-- Intellect: Determines the likelihood of an attack dealing critical damage. Critical damage deals 1.5x the damage of a normal attack
+- Agility: Determines the chances of dodging an attack.
+- Stamina: Determines the starting health of the character where 100 is the max health for all players.
+- Intellect:  Determines the maximum number of potions that can be collected in the mini game that is triggered by the ultimate move. Every yellow potion collected is equivalent to charging 2 normal attack for the next turn. Every wrong purple poison collected will result in 5 damage done to the player.
 
 Secondly, users will be able to visualise how their daily habits change over time through the use of a line graph.
 
 Lastly, the user will be able to find and add a specific player based on their player ID as a friend and challenge/battle their friends to earn medals to instil some friendly competition.
 
-**(The battle system, mechanics and animations will also be implemented in later stages.)**
-
 #### <a name="milestone1-features"></a>**4.2.1 Features implemented in Milestone 1**
-
 a. Login to account
-
 - New User Sign Up
 - Log in
 
 b. User Profile
-
 - User information
   - User's data are stored in the Firebase datatbase
 - Upgrading of Character
   - When the user updates their daily log, the character’s progress bars will automatically re-render and update as well
+    
+#### <a name="milestone2-features"></a>**4.2.2 Features implemented in Milestone 2**
+a. Adding and removing of Friend
+
+b. Player Battle System
+- In the game, the player's health bar is updated based on their character's stats, and they can restore health using healing abilities limited to 3 uses per game. The player can charge their ultimate ability as long as their power bar is not depleted. To access information about how to play, they can click the info button in the top right corner of the animation window. Once the player makes a move, the game starts, and a bot randomly chooses a move in response. The damage taken and moves played are shown in a grey box below the animation window.
+<div style="display: flex;">
+<img src="images_README/Game/game.jpg" style="max-width:20px; width:20%;">
+<img src="images_README/Game/minigame_1.jpg" style="max-width:20px; width:20%;">
+<img src="images_README/Alerts/instructionsmodal.jpg" style="max-width:20px; width:20%;">
+</div>
+
+#### <a name="milestone3-features"></a>**4.2.3 Features implemented in Milestone 3**
+a. Animation window for Player Battle System
+<div style="display: flex;">
+<img src="images_README/Game/healanimation.jpg" style="max-width:20px; width:20%;">
+<img src="images_README/Game/healanimation.jpg" style="max-width:20px; width:20%;">
+<img src="images_README/Alerts/dodgeanimation.jpg" style="max-width:20px; width:20%;">
+</div>
+<div style="display: flex;">
+<img src="images_README/Game/fireanimation.jpg" style="max-width:20px; width:20%;">
+<img src="images_README/Alerts/ultimateanimation.jpg" style="max-width:20px; width:20%;">
+</div>
 
 ## <a name="architecture"></a>5. Architecture
 
