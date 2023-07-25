@@ -137,6 +137,9 @@ An **iOS mobile app** that supports 3 main features. The user will be able to in
 - Agility: Determines the chances of dodging an attack.
 - Stamina: Determines the starting health of the character where 100 is the max health for all players.
 - Intellect:  Determines the maximum number of potions that can be collected in the mini game that is triggered by the ultimate move. Every yellow potion collected is equivalent to charging 2 normal attack for the next turn. Every wrong purple poison collected will result in 5 damage done to the player.
+  
+Implementation philosophy:
+The battle system implements game logic using boolean values to track move actions and state changes. These boolean values enable move validation, enforce move limits, manage game state, and control the flow of the game. By utilising these boolean variables, the system determines the validity of moves, adjusts actions based on move limits, and ensures proper sequencing of player and enemy turns. Additionally, the system evaluates health conditions at every move to determine the outcome of the battle. Overall, the use of boolean values in the battle system enhances the gameplay experience by providing structured decision-making and result evaluation.
 
 Secondly, users will be able to visualise how their daily habits change over time through the use of a line graph.
 
@@ -145,7 +148,17 @@ Lastly, the user will be able to find and add a specific player based on their p
 #### <a name="milestone1-features"></a>**4.2.1 Features implemented in Milestone 1**
 a. Login to account
 - New User Sign Up
+  
+<div style="display: flex;">
+<img src="images_README/SignUp.jpg" style="max-width:20px; width:20%;">
+<img src="images_README/Alerts/signupalert.jpg" style="max-width:20px; width:20%;">
+</div>
 - Log in
+
+<div style="display: flex;">
+<img src="images_README/LogIn.jpg" style="max-width:20px; width:20%;">
+<img src="images_README/Alerts/signinalert.jpg" style="max-width:20px; width:20%;">
+</div>
 
 b. User Profile
 - User information
@@ -155,6 +168,10 @@ b. User Profile
     
 #### <a name="milestone2-features"></a>**4.2.2 Features implemented in Milestone 2**
 a. Adding and removing of Friend
+<div style="display: flex;">
+<img src="images_README/Alerts/friendadd_alert.jpg" style="max-width:20px; width:20%;">
+<img src="images_README/Alerts/friendadd_alert.jpg" style="max-width:20px; width:20%;">
+</div>
 
 b. Player Battle System
 - In the game, the player's health bar is updated based on their character's stats, and they can restore health using healing abilities limited to 3 uses per game. The player can charge their ultimate ability as long as their power bar is not depleted. To access information about how to play, they can click the info button in the top right corner of the animation window. Once the player makes a move, the game starts, and a bot randomly chooses a move in response. The damage taken and moves played are shown in a grey box below the animation window.
@@ -167,13 +184,13 @@ b. Player Battle System
 #### <a name="milestone3-features"></a>**4.2.3 Features implemented in Milestone 3**
 a. Animation window for Player Battle System
 <div style="display: flex;">
+<img src="images_README/Game/attackanimation.jpg" style="max-width:20px; width:20%;">
 <img src="images_README/Game/healanimation.jpg" style="max-width:20px; width:20%;">
-<img src="images_README/Game/healanimation.jpg" style="max-width:20px; width:20%;">
-<img src="images_README/Alerts/dodgeanimation.jpg" style="max-width:20px; width:20%;">
+<img src="images_README/Game/dodgeanimation.jpg" style="max-width:20px; width:20%;">
 </div>
 <div style="display: flex;">
 <img src="images_README/Game/fireanimation.jpg" style="max-width:20px; width:20%;">
-<img src="images_README/Alerts/ultimateanimation.jpg" style="max-width:20px; width:20%;">
+<img src="images_README/Game/ultimateanimation.jpg" style="max-width:20px; width:20%;">
 </div>
 
 ## <a name="architecture"></a>5. Architecture
