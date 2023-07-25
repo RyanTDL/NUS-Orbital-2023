@@ -195,8 +195,9 @@ In order to make the gameplay smooth and straightforward to play, we made the ga
     <img src="images_README/Game/infowindow.jpg" style="max-width:20px; width:20%;">
     <img src="images_README/Alerts/move_empty.png" style="max-width:20px; width:20%;">
   </div>
-4. Made the charging of ultimate a mini game and the game stops and closes when either the time limit of 15s has run out, power bar has been depleted or the maximum number of potions equivalent to the intellect stat has been found.<br>
-5. Alert players of the outcome of their battle or when they are about to leave the battle. Players are able to leave the battle by pressing the blue coloured RUN button or the blue coloured exit icon while in the ultimate mini game.
+&emsp;4. Made the charging of ultimate a mini game and the game stops and closes when either the time limit of 15s has run out, power bar has been depleted or the maximum number of potions equivalent to the intellect stat has been found.<br>
+&emsp;5. Alert players of the outcome of their battle or when they are about to leave the battle. Players are able to leave the battle by pressing the blue coloured RUN button or the blue coloured exit icon while in the ultimate mini game.
+
   <div style="display: flex;">
     <img src="images_README/Alerts/winmodal.jpg" style="max-width:20px; width:20%;">
     <img src="images_README/Alerts/lostmodal.jpg" style="max-width:20px; width:20%;">
