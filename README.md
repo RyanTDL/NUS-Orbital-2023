@@ -97,9 +97,9 @@ Over mobile app's frontend is made up of these main componenets:
 - Sign Up
 - Log in
 <div style="display: flex;">
-<img src="images_README/Welcome.jpg" style="max-width:20px; width:20%;">
-<img src="images_README/SignUp.jpg" style="max-width:20px; width:20%;">
-<img src="images_README/LogIn.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/Welcome.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/SignUp.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/LogIn.jpg" style="max-width:20px; width:20%;">
 </div>
 
 - Daily Log
@@ -112,9 +112,9 @@ Over mobile app's frontend is made up of these main componenets:
 
 - Weekly Activity
 <div style="display: flex;">
-<img src="images_README/WeeklyActivity 1.jpg" style="max-width:20px; width:20%;">
-<img src="images_README/WeeklyActivity 2.jpg" style="max-width:20px; width:20%;">
-<img src="images_README/WeeklyActivity 3.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/WeeklyActivity 1.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/WeeklyActivity 2.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/WeeklyActivity 3.jpg" style="max-width:20px; width:20%;">
 </div>
 
 - Friends List
@@ -122,8 +122,8 @@ Over mobile app's frontend is made up of these main componenets:
 
 - Battle Page
 <div style="display: flex;">
-<img src="images_README/Game/game.jpg" style="max-width:20px; width:20%;">
-<img src="images_README/Game/minigame_1.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/Game/game.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/Game/minigame_1.jpg" style="max-width:20px; width:20%;">
 </div>
 
   
@@ -150,14 +150,14 @@ a. Login to account
 - New User Sign Up
   
 <div style="display: flex;">
-<img src="images_README/SignUp.jpg" style="max-width:20px; width:20%;">
-<img src="images_README/Alerts/signupalert.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/SignUp.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/Alerts/signupalert.jpg" style="max-width:20px; width:20%;">
 </div>
 - Log in
 
 <div style="display: flex;">
-<img src="images_README/LogIn.jpg" style="max-width:20px; width:20%;">
-<img src="images_README/Alerts/signinalert.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/LogIn.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/Alerts/signinalert.jpg" style="max-width:20px; width:20%;">
 </div>
 
 b. User Profile
@@ -165,21 +165,39 @@ b. User Profile
   - User's data are stored in the Firebase datatbase
 - Upgrading of Character
   - When the user updates their daily log, the character’s progress bars will automatically re-render and update as well
+  <div style="display: flex;">
+    <img src="images_README/DailyLog.jpg" style="max-width:20px; width:20%;">
+    <img src="images_README/Alerts/emptylog_alert.jpg" style="max-width:20px; width:20%;">
+    <img src="images_README/Alerts/24h_alert.jpg" style="max-width:20px; width:20%;">
+  </div>
     
 #### <a name="milestone2-features"></a>**4.2.2 Features implemented in Milestone 2**
 a. Adding and removing of Friend
 <div style="display: flex;">
-<img src="images_README/Alerts/friendadd_alert.jpg" style="max-width:20px; width:20%;">
-<img src="images_README/Alerts/friendadd_alert.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/Alerts/friendadd_alert.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/Alerts/removefriend_alert.jpg" style="max-width:20px; width:20%;">
 </div>
 
 b. Player Battle System
 - In the game, the player's health bar is updated based on their character's stats, and they can restore health using healing abilities limited to 3 uses per game. The player can charge their ultimate ability as long as their power bar is not depleted. To access information about how to play, they can click the info button in the top right corner of the animation window. Once the player makes a move, the game starts, and a bot randomly chooses a move in response. The damage taken and moves played are shown in a grey box below the animation window.
-<div style="display: flex;">
-<img src="images_README/Game/game.jpg" style="max-width:20px; width:20%;">
-<img src="images_README/Game/minigame_1.jpg" style="max-width:20px; width:20%;">
-<img src="images_README/Alerts/instructionsmodal.jpg" style="max-width:20px; width:20%;">
+  <div style="display: flex;">
+  <img src="images_README/Game/game.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/Game/minigame_1.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/Alerts/instructionsmodal.jpg" style="max-width:20px; width:20%;">
 </div>
+
+1. Disabled the move buttons when it's the bot’s turn to prevent players from making any moves and disrupting the game
+2. Disabled the heal button when the player’s health is at the maximum 100 health, to prevent players from wasting a heal which won’t heal any health
+3. Disabled the ultimate and heal button when the ultimate or heal has been completely used up, in order to let the players know and plan their next move. Players will also be able to view how many heals or power they have left in the top section.
+4. Made the charging of ultimate a mini game and the game stops and closes when either the time limit of 15s has run out, power bar has been depleted or the maximum number of potions equivalent to the intellect stat has been found.
+5. Alert players of the outcome of their battle or when they are about to leave the battle. Players are able to leave the battle by pressing the blue coloured RUN button or the blue coloured exit icon while in the ultimate mini game.
+<div style="display: flex;">
+  <img src="images_README/Alerts/winmodal.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/Alerts/lostmodal.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/Alerts/abandonmodal.jpg" style="max-width:20px; width:20%;">
+  <img src="images_README/Alerts/abandon_minigamemodal.jpg" style="max-width:20px; width:20%;">
+</div>
+
 
 #### <a name="milestone3-features"></a>**4.2.3 Features implemented in Milestone 3**
 a. Animation window for Player Battle System
@@ -203,7 +221,7 @@ a. Animation window for Player Battle System
 
 ### Game Flowchart
 
-![](images_README/GameFlowchart.png)
+![](images_README/GameFlowchart.jpg)
 
 ### <a name="processes"></a>5.2 Processes
 
