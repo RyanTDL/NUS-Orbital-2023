@@ -180,23 +180,29 @@ a. Adding and removing of Friend
 
 b. Player Battle System
 - In the game, the player's health bar is updated based on their character's stats, and they can restore health using healing abilities limited to 3 uses per game. The player can charge their ultimate ability as long as their power bar is not depleted. To access information about how to play, they can click the info button in the top right corner of the animation window. Once the player makes a move, the game starts, and a bot randomly chooses a move in response. The damage taken and moves played are shown in a grey box below the animation window.
-  <div style="display: flex;">
+<div style="display: flex;">
   <img src="images_README/Game/game.jpg" style="max-width:20px; width:20%;">
   <img src="images_README/Game/minigame_1.jpg" style="max-width:20px; width:20%;">
   <img src="images_README/Alerts/instructionsmodal.jpg" style="max-width:20px; width:20%;">
 </div>
 
+In order to make the gameplay smooth and straightforward to play, we made the game intuitive and restricted moves based on different scenarios to prevent any errors from arising. We considered several test cases as well to address while implementing the features.
+
 1. Disabled the move buttons when it's the bot’s turn to prevent players from making any moves and disrupting the game
 2. Disabled the heal button when the player’s health is at the maximum 100 health, to prevent players from wasting a heal which won’t heal any health
-3. Disabled the ultimate and heal button when the ultimate or heal has been completely used up, in order to let the players know and plan their next move. Players will also be able to view how many heals or power they have left in the top section.
-4. Made the charging of ultimate a mini game and the game stops and closes when either the time limit of 15s has run out, power bar has been depleted or the maximum number of potions equivalent to the intellect stat has been found.
+3. Disabled the ultimate and heal button when the ultimate or heal has been completely used up, in order to let the players know and plan their next move. Players will also be able to    view how many heals or power they have left in the top section.
+  <div style="display: flex;">
+    <img src="images_README/Game/infowindow.jpg" style="max-width:20px; width:20%;">
+    <img src="images_README/Alerts/move_empty.png" style="max-width:20px; width:20%;">
+  </div>
+4. Made the charging of ultimate a mini game and the game stops and closes when either the time limit of 15s has run out, power bar has been depleted or the maximum number of potions equivalent to the intellect stat has been found.<br>
 5. Alert players of the outcome of their battle or when they are about to leave the battle. Players are able to leave the battle by pressing the blue coloured RUN button or the blue coloured exit icon while in the ultimate mini game.
-<div style="display: flex;">
-  <img src="images_README/Alerts/winmodal.jpg" style="max-width:20px; width:20%;">
-  <img src="images_README/Alerts/lostmodal.jpg" style="max-width:20px; width:20%;">
-  <img src="images_README/Alerts/abandonmodal.jpg" style="max-width:20px; width:20%;">
-  <img src="images_README/Alerts/abandon_minigamemodal.jpg" style="max-width:20px; width:20%;">
-</div>
+  <div style="display: flex;">
+    <img src="images_README/Alerts/winmodal.jpg" style="max-width:20px; width:20%;">
+    <img src="images_README/Alerts/lostmodal.jpg" style="max-width:20px; width:20%;">
+    <img src="images_README/Alerts/abandonmodal.jpg" style="max-width:20px; width:20%;">
+    <img src="images_README/Alerts/abandon_minigamemodal.jpg" style="max-width:20px; width:20%;">
+  </div>
 
 
 #### <a name="milestone3-features"></a>**4.2.3 Features implemented in Milestone 3**
